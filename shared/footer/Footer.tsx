@@ -56,7 +56,7 @@ const Footer = () => {
                                 />
                             </div>
                         </Link>
-                        <p className="text-[#94A3B8] text-[15px] leading-relaxed max-w-[280px]">
+                        <p className="text-[#A3A7AE]  text-sm font-normal leading-5 max-w-[280px]">
                             The centralized platform for research opportunities, mentorship, and academic growth.
                         </p>
                         <div className="flex items-center gap-2.5">
@@ -65,7 +65,7 @@ const Footer = () => {
                                     key={idx}
                                     href={social.href}
                                     aria-label={social.label}
-                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#0A0C0F] border border-white/10 text-gray-400 hover:text-[#00D1FF] hover:border-[#00D1FF]/30 transition-all duration-300"
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#20232D] border border-white/10 text-gray-400 hover:text-[#00D1FF] hover:border-[#00D1FF]/30 transition-all duration-300"
                                 >
                                     {social.icon}
                                 </Link>
@@ -75,13 +75,13 @@ const Footer = () => {
 
                     {/* Links Sections */}
                     <div className="lg:col-span-2">
-                        <h4 className="text-white font-semibold mb-7 text-[16px]">Platform</h4>
+                        <h4 className="text-[#E5E7EB] text-base font-semibold leading-6 mb-7">Platform</h4>
                         <ul className="flex flex-col gap-4">
                             {footerLinks.platform.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-[#94A3B8] text-[14px] hover:text-[#00D1FF] transition-colors duration-200"
+                                        className=" hover:text-[#00D1FF] text-[#A3A7AE]  text-sm font-normal leading-5 transition-colors duration-200"
                                     >
                                         {link.name}
                                     </Link>
@@ -97,7 +97,7 @@ const Footer = () => {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-[#94A3B8] text-[14px] hover:text-[#00D1FF] transition-colors duration-200"
+                                        className="hover:text-[#00D1FF] text-[#A3A7AE]  text-sm font-normal leading-5 transition-colors duration-200"
                                     >
                                         {link.name}
                                     </Link>
@@ -113,7 +113,7 @@ const Footer = () => {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-[#94A3B8] text-[14px] hover:text-[#00D1FF] transition-colors duration-200"
+                                        className="hover:text-[#00D1FF] text-[#A3A7AE]  text-sm font-normal leading-5 transition-colors duration-200"
                                     >
                                         {link.name}
                                     </Link>
