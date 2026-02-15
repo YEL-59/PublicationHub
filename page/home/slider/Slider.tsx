@@ -62,14 +62,14 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
                 {/* Content */}
                 <div className="space-y-4">
                     <h3
-                        className="font-bold text-[#E5E7EB] tracking-tight"
-                        style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "30px", lineHeight: "1.2" }}
+                        className="text-[#E5E7EB] text-[30px] font-bold leading-normal"
+                        style={{ fontFamily: "'Space Grotesk', sans-serif", }}
                     >
                         {data.title}
                     </h3>
                     <p
-                        className="text-[#A3A7AE] font-medium"
-                        style={{ fontFamily: "'Inter', sans-serif", fontSize: "16px", lineHeight: "28px" }}
+                        className="text-[#A3A7AE] text-base font-medium leading-[28px]"
+                        style={{ fontFamily: "'Inter', sans-serif", }}
                     >
                         {data.description}
                     </p>
