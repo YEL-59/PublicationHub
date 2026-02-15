@@ -14,7 +14,7 @@ const Banner = () => {
     ];
 
     return (
-        <section className="relative w-full min-h-screen flex flex-col items-center justify-center pt-20 pb-24 overflow-hidden">
+        <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center pt-28 pb-12 overflow-visible">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
@@ -67,7 +67,7 @@ const Banner = () => {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl translate-y-24 relative z-20">
                     {stats.map((stat, idx) => (
                         <div
                             key={idx}
