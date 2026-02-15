@@ -1,8 +1,4 @@
 
-
-
-
-
 import SmoothScroll from "@/components/SmoothScroll";
 import Footer from "@/shared/footer/Footer";
 import Navbar from "@/shared/navbar/Navbar";
@@ -10,7 +6,7 @@ import Navbar from "@/shared/navbar/Navbar";
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
     return (
         <SmoothScroll>
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-background">
                 <Navbar />
                 <main>{children}</main>
                 <Footer />
