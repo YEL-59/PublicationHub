@@ -13,7 +13,7 @@ const Navbar = () => {
     const navLinks = [
         { name: "Home", href: "/", active: true },
         { name: "Research Opportunities", href: "/researchopportunities" },
-        { name: "Services", href: "/services" },
+        { name: "Services", href: "/service" },
         { name: "Meta Academy", href: "/academy" },
         { name: "Partnership", href: "/partnership" },
         { name: "About", href: "/about" },
