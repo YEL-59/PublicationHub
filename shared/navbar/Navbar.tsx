@@ -12,7 +12,7 @@ const Navbar = () => {
 
     const navLinks = [
         { name: "Home", href: "/", active: true },
-        { name: "Research Opportunities", href: "/research" },
+        { name: "Research Opportunities", href: "/researchopportunities" },
         { name: "Services", href: "/services" },
         { name: "Meta Academy", href: "/academy" },
         { name: "Partnership", href: "/partnership" },
