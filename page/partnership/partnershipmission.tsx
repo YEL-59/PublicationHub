@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import missionImg from "@/assets/images/missionimg.png";
 
 // API-ready data
@@ -13,16 +13,23 @@ const MISSION_POINTS = [
     "Integrate AI-driven solutions into modern research workflows",
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: {},
     visible: {
         transition: { staggerChildren: 0.1 },
     },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { opacity: 0, x: -12 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+    visible: { 
+        opacity: 1, 
+        x: 0, 
+        transition: { 
+            duration: 0.5, 
+            ease: [0.22, 1, 0.36, 1] 
+        } 
+    },
 };
 
 const PartnershipMission = () => {

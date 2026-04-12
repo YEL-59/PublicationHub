@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 // API-ready data
 const STEPS = [
@@ -12,14 +12,21 @@ const STEPS = [
     "Publication-ready manuscript preparation",
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.1 } },
 };
 
-const stepVariants = {
+const stepVariants: Variants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+    visible: { 
+        opacity: 1, 
+        x: 0, 
+        transition: { 
+            duration: 0.5, 
+            ease: [0.22, 1, 0.36, 1] 
+        } 
+    },
 };
 
 const Systematic = () => {
