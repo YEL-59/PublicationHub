@@ -1,17 +1,36 @@
 "use client";
 
-import React from "react";
+import { getBannerContent, getCounterContent } from "@/services/home";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Search, Sparkles } from "lucide-react";
 import heroBg from "@/assets/images/hero-bg.png";
 
 const Banner = () => {
-    const stats = [
-        { value: "500+", label: "Research Opportunities" },
-        { value: "150+", label: "Expert Mentors" },
-        { value: "10K+", label: "Active Researchers" },
-        { value: "95%", label: "Satisfaction Rate" },
+    const [banner, setBanner] = useState<any>(null);
+    const [stats, setStats] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const [bannerRes, statsRes] = await Promise.all([
+                getBannerContent(),
+                getCounterContent()
+            ]);
+            
+            if (bannerRes?.status) setBanner(bannerRes.data);
+            if (statsRes?.status) setStats(statsRes.data.items);
+        };
+        fetchData();
+    }, []);
+
+    const defaultStats = [
+        { count_number: "500+", sub_title: "Research Opportunities" },
+        { count_number: "150+", sub_title: "Expert Mentors" },
+        { count_number: "10K+", label: "Active Researchers" },
+        { count_number: "95%", label: "Satisfaction Rate" },
     ];
+
+    const displayStats = stats.length > 0 ? stats : defaultStats;
 
     return (
         <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center pt-28 pb-12 overflow-visible">
@@ -32,17 +51,17 @@ const Banner = () => {
                 {/* Badge */}
                 <div className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00E6FF]/10 border border-[#00E6FF]/20 text-[#00E6FF] text-sm font-medium leading-5 shadow-lg backdrop-blur-sm">
                     <Sparkles size={14} className="text-[#00E6FF]" />
-                    Global Research Network
+                    {banner?.sub_title || "Global Research Network"}
                 </div>
 
                 {/* Heading */}
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent pb-2">
-                    PublicationHub
+                    {banner?.title || "PublicationHub"}
                 </h1>
 
                 {/* Subheading */}
                 <p className="max-w-xl text-[#A3A7AE] text-lg md:text-xl font-normal leading-relaxed mb-12">
-                    Advancing clinical excellence and evidence-based medicine across the Kingdom.
+                    {banner?.description || "Advancing clinical excellence and evidence-based medicine across the Kingdom."}
                 </p>
 
                 {/* Search Bar */}
@@ -68,7 +87,7 @@ const Banner = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl translate-y-24 relative z-20">
-                    {stats.map((stat, idx) => (
+                    {displayStats.map((stat, idx) => (
                         <div
                             key={idx}
                             className="border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center group transition-all duration-300 hover:border-[#00D1FF]/30 hover:-translate-y-2 backdrop-blur-md"
@@ -78,10 +97,10 @@ const Banner = () => {
                             }}
                         >
                             <h3 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-br from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                                {stat.value}
+                                {stat.count_number}
                             </h3>
                             <p className="text-[#fff] text-sm font-medium text-center leading-tight uppercase tracking-wider">
-                                {stat.label}
+                                {stat.sub_title}
                             </p>
                         </div>
                     ))}

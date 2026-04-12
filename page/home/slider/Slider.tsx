@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
+import { getWhyChooseContent } from "@/services/home";
+import { useState, useEffect } from "react";
+import heroBg from "@/assets/images/hero-bg.png";
 
 // Import Swiper styles
 import "swiper/css";
@@ -93,8 +95,32 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
 };
 
 const Slider = () => {
-    const [prevEl, setPrevEl] = React.useState<HTMLButtonElement | null>(null);
-    const [nextEl, setNextEl] = React.useState<HTMLButtonElement | null>(null);
+    const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+    const [content, setContent] = useState<any>(null);
+    const [items, setItems] = useState<SliderData[]>([]);
+
+    useEffect(() => {
+        const fetchSlider = async () => {
+            const res = await getWhyChooseContent();
+            if (res?.status) {
+                setContent(res.data.content);
+                setItems(res.data.items);
+            }
+        };
+        fetchSlider();
+    }, []);
+
+    const defaultData: SliderData[] = [
+        {
+            id: 1,
+            title: "High-Quality Research Services",
+            description: "At Publication Hub, we are committed to advancing research excellence by empowering researchers and increasing both the quality and impact of scientific publications.",
+            image: "https://images.unsplash.com/photo-1579165466511-703398321689?q=80&w=600&auto=format&fit=crop",
+        }
+    ];
+
+    const displayItems = items.length > 0 ? items : defaultData;
 
     return (
         <section className="w-full bg-[#0A0C0F] pt-40 pb-20 px-4 md:px-8 overflow-hidden border border-t-[#2A9D90]/20">
@@ -102,10 +128,12 @@ const Slider = () => {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-                        Why Researchers Choose{" "}
-                        <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                            PublicationHub
-                        </span>
+                        {content?.title || "Why Researchers Choose"}{" "}
+                        {!content?.title && (
+                            <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
+                                PublicationHub
+                            </span>
+                        )}
                     </h2>
                 </div>
 
@@ -126,8 +154,8 @@ const Slider = () => {
                         }}
                         className="!pb-16"
                     >
-                        {sliderData.map((item) => (
-                            <SwiperSlide key={item.id}>
+                        {displayItems.map((item, idx) => (
+                            <SwiperSlide key={item.id || idx}>
                                 <ResearcherCard data={item} />
                             </SwiperSlide>
                         ))}
