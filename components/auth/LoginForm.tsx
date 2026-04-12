@@ -4,9 +4,13 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { loginService } from "@/services/auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -20,8 +24,18 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (data: any) => {
-    console.log("Login data:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const res = await loginService(data.email, data.password);
+      if (res?.status) {
+        toast.success(res.message || "Logged in successfully!");
+        router.push("/");
+      } else {
+        // Show the specific error message from the API (e.g. "No account found...")
+        toast.error(res?.message || "Invalid credentials. Please try again.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during login.");
+    }
   };
 
   const gradientBtnStyle = { background: "linear-gradient(135deg, #00D1FF 0%, #6467F2 100%)" };

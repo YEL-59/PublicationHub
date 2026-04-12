@@ -1,13 +1,13 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { ArrowRight, RotateCcw } from "lucide-react";
-import { verifyOtpService, resendOtpService } from "@/services/auth";
+import { verifyForgotPasswordOtpService, resendOtpService } from "@/services/auth";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const OTPVerificationForm = () => {
+const ForgotPasswordOTPForm = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
@@ -39,10 +39,13 @@ const OTPVerificationForm = () => {
   const onSubmit = async () => {
     const otpString = otp.join("");
     try {
-      const res = await verifyOtpService(email, otpString);
+      const res = await verifyForgotPasswordOtpService(email, otpString);
       if (res?.status) {
-        toast.success(res.message || "Email verified successfully!");
-        router.push("/"); // Redirect to dashboard since we have the token
+        toast.success(res.message || "OTP verified successfully!");
+        // Store token for password reset
+        sessionStorage.setItem("reset_token", res.token);
+        sessionStorage.setItem("reset_email", email);
+        router.push("/reset-password");
       } else {
         toast.error(res?.message || "Invalid OTP. Please try again.");
       }
@@ -68,20 +71,18 @@ const OTPVerificationForm = () => {
 
   return (
     <div className="bg-[#171A21] backdrop-blur-xl border border-white/10 rounded-3xl p-10 shadow-2xl shadow-cyan-500/5 text-center max-w-md mx-auto">
-      {/* Header */}
       <div className="mb-10 text-center">
          <h1 className="text-3xl font-bold text-white mb-6 tracking-tight">
           Publication<span className="text-[#00D1FF]">Hub</span>
         </h1>
-        <h2 className="text-2xl font-bold text-white mb-2">OTP Verification</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Verify Reset Code</h2>
         <p className="text-gray-400 text-sm leading-relaxed">
-          Enter the verification code we sent you on: <br />
+          Enter the reset code sent to: <br />
           <span className="font-semibold text-gray-300">{email || "your email"}</span>
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-        {/* OTP Inputs */}
         <div className="flex justify-between items-center gap-3">
           {otp.map((digit, index) => (
             <input
@@ -98,7 +99,6 @@ const OTPVerificationForm = () => {
           ))}
         </div>
 
-        {/* Action Buttons */}
         <div className="space-y-4">
           <button
             disabled={isSubmitting || otp.some((d) => !d)}
@@ -112,7 +112,7 @@ const OTPVerificationForm = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-              ) : "Continue"}
+              ) : "Verify Code"}
               {!isSubmitting && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
             </span>
           </button>
@@ -123,7 +123,7 @@ const OTPVerificationForm = () => {
             className="flex items-center justify-center gap-2 mx-auto text-sm font-semibold text-gray-500 hover:text-[#00D1FF] transition-colors py-2"
           >
             <RotateCcw size={16} />
-            Don't receive the code? <span className="text-[#00D1FF] hover:underline">Click to resend code</span>
+            Didn't receive code? <span className="text-[#00D1FF] hover:underline">Resend</span>
           </button>
         </div>
       </form>
@@ -131,4 +131,4 @@ const OTPVerificationForm = () => {
   );
 };
 
-export default OTPVerificationForm;
+export default ForgotPasswordOTPForm;

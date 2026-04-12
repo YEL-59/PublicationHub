@@ -1,12 +1,39 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { resetPasswordService } from "@/services/auth";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ResetPasswordForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Try search params first, then session storage
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const urlEmail = searchParams.get("email");
+    const urlToken = searchParams.get("token");
+    
+    if (urlEmail && urlToken) {
+      setEmail(urlEmail);
+      setToken(urlToken);
+    } else {
+      const sessionEmail = sessionStorage.getItem("reset_email");
+      const sessionToken = sessionStorage.getItem("reset_token");
+      if (sessionEmail && sessionToken) {
+        setEmail(sessionEmail);
+        setToken(sessionToken);
+      }
+    }
+  }, [searchParams]);
+
   const {
     register,
     handleSubmit,
@@ -15,7 +42,7 @@ const ResetPasswordForm = () => {
   } = useForm({
     defaultValues: {
       password: "",
-      confirmPassword: "",
+      password_confirmation: "",
     },
   });
 
@@ -24,8 +51,21 @@ const ResetPasswordForm = () => {
   const inputBaseClass = "w-full pl-11 pr-12 py-3.5 bg-[#1F242D] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#00D1FF]/30 focus:border-[#00D1FF]/50 transition-all placeholder:text-gray-500 text-white";
 
   const onSubmit = async (data: any) => {
-    console.log("Reset password data:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await resetPasswordService({
+        ...data,
+        email,
+        token,
+      });
+      if (res?.status) {
+        toast.success(res.message || "Password reset successfully!");
+        router.push("/login");
+      } else {
+        toast.error(res?.message || "Failed to reset password.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred.");
+    }
   };
 
   return (
@@ -79,13 +119,13 @@ const ResetPasswordForm = () => {
               <Lock size={18} className="text-gray-500 group-focus-within:text-inherit" />
             </div>
             <input
-              {...register("confirmPassword", {
+              {...register("password_confirmation", {
                 required: "Confirm password is required",
                 validate: (value) => value === password || "Passwords do not match",
               })}
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className={`${inputBaseClass} ${errors.confirmPassword ? "border-red-500/50" : ""}`}
+              className={`${inputBaseClass} ${errors.password_confirmation ? "border-red-500/50" : ""}`}
             />
             <button
                type="button"
@@ -95,8 +135,8 @@ const ResetPasswordForm = () => {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          {errors.confirmPassword && (
-            <p className="text-xs font-medium text-red-400 ml-1">{errors.confirmPassword.message}</p>
+          {errors.password_confirmation && (
+            <p className="text-xs font-medium text-red-400 ml-1">{errors.password_confirmation.message}</p>
           )}
         </div>
 

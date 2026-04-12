@@ -3,10 +3,16 @@
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { Mail, ArrowLeft, Send, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { forgotPasswordService } from "@/services/auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const ForgotPasswordForm = () => {
   const [isSent, setIsSent] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -17,10 +23,28 @@ const ForgotPasswordForm = () => {
     },
   });
 
+  useEffect(() => {
+    if (isSent) {
+      const timer = setTimeout(() => {
+        router.push(`/forgot-password/verify-otp?email=${encodeURIComponent(emailValue)}`);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSent, emailValue, router]);
+
   const onSubmit = async (data: any) => {
-    console.log("Forgot password data:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSent(true);
+    try {
+      const res = await forgotPasswordService(data.email);
+      if (res?.status) {
+        setEmailValue(data.email);
+        toast.success(res.message || "OTP sent successfully!");
+        setIsSent(true);
+      } else {
+        toast.error(res?.message || "Failed to send reset link.");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred.");
+    }
   };
 
   const gradientBtnStyle = { background: "linear-gradient(135deg, #00D1FF 0%, #6467F2 100%)" };
