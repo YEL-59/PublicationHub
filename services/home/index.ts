@@ -116,3 +116,44 @@ export const getFaqsByCategory = async (categoryId: number) => {
         throw new Error(error);
     }
 }
+
+// send contact message
+export const sendContactMessage = async (formData: FormData) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/contact-support-message/sent`, {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// subscribe newsletter
+export const subscribeNewsletter = async (formData: FormData) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/newsletter/subscribe`, {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get system info
+export const getSystemInfo = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/system-info`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}

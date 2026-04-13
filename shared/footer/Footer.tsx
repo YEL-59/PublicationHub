@@ -5,10 +5,55 @@ import Image from "next/image";
 import Link from "next/link";
 import { TwitterIcon, LinkedInIcon, YoutubeIcon, MailIcon } from "@/components/icons/SocialIcons";
 import navLogo from "@/assets/images/nav-logo.png";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { subscribeNewsletter, getSystemInfo } from "@/services/home";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [systemInfo, setSystemInfo] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchSystemInfo = async () => {
+            try {
+                const res = await getSystemInfo();
+                if (res?.status) {
+                    setSystemInfo(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch system info:", error);
+            }
+        };
+        fetchSystemInfo();
+    }, []);
+
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email) {
+            toast.error("Please enter an email address");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append("email", email);
+            const res = await subscribeNewsletter(formData);
+            if (res.status) {
+                toast.success(res.message || "Subscribed successfully!");
+                setEmail("");
+            } else {
+                toast.error(res.message || "Failed to subscribe");
+            }
+        } catch (error) {
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const footerLinks = {
         platform: [
@@ -48,8 +93,8 @@ const Footer = () => {
                         <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
                             <div className="relative w-48 h-12">
                                 <Image
-                                    src={navLogo}
-                                    alt="PublicationHub Logo"
+                                    src={systemInfo?.logo || navLogo}
+                                    alt={systemInfo?.system_name || "PublicationHub Logo"}
                                     fill
                                     className="object-contain object-left"
                                     priority
@@ -57,7 +102,7 @@ const Footer = () => {
                             </div>
                         </Link>
                         <p className="text-[#A3A7AE]  text-sm font-normal leading-5 max-w-[280px]">
-                            The centralized platform for research opportunities, mentorship, and academic growth.
+                            {systemInfo?.description || "The centralized platform for research opportunities, mentorship, and academic growth."}
                         </p>
                         <div className="flex items-center gap-2.5">
                             {socialLinks.map((social, idx) => (
@@ -128,20 +173,33 @@ const Footer = () => {
                         <p className="text-[#94A3B8] text-[14px] leading-relaxed">
                             Get the latest opportunities delivered to your inbox.
                         </p>
-                        <div className="relative">
+                        <form onSubmit={handleSubscribe} className="relative group">
                             <input
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Email address"
-                                className="w-full bg-[#20232D] border border-white/10 rounded-xl py-3.5 px-5 text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#00D1FF]/20 transition-all duration-300 shadow-lg"
+                                className="w-full bg-[#20232D] border border-white/10 rounded-xl py-3.5 pl-5 pr-12 text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#00D1FF]/40 transition-all duration-300 shadow-lg"
                             />
-                        </div>
+                            <button 
+                                type="submit"
+                                disabled={loading}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-[#00D1FF]/10 text-[#00D1FF] hover:bg-[#00D1FF] hover:text-white transition-all duration-300 disabled:opacity-50"
+                            >
+                                {loading ? (
+                                    <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                    <Send size={16} />
+                                )}
+                            </button>
+                        </form>
                     </div>
                 </div>
 
                 {/* Bottom Footer */}
                 <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-gray-500 text-sm tracking-tight">
-                        © {currentYear} PublicationHub. All rights reserved.
+                    <p className="text-gray-500 text-sm tracking-tight text-center md:text-left">
+                        {systemInfo?.copyright_text || `© ${currentYear} PublicationHub. All rights reserved.`}
                     </p>
                     <p className="text-gray-500 text-sm">
                         Built for researchers, by researchers.
