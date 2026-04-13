@@ -1,16 +1,39 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { CheckCircle2, BookOpen, ArrowRight } from "lucide-react";
+import { getMetaAcademyContent } from "@/services/home";
 
 const Skill = () => {
-    const features = [
+    const [content, setContent] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const res = await getMetaAcademyContent();
+            if (res?.status) {
+                setContent(res.data);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const defaultFeatures = [
         "Access expert-led courses at your own pace",
         "Earn certificates upon completion",
         "Apply learnings to real research projects",
         "Join a community of active learners",
     ];
+
+    // Simple helper to extract text from <p> tags if we want to keep the icon styling
+    const parseFeatures = (html: string) => {
+        if (!html) return defaultFeatures;
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        return Array.from(div.querySelectorAll("p")).map(p => p.textContent || "");
+    };
+
+    const features = content?.description ? parseFeatures(content.description) : defaultFeatures;
 
     return (
         <section className="w-full bg-[#0A0C0F] py-24 px-4 md:px-8 lg:px-12 overflow-hidden">
@@ -32,13 +55,12 @@ const Skill = () => {
                                 className="text-4xl md:text-5xl font-bold text-white leading-tight"
                                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                             >
-                                Level Up Your Research Skills
+                                {content?.title || "Level Up Your Research Skills"}
                             </h2>
                             <p
                                 className="text-[#A3A7AE] font-inter text-base font-normal leading-7 max-w-xl"
                             >
-                                Comprehensive courses designed by leading researchers to help you master essential
-                                skills—from methodology to publication.
+                                {content?.sub_title || "Comprehensive courses designed by leading researchers to help you master essential skills—from methodology to publication."}
                             </p>
                         </div>
 
@@ -64,7 +86,7 @@ const Skill = () => {
                                 className="group flex items-center gap-3 px-8 py-4 rounded-xl text-white font-bold transition-all duration-300 shadow-[0_0_20px_rgba(42,157,144,0.2)] hover:shadow-[0_0_30px_rgba(100,103,242,0.4)] hover:scale-[1.02] active:scale-[0.98]"
                                 style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                             >
-                                <span>Explore Courses</span>
+                                <span>{content?.button_text || "Explore Courses"}</span>
                                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
@@ -74,8 +96,8 @@ const Skill = () => {
                     <div className="relative w-full aspect-[4/3] lg:aspect-square xl:aspect-[1.2/1] rounded-[32px] overflow-hidden border border-white/10 group shadow-2xl">
                         <div className="absolute inset-0 bg-gradient-to-tr from-[#00D1FF]/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <Image
-                            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200&auto=format&fit=crop"
-                            alt="Researchers working in lab"
+                            src={content?.image || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200&auto=format&fit=crop"}
+                            alt={content?.title || "Researchers working in lab"}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                             priority

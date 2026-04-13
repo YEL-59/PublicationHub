@@ -1,139 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
+import { getFaqCategories, getFaqsByCategory } from "@/services/home";
 
 // ── Types ──────────────────────────────────────────────────────────────
 interface FaqItem {
-    id: string;
+    id: number;
     question: string;
     answer: string;
 }
 
 interface FaqCategory {
-    id: string;
-    title: string;
-    items: FaqItem[];
+    id: number;
+    name: string;
+    faqs?: FaqItem[];
 }
-
-// ── Data (API-ready) ───────────────────────────────────────────────────
-const FAQ_DATA: FaqCategory[] = [
-    {
-        id: "general",
-        title: "General",
-        items: [
-            {
-                id: "g1",
-                question: "What is Meta Scholars?",
-                answer:
-                    "Meta Scholars is a premier academic network connecting students, researchers, and institutions across Saudi Arabia. It provides access to research opportunities, mentorship programmes, and world-class publishing support.",
-            },
-            {
-                id: "g2",
-                question: "Who can apply for research opportunities?",
-                answer:
-                    "Any enrolled undergraduate, postgraduate, or doctoral student — as well as early-career researchers — can browse and apply for research opportunities listed on the platform.",
-            },
-            {
-                id: "g3",
-                question: "Is Meta Scholars free to use?",
-                answer:
-                    "The core platform, including browsing research opportunities and accessing community resources, is completely free. Premium services such as statistical analysis and manuscript writing carry separate fees.",
-            },
-        ],
-    },
-    {
-        id: "applications",
-        title: "Applications",
-        items: [
-            {
-                id: "a1",
-                question: "How do I apply for a research opportunity?",
-                answer:
-                    "Navigate to the Research Opportunities page, find an opportunity that matches your profile, and click 'Apply Now'. You will be guided through a multi-step application form covering personal info, academic background, and document uploads.",
-            },
-            {
-                id: "a2",
-                question: "What documents do I need to apply?",
-                answer:
-                    "Typically you will need your CV/resume, a cover letter, and proof of current enrolment or affiliation. Specific requirements are listed on each opportunity's detail page.",
-            },
-            {
-                id: "a3",
-                question: "How long does the application review process take?",
-                answer:
-                    "Review times vary by opportunity, but you can generally expect a response within 2–4 weeks of submitting your application. You will be notified via email once a decision has been made.",
-            },
-            {
-                id: "a4",
-                question: "Can I apply to multiple opportunities at once?",
-                answer:
-                    "Yes. There is no limit on the number of opportunities you can apply for simultaneously. We recommend tailoring your cover letter for each application to improve your chances.",
-            },
-        ],
-    },
-    {
-        id: "meta-academy",
-        title: "Meta Academy",
-        items: [
-            {
-                id: "m1",
-                question: "What is Meta Academy?",
-                answer:
-                    "Meta Academy is the educational arm of ResearchHub, offering structured online courses in research methodology, biostatistics, academic writing, and more — all designed for healthcare and research professionals.",
-            },
-            {
-                id: "m2",
-                question: "How do I access premium courses?",
-                answer:
-                    "After registering on the platform, visit the Meta Academy section and choose a course. Premium courses require a one-time purchase or an active subscription, both manageable from your profile settings.",
-            },
-            {
-                id: "m3",
-                question: "Are course certificates recognized?",
-                answer:
-                    "Our certificates are recognised by a growing number of academic institutions and healthcare organisations across the Kingdom. We are actively expanding our partnerships to broaden recognition.",
-            },
-            {
-                id: "m4",
-                question: "Can I access courses on mobile devices?",
-                answer:
-                    "Yes. The platform is fully responsive and optimised for mobile, tablet, and desktop. You can continue a course on any device and your progress is saved automatically.",
-            },
-        ],
-    },
-    {
-        id: "account-support",
-        title: "Account & Support",
-        items: [
-            {
-                id: "s1",
-                question: "How do I create an account?",
-                answer:
-                    "Click 'Sign Up' in the navigation bar, fill in your details, and verify your email address. Your account will be ready to use immediately after verification.",
-            },
-            {
-                id: "s2",
-                question: "How can I contact support?",
-                answer:
-                    "You can reach our support team via the Contact Us page, by emailing support@publicationhub.sa, or through the WhatsApp support button available throughout the site.",
-            },
-            {
-                id: "s3",
-                question: "Can institutions partner with Meta Scholars?",
-                answer:
-                    "Absolutely. Hospitals, universities, and research centres can partner with us to list opportunities, sponsor courses, or co-develop training programmes. Please visit the Partnership page for more details.",
-            },
-            {
-                id: "s4",
-                question: "I forgot my password. What should I do?",
-                answer:
-                    "Click 'Sign In', then 'Forgot Password'. Enter your registered email address and you will receive a password reset link within a few minutes. Check your spam folder if you do not see it.",
-            },
-        ],
-    },
-];
 
 // ── Accordion Item ─────────────────────────────────────────────────────
 const AccordionItem = ({
@@ -181,9 +64,10 @@ const AccordionItem = ({
                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                 >
-                    <p className="px-5 pb-5 text-[13px] text-[#6B7280] leading-relaxed">
-                        {item.answer}
-                    </p>
+                    <div 
+                        className="px-5 pb-5 text-[13px] text-[#6B7280] leading-relaxed faq-answer"
+                        dangerouslySetInnerHTML={{ __html: item.answer }}
+                    />
                 </motion.div>
             )}
         </AnimatePresence>
@@ -198,8 +82,8 @@ const CategoryBlock = ({
     index,
 }: {
     category: FaqCategory;
-    openId: string | null;
-    setOpenId: (id: string | null) => void;
+    openId: number | null;
+    setOpenId: (id: number | null) => void;
     index: number;
 }) => (
     <motion.div
@@ -213,13 +97,13 @@ const CategoryBlock = ({
         <div className="flex items-center gap-3 mb-4">
             <span className="w-[3px] h-5 bg-[#00D1FF] rounded-full" />
             <h2 className="text-base font-bold text-white tracking-tight">
-                {category.title}
+                {category.name}
             </h2>
         </div>
 
         {/* Accordion items */}
         <div className="flex flex-col gap-2">
-            {category.items.map((item) => (
+            {category.faqs?.map((item) => (
                 <AccordionItem
                     key={item.id}
                     item={item}
@@ -235,20 +119,57 @@ const CategoryBlock = ({
 
 // ── Main Component ─────────────────────────────────────────────────────
 const FaqContent = () => {
-    const [openId, setOpenId] = useState<string | null>(null);
+    const [categories, setCategories] = useState<FaqCategory[]>([]);
+    const [openId, setOpenId] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAllFaqs = async () => {
+            setLoading(true);
+            try {
+                const catRes = await getFaqCategories();
+                if (catRes?.status) {
+                    const detailedCategories = await Promise.all(
+                        catRes.data.map(async (cat: any) => {
+                            const detailedRes = await getFaqsByCategory(cat.id);
+                            return {
+                                id: cat.id,
+                                name: cat.name,
+                                faqs: detailedRes?.status ? detailedRes.data.faqs : []
+                            };
+                        })
+                    );
+                    setCategories(detailedCategories);
+                }
+            } catch (error) {
+                console.error("Failed to load FAQs:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAllFaqs();
+    }, []);
 
     return (
-        <section className="relative bg-[#0A0C0F] py-12 px-6 md:px-12 lg:px-20">
+        <section className="relative bg-[#0A0C0F] py-12 px-6 md:px-12 lg:px-20 min-h-[400px]">
             <div className="container mx-auto max-w-2xl">
-                {FAQ_DATA.map((category, index) => (
-                    <CategoryBlock
-                        key={category.id}
-                        category={category}
-                        openId={openId}
-                        setOpenId={setOpenId}
-                        index={index}
-                    />
-                ))}
+                {loading ? (
+                    <div className="flex flex-col items-center py-20 gap-4">
+                        <Loader2 className="w-10 h-10 text-[#00D1FF] animate-spin" />
+                        <p className="text-[#A3A7AE] font-medium">Loading Frequently Asked Questions...</p>
+                    </div>
+                ) : (
+                    categories.map((category, index) => (
+                        <CategoryBlock
+                            key={category.id}
+                            category={category}
+                            openId={openId}
+                            setOpenId={setOpenId}
+                            index={index}
+                        />
+                    ))
+                )}
             </div>
         </section>
     );

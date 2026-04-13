@@ -1,91 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-    BarChart3,
-    FileSearch,
-    PenTool,
-    CheckSquare,
-    LayoutGrid,
-    Microscope,
     ChevronDown,
     Check,
-    MessageCircle
+    MessageCircle,
+    Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getAllServices } from "@/services/home";
+import Image from "next/image";
 
-const services = [
-    {
-        id: 1,
-        title: "Statistical Analysis",
-        shortDesc: "Advanced statistical methods for robust research conclusions.",
-        longDesc: "Comprehensive statistical support including descriptive analysis, inferential statistics, regression modeling, survival analysis, and more. Our experts use SPSS, R, and Stata to ensure accuracy.",
-        icon: BarChart3,
-        color: "#00D1FF",
-        features: ["Data cleaning & preparation", "Hypothesis testing", "Multivariate analysis", "Results interpretation"],
-        price: "$299"
-    },
-    {
-        id: 2,
-        title: "Systematic Review",
-        shortDesc: "Rigorous literature synthesis following PRISMA guidelines.",
-        longDesc: "Expert guidance in conducting systematic reviews and meta-analyses. We help with search strategy development, study selection, data extraction, and quality assessment.",
-        icon: FileSearch,
-        color: "#8B8FF9",
-        features: ["PRISMA compliance", "Meta-analysis support", "Quality assessment", "Protocol registration"],
-        price: "$399"
-    },
-    {
-        id: 3,
-        title: "Manuscript Writing",
-        shortDesc: "Expert scientific writing and editing services.",
-        longDesc: "High-quality medical and scientific writing services tailored to your research. From drafting to final polish, we ensure your message is clear and compelling.",
-        icon: PenTool,
-        color: "#FF6B9C",
-        features: ["Structured abstracts", "Discussion development", "Reference management", "Clarity & flow optimization"],
-        price: "$499"
-    },
-    {
-        id: 4,
-        title: "Publication Support",
-        shortDesc: "Navigate the publication process with confidence.",
-        longDesc: "Comprehensive assistance in getting your research published. We help with journal selection, submission management, and responding to peer review comments.",
-        icon: CheckSquare,
-        color: "#FF6B6B",
-        features: ["Journal matching", "Cover letter drafting", "Peer review response", "Formatting guidance"],
-        price: "$199"
-    },
-    {
-        id: 5,
-        title: "Research Methodology",
-        shortDesc: "Design robust studies with proper methodological frameworks.",
-        longDesc: "Strategic consulting on study design, sampling methods, and data collection protocols to ensure your research meets high scientific standards.",
-        icon: LayoutGrid,
-        color: "#FFA726",
-        features: ["Study design optimization", "Sample size calculation", "Protocol development", "Ethics submission support"],
-        price: "$349"
-    },
-    {
-        id: 6,
-        title: "Lab & Clinical Studies",
-        shortDesc: "Support for experimental and clinical research projects.",
-        longDesc: "Specialized support for laboratory-based research and clinical trials, ensuring rigorous data collection and adherence to safety protocols.",
-        icon: Microscope,
-        color: "#4CAF50",
-        features: ["Clinical trial design", "Lab data management", "Safety monitoring", "Regulatory compliance"],
-        price: "$599"
-    }
-];
+interface ServiceData {
+    id: number;
+    title: string;
+    icon: string;
+    overview: string;
+    description: string;
+    starting_price: string;
+    whats_app_num: string;
+    effective_whatsapp_number?: string;
+}
 
 const ServiceCard = ({
     service,
     isHovered,
     onHover
 }: {
-    service: typeof services[0];
+    service: ServiceData;
     isHovered: boolean;
     onHover: (active: boolean) => void;
 }) => {
+    // Helper to parse HTML from API description
+    const parseFeatures = (html: string) => {
+        if (typeof window === "undefined" || !html) return [];
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        // Search for li tags
+        const listItems = Array.from(div.querySelectorAll("li")).map(li => li.textContent || "");
+        if (listItems.length > 0) return listItems;
+        // Fallback for simple p tags
+        return Array.from(div.querySelectorAll("p")).map(p => p.textContent || "");
+    };
+
+    const features = parseFeatures(service.description);
+
     return (
         <motion.div
             onMouseEnter={() => onHover(true)}
@@ -99,14 +58,17 @@ const ServiceCard = ({
         >
             <div className="flex items-start justify-between mb-6">
                 <div
-                    className="p-3.5 rounded-2xl transition-transform duration-500"
+                    className="w-14 h-14 rounded-2xl transition-transform duration-500 flex items-center justify-center overflow-hidden bg-[#00D1FF]/10 relative"
                     style={{
-                        backgroundColor: `${service.color}15`,
-                        color: service.color,
                         transform: isHovered ? "scale(1.1)" : "scale(1)"
                     }}
                 >
-                    <service.icon className="w-6 h-6" strokeWidth={2} />
+                    <Image 
+                        src={service.icon} 
+                        alt={service.title} 
+                        fill 
+                        className="object-cover" 
+                    />
                 </div>
                 <motion.div
                     animate={{ rotate: isHovered ? 180 : 0 }}
@@ -121,7 +83,7 @@ const ServiceCard = ({
             </h3>
 
             <p className="text-[#A3A7AE] text-sm leading-relaxed mb-6 font-medium">
-                {service.shortDesc}
+                {service.overview}
             </p>
 
             <AnimatePresence>
@@ -133,12 +95,8 @@ const ServiceCard = ({
                         transition={{ duration: 0.4, ease: "easeOut" }}
                         className="space-y-6"
                     >
-                        <p className="text-[#A3A7AE]/80 text-[13px] leading-relaxed">
-                            {service.longDesc}
-                        </p>
-
                         <ul className="space-y-3">
-                            {service.features.map((feature, idx) => (
+                            {features.map((feature, idx) => (
                                 <motion.li
                                     key={idx}
                                     initial={{ opacity: 0, x: -10 }}
@@ -155,11 +113,16 @@ const ServiceCard = ({
                         <div className="pt-4 flex items-center justify-between border-t border-white/5">
                             <div>
                                 <p className="text-[11px] text-[#00D1FF] font-bold uppercase tracking-wider mb-1">Starting from</p>
-                                <p className="text-xl font-bold text-white">{service.price}</p>
+                                <p className="text-xl font-bold text-white">${service.starting_price}</p>
                             </div>
-                            <button className="bg-gradient-to-r from-[#00D1FF] to-[#8B8FF9] hover:from-[#00E5FF] hover:to-[#9B9FFF] text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-[#00D1FF]/20">
+                            <a 
+                                href={`https://wa.me/${service.effective_whatsapp_number || service.whats_app_num}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-gradient-to-r from-[#00D1FF] to-[#8B8FF9] hover:from-[#00E5FF] hover:to-[#9B9FFF] text-white px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-[#00D1FF]/20"
+                            >
                                 <MessageCircle className="w-4 h-4" /> Start on WhatsApp
-                            </button>
+                            </a>
                         </div>
                     </motion.div>
                 )}
@@ -169,7 +132,45 @@ const ServiceCard = ({
 };
 
 const Services = () => {
+    const [services, setServices] = useState<ServiceData[]>([]);
     const [activeId, setActiveId] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+
+    const fetchAllServices = async (page: number, isInitial = false) => {
+        if (isInitial) setLoading(true);
+        else setLoadMoreLoading(true);
+
+        try {
+            const res = await getAllServices(page);
+            if (res?.status) {
+                if (isInitial) {
+                    setServices(res.data);
+                } else {
+                    setServices(prev => [...prev, ...res.data]);
+                }
+                setCurrentPage(res.pagination.current_page);
+                setLastPage(res.pagination.last_page);
+            }
+        } catch (error) {
+            console.error("Failed to fetch services:", error);
+        } finally {
+            setLoading(false);
+            setLoadMoreLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAllServices(1, true);
+    }, []);
+
+    const handleLoadMore = () => {
+        if (currentPage < lastPage) {
+            fetchAllServices(currentPage + 1);
+        }
+    };
 
     return (
         <section className="relative min-h-screen bg-[#0A0C0F] text-white py-20 px-6 md:px-12 lg:px-20 font-inter overflow-hidden">
@@ -211,26 +212,49 @@ const Services = () => {
 
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
-                    {services.map((service, index) => (
-                        <motion.div
-                            key={service.id}
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-100px" }}
-                            transition={{
-                                duration: 0.6,
-                                delay: index * 0.1,
-                                ease: [0.22, 1, 0.36, 1]
-                            }}
-                        >
-                            <ServiceCard
-                                service={service}
-                                isHovered={activeId === service.id}
-                                onHover={(active) => setActiveId(active ? service.id : null)}
-                            />
-                        </motion.div>
-                    ))}
+                    {loading ? (
+                        Array.from({ length: 6 }).map((_, idx) => (
+                            <div key={idx} className="h-[250px] bg-[#111419] border border-white/5 rounded-[24px] animate-pulse" />
+                        ))
+                    ) : (
+                        services.map((service, index) => (
+                            <motion.div
+                                key={service.id}
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{
+                                    duration: 0.6,
+                                    delay: index * 0.1,
+                                    ease: [0.22, 1, 0.36, 1]
+                                }}
+                            >
+                                <ServiceCard
+                                    service={service}
+                                    isHovered={activeId === service.id}
+                                    onHover={(active) => setActiveId(active ? service.id : null)}
+                                />
+                            </motion.div>
+                        ))
+                    )}
                 </div>
+
+                {/* Load More */}
+                {currentPage < lastPage && (
+                    <div className="mt-20 flex justify-center">
+                        <button
+                            onClick={handleLoadMore}
+                            disabled={loadMoreLoading}
+                            className="bg-transparent border border-[#00D1FF]/30 hover:border-[#00D1FF] text-[#00D1FF] hover:bg-[#00D1FF]/5 px-10 py-4 rounded-2xl font-bold transition-all flex items-center gap-3 disabled:opacity-50"
+                        >
+                            {loadMoreLoading ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                "Explore More Services"
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     );

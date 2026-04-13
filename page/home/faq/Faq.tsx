@@ -1,8 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, Minus } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Minus, Loader2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getAllFaq } from "@/services/home";
+
+interface FAQData {
+    id: number;
+    question: string;
+    answer: string;
+}
 
 interface FAQItemProps {
     question: string;
@@ -54,38 +61,58 @@ const FAQItem = ({ question, answer, isOpen, onClick }: FAQItemProps) => {
 };
 
 const Faq = () => {
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const [faqs, setFaqs] = useState<FAQData[]>([]);
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
 
-    const faqs = [
-        {
-            question: "What types of research projects does Publication Hub handle?",
-            answer: "We specialize in: Systematic Reviews and Meta-Analyses, Epidemiological Studies, and Cohort Studies (Prospective and Retrospective). We also provide support for Clinical Trials and Case-Control Studies across various medical specialties.",
-        },
-        {
-            question: "Is publication guaranteed?",
-            answer: "While we provide expert guidance and high-quality services to maximize your chances, the final decision lies with the journal's peer-review process. However, our track record shows a significantly higher acceptance rate for our mentees.",
-        },
-        {
-            question: "Are consultants involved in the research process?",
-            answer: "Yes, our team of expert consultants and mentors provides hands-on guidance throughout every stage, from methodology design to final manuscript preparation and submission.",
-        },
-        {
-            question: "Can I request a certificate for my research participation?",
-            answer: "Absolutely! Upon successful completion of your research project or course, we provide formalized certificates that recognize your contribution and mastery of research skills.",
-        },
-        {
-            question: "Who are the mentors and coordinators?",
-            answer: "Our mentors are seasoned researchers, PhD holders, and clinical experts from top-tier institutions worldwide who are dedicated to academic excellence and student success.",
-        },
-        {
-            question: "Can I get a refund after registering?",
-            answer: "Registrations are subject to our standard refund policy. Generally, withdrawals made before the project commencement or course access are eligible for partial or full refunds depending on the timing.",
-        },
-        {
-            question: "Is previous research experience required?",
-            answer: "No, we welcome researchers at all levels. Our programs are designed to support everyone from absolute beginners to advanced researchers looking to polish their skills.",
-        },
-    ];
+    const fetchFaqs = async (page: number, isInitial = false) => {
+        if (isInitial) setLoading(true);
+        else setLoadMoreLoading(true);
+
+        try {
+            const res = await getAllFaq(page);
+            if (res?.status) {
+                if (isInitial) {
+                    setFaqs(res.data.slice(0, 10)); // Show first 10 from the first page
+                } else {
+                    setFaqs((prev) => [...prev, ...res.data]);
+                }
+                setCurrentPage(res.pagination.current_page);
+                setLastPage(res.pagination.last_page);
+            }
+        } catch (error) {
+            console.error("Failed to fetch FAQs:", error);
+        } finally {
+            setLoading(false);
+            setLoadMoreLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchFaqs(1, true);
+    }, []);
+
+    const handleLoadMore = () => {
+        if (currentPage < lastPage) {
+            fetchFaqs(currentPage + 1);
+        } else if (faqs.length === 10 && lastPage === 1) {
+            // If we initially sliced 10 and want to show the rest of page 1
+            // (Note: The user specifically asked for "show first 10 then pagination")
+            // In your API, page 1 has 12 items. So we show the remaining 2.
+            const fetchRemaining = async () => {
+                setLoadMoreLoading(true);
+                const res = await getAllFaq(1);
+                if (res?.status) {
+                    setFaqs(res.data); // Show all 12
+                }
+                setLoadMoreLoading(false);
+            };
+            fetchRemaining();
+        }
+    };
 
     return (
         <section className="relative w-full bg-[#0A0C0F] py-24 px-4 overflow-hidden">
@@ -116,15 +143,44 @@ const Faq = () => {
 
                 {/* FAQ List */}
                 <div className="flex flex-col gap-4">
-                    {faqs.map((faq, index) => (
-                        <FAQItem
-                            key={index}
-                            question={faq.question}
-                            answer={faq.answer}
-                            isOpen={openIndex === index}
-                            onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                        />
-                    ))}
+                    {loading ? (
+                        <div className="flex flex-col items-center py-20 gap-4">
+                            <Loader2 className="w-10 h-10 text-[#00D1FF] animate-spin" />
+                            <p className="text-[#A3A7AE] font-medium">Loading FAQs...</p>
+                        </div>
+                    ) : (
+                        <>
+                            {faqs.map((faq, index) => (
+                                <FAQItem
+                                    key={faq.id || index}
+                                    question={faq.question}
+                                    answer={faq.answer}
+                                    isOpen={openIndex === index}
+                                    onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                                />
+                            ))}
+
+                            {/* Pagination/Load More */}
+                            {(currentPage < lastPage || (faqs.length === 10 && lastPage === 1)) && (
+                                <div className="mt-12 flex justify-center">
+                                    <button
+                                        onClick={handleLoadMore}
+                                        disabled={loadMoreLoading}
+                                        className="group relative flex items-center gap-2 px-8 py-3.5 rounded-xl border border-[#00D1FF]/30 bg-[#00D1FF]/5 hover:bg-[#00D1FF]/10 text-[#00D1FF] font-bold transition-all duration-300 disabled:opacity-50"
+                                    >
+                                        {loadMoreLoading ? (
+                                            <Loader2 size={20} className="animate-spin" />
+                                        ) : (
+                                            <>
+                                                <span>Show More Questions</span>
+                                                <ChevronDown size={18} className="group-hover:translate-y-0.5 transition-transform" />
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </section>
