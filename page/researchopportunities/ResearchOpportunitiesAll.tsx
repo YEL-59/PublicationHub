@@ -1,15 +1,45 @@
 "use client";
 
-import React from "react";
-import { Search, ChevronDown, Filter, Calendar, User, ArrowRight, ChevronLeft } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search, ChevronDown, Filter, Calendar, User, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { opportunities } from "@/lib/opportunities";
-
-// For demonstration, we'll repeat the opportunities to fill 9 slots
-const allOpportunities = [...opportunities, ...opportunities.slice(0, 3)];
+import { getAllOpportunities } from "@/services/home";
+import { Opportunity } from "@/types/opportunity";
 
 const ResearchOpportunitiesAll = () => {
+    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchOpportunities = async (page: number) => {
+        setLoading(true);
+        try {
+            const response = await getAllOpportunities(page);
+            if (response.status) {
+                setOpportunities(response.data);
+                setTotalPages(response.pagination.last_page);
+                setCurrentPage(response.pagination.current_page);
+            }
+        } catch (error) {
+            console.error("Error fetching opportunities:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOpportunities(currentPage);
+    }, [currentPage]);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
     return (
         <section className="min-h-screen bg-[#0A0C0F] text-white py-12 px-6 md:px-12 lg:px-20 font-inter">
             <div className="container mx-auto">
@@ -46,94 +76,133 @@ const ResearchOpportunitiesAll = () => {
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                    {allOpportunities.map((opp, index) => (
-                        <motion.div
-                            key={`${opp.id}-${index}`}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
-                            className="group bg-[#111419] border border-white/5 rounded-[20px] overflow-hidden hover:border-[#00D1FF]/20 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
-                        >
-                            {/* Card Image */}
-                            <div className="relative h-56 overflow-hidden">
-                                <img
-                                    src={opp.image}
-                                    alt={opp.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#111419] via-transparent to-transparent opacity-30" />
-                                <span className={`absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-bold text-black uppercase tracking-wider ${opp.categoryColor} shadow-lg shadow-black/10`}>
-                                    {opp.category}
-                                </span>
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="p-7">
-                                <h3 className="text-xl font-bold mb-3 text-white tracking-tight leading-snug h-[3.5rem] line-clamp-2">
-                                    {opp.title}
-                                </h3>
-                                <p className="text-[#A3A7AE]/80 text-[13px] md:text-sm mb-6 line-clamp-2 leading-relaxed font-inter h-[2.5rem]">
-                                    {opp.description}
-                                </p>
-
-                                <div className="flex flex-col gap-3 mb-6">
-                                    <div className="flex items-center gap-3 group/info">
-                                        <User className="w-4.5 h-4.5 text-[#00D1FF]" strokeWidth={1.5} />
-                                        <span className="text-xs font-medium text-[#A3A7AE]/90">{opp.mentor}</span>
+                {loading ? (
+                    <div className="flex justify-center items-center py-40">
+                        <Loader2 className="w-10 h-10 text-[#00D1FF] animate-spin" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                        {opportunities.length > 0 ? (
+                            opportunities.map((opp, index) => (
+                                <motion.div
+                                    key={opp.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.5, delay: (index % 3) * 0.1 }}
+                                    className="group bg-[#111419] border border-white/5 rounded-[20px] overflow-hidden hover:border-[#00D1FF]/20 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+                                >
+                                    {/* Card Image */}
+                                    <div className="relative h-56 overflow-hidden bg-gray-800">
+                                        <img
+                                            src={opp.thumbnail || "https://images.unsplash.com/photo-1614935151651-0bea6508db6b?q=80&w=1471&auto=format&fit=crop"}
+                                            alt={opp.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#111419] via-transparent to-transparent opacity-30" />
+                                        <span className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-bold text-black uppercase tracking-wider bg-[#00D1FF] shadow-lg shadow-black/10">
+                                            {opp.categories?.[0]?.name || "Uncategorized"}
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-3 group/info">
-                                        <Calendar className="w-4.5 h-4.5 text-[#00D1FF]" strokeWidth={1.5} />
-                                        <span className="text-xs font-medium text-[#A3A7AE]/90">Deadline: {opp.deadline}</span>
-                                    </div>
-                                </div>
 
-                                <div className="flex items-center gap-3">
-                                    <Link
-                                        href={`/researchopportunities/apply/${opp.id}`}
-                                        className="flex-[3.5] bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-2.5 px-6 rounded-lg text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-[0.98]"
-                                    >
-                                        Apply Now <ArrowRight className="w-4.5 h-4.5 group-hover/btn:translate-x-1 transition-transform" />
-                                    </Link>
-                                    <Link
-                                        href={`/researchopportunities/${opp.id}`}
-                                        className="flex-1 bg-[#111419] border border-white/10 hover:bg-white/5 text-white/90 font-medium py-2.5 px-2 rounded-lg text-xs md:text-sm transition-all duration-300 active:scale-[0.98] text-center"
-                                    >
-                                        Details
-                                    </Link>
-                                </div>
+                                    {/* Card Content */}
+                                    <div className="p-7">
+                                        <h3 className="text-xl font-bold mb-3 text-white tracking-tight leading-snug h-[3.5rem] line-clamp-2">
+                                            {opp.title}
+                                        </h3>
+                                        <p className="text-[#A3A7AE]/80 text-[13px] md:text-sm mb-6 line-clamp-2 leading-relaxed font-inter h-[2.5rem]">
+                                            {opp.overview}
+                                        </p>
+
+                                        <div className="flex flex-col gap-3 mb-6">
+                                            <div className="flex items-center gap-3 group/info">
+                                                <User className="w-4.5 h-4.5 text-[#00D1FF]" strokeWidth={1.5} />
+                                                <span className="text-xs font-medium text-[#A3A7AE]/90">
+                                                    {opp.mentor?.user?.name || "Anonymous Mentor"}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-3 group/info">
+                                                <Calendar className="w-4.5 h-4.5 text-[#00D1FF]" strokeWidth={1.5} />
+                                                <span className="text-xs font-medium text-[#A3A7AE]/90">
+                                                    Deadline: {new Date(opp.dead_line).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <Link
+                                                href={`/researchopportunities/apply/${opp.id}`}
+                                                className="flex-[3.5] bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-2.5 px-6 rounded-lg text-xs md:text-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-[0.98]"
+                                            >
+                                                Apply Now <ArrowRight className="w-4.5 h-4.5 group-hover/btn:translate-x-1 transition-transform" />
+                                            </Link>
+                                            <Link
+                                                href={`/researchopportunities/${opp.id}`}
+                                                className="flex-1 bg-[#111419] border border-white/10 hover:bg-white/5 text-white/90 font-medium py-2.5 px-2 rounded-lg text-xs md:text-sm transition-all duration-300 active:scale-[0.98] text-center"
+                                            >
+                                                Details
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))
+                        ) : (
+                            <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 bg-[#111419] rounded-[20px] border border-white/5">
+                                <p className="text-[#A3A7AE] text-lg">No research opportunities found.</p>
                             </div>
-                        </motion.div>
-                    ))}
-                </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Pagination */}
-                <div className="flex items-center justify-center gap-2 md:gap-4 py-8">
-                    <button className="flex items-center gap-2 text-[#A3A7AE] hover:text-white transition-colors text-sm font-medium mr-4 group">
-                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Prev
-                    </button>
-
-                    <button className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-[#00D1FF] text-black font-bold text-sm transition-all shadow-lg shadow-[#00D1FF]/20">
-                        1
-                    </button>
-
-                    {[2, 3, 4, 5].map((num) => (
-                        <button key={num} className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-transparent border border-white/5 text-[#A3A7AE] hover:text-white hover:border-white/20 font-medium text-sm transition-all">
-                            {num}
+                {!loading && totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 md:gap-4 py-8">
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`flex items-center gap-2 text-[#A3A7AE] hover:text-white transition-colors text-sm font-medium mr-4 group ${currentPage === 1 ? "opacity-30 cursor-not-allowed" : ""}`}
+                        >
+                            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Prev
                         </button>
-                    ))}
 
-                    <span className="text-[#64748B] px-1 md:px-2">...</span>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => {
+                            // Show first, last, current, and one around current
+                            if (
+                                num === 1 ||
+                                num === totalPages ||
+                                (num >= currentPage - 1 && num <= currentPage + 1)
+                            ) {
+                                return (
+                                    <button
+                                        key={num}
+                                        onClick={() => handlePageChange(num)}
+                                        className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+                                            currentPage === num
+                                                ? "bg-[#00D1FF] text-black shadow-lg shadow-[#00D1FF]/20"
+                                                : "bg-transparent border border-white/5 text-[#A3A7AE] hover:text-white hover:border-white/20"
+                                        }`}
+                                    >
+                                        {num}
+                                    </button>
+                                );
+                            } else if (
+                                (num === currentPage - 2 && num > 1) ||
+                                (num === currentPage + 2 && num < totalPages)
+                            ) {
+                                return <span key={num} className="text-[#64748B] px-1 md:px-2">...</span>;
+                            }
+                            return null;
+                        })}
 
-                    <button className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-transparent border border-white/5 text-[#A3A7AE] hover:text-white hover:border-white/20 font-medium text-sm transition-all">
-                        15
-                    </button>
-
-                    <button className="flex items-center gap-2 text-[#A3A7AE] hover:text-white transition-colors text-sm font-medium ml-4 group">
-                        Next <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-                </div>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`flex items-center gap-2 text-[#A3A7AE] hover:text-white transition-colors text-sm font-medium ml-4 group ${currentPage === totalPages ? "opacity-30 cursor-not-allowed" : ""}`}
+                        >
+                            Next <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     );

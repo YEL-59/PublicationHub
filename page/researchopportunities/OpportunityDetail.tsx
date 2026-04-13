@@ -37,20 +37,28 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                     {/* Main Content */}
                     <div className="lg:col-span-8">
                         {/* Tags */}
-                        <div className="flex gap-2 mb-6">
-                            {(opportunity.tags || ["Oncology", "Medicine"]).map((tag: string) => (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {(opportunity.specialities || []).map((spec: any) => (
                                 <span
-                                    key={tag}
+                                    key={spec.id}
                                     className="px-3 py-1 bg-[#171A21] border border-white/5 rounded-full text-[11px] font-semibold text-[#8B8FF9]"
                                 >
-                                    {tag}
+                                    {spec.name}
+                                </span>
+                            ))}
+                            {(opportunity.categories || []).map((cat: any) => (
+                                <span
+                                    key={`cat-${cat.id}`}
+                                    className="px-3 py-1 bg-[#171A21] border border-white/5 rounded-full text-[11px] font-semibold text-[#00E5FF]"
+                                >
+                                    {cat.name}
                                 </span>
                             ))}
                         </div>
 
                         {/* Title */}
                         <h1 className="text-3xl md:text-4xl lg:text-4xl font-bold leading-tight mb-10 tracking-tight text-[#EBEEF1]">
-                            {opportunity.title} : a retrospective cohort study
+                            {opportunity.title}
                         </h1>
 
                         {/* Info Bar */}
@@ -61,7 +69,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-[#A3A7AE] uppercase tracking-wider font-bold mb-0.5">Deadline</p>
-                                    <p className="text-sm font-semibold">{opportunity.deadline}</p>
+                                    <p className="text-sm font-semibold">{opportunity.dead_line ? new Date(opportunity.dead_line).toLocaleDateString() : "N/A"}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -70,7 +78,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-[#A3A7AE] uppercase tracking-wider font-bold mb-0.5">Duration</p>
-                                    <p className="text-sm font-semibold">{opportunity.duration || "2 Months"}</p>
+                                    <p className="text-sm font-semibold">{opportunity.durations || "N/A"}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -79,7 +87,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                                 </div>
                                 <div>
                                     <p className="text-[10px] text-[#A3A7AE] uppercase tracking-wider font-bold mb-0.5">Start Date</p>
-                                    <p className="text-sm font-semibold">{opportunity.startDate || "July 2026"}</p>
+                                    <p className="text-sm font-semibold">{opportunity.start_date ? new Date(opportunity.start_date).toLocaleDateString() : "N/A"}</p>
                                 </div>
                             </div>
                         </div>
@@ -89,70 +97,26 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             <div>
                                 <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">About This Opportunity</h2>
                                 <p className="text-[#A3A7AE] leading-relaxed text-base">
-                                    {opportunity.description} This fellowship offers unparalleled training in both clinical and translational research. As a fellow, you will work alongside leading cardiologists and scientists to conduct groundbreaking research that directly impacts patient care. Our program emphasizes hands-on experience with the latest technologies and methodologies in cardiovascular medicine.
+                                    {opportunity.overview || "No overview available."}
                                 </p>
                             </div>
 
-                            <div>
-                                <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">Responsibilities</h2>
-                                <ul className="space-y-4">
-                                    {[
-                                        "Conduct independent research under faculty mentorship",
-                                        "Participate in clinical trials and data analysis",
-                                        "Present findings at national conferences",
-                                        "Collaborate with multidisciplinary research teams",
-                                        "Contribute to peer-reviewed publications"
-                                    ].map((item, i) => (
-                                        <li key={i} className="flex gap-3 text-[#A3A7AE] text-sm md:text-base leading-relaxed items-start">
-                                            <span className="text-[#00D1FF] mt-1.5 shrink-0">•</span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">Requirements</h2>
-                                <ul className="space-y-4">
-                                    {[
-                                        "MD or PhD in a relevant field",
-                                        "Strong foundation in cardiovascular science",
-                                        "Excellent communication and writing skills",
-                                        "Prior research experience preferred",
-                                        "Eligible to work in the United States"
-                                    ].map((item, i) => (
-                                        <li key={i} className="flex gap-3 text-[#A3A7AE] text-sm md:text-base leading-relaxed items-start">
-                                            <span className="text-[#00D1FF] mt-1.5 shrink-0">•</span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">Benefits</h2>
-                                <ul className="space-y-4">
-                                    {[
-                                        "Competitive stipend and benefits",
-                                        "Conference travel support",
-                                        "Access to state-of-the-art facilities",
-                                        "Networking with global researchers",
-                                        "Publication opportunities"
-                                    ].map((item, i) => (
-                                        <li key={i} className="flex gap-3 text-[#A3A7AE] text-sm md:text-base leading-relaxed items-start">
-                                            <span className="text-[#00D1FF] mt-1.5 shrink-0">•</span>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                            {opportunity.desciptions && opportunity.desciptions.map((desc: any, index: number) => (
+                                <div key={index}>
+                                    <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">{desc.title}</h2>
+                                    <div 
+                                        className="text-[#A3A7AE] text-sm md:text-base leading-relaxed prose prose-invert max-w-none"
+                                        dangerouslySetInnerHTML={{ __html: desc.description }}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     {/* Sidebar */}
                     <div className="lg:col-span-4 space-y-6">
                         {/* Action Card */}
-                        <div className="bg-[#111419] border border-white/5 rounded-2x p-6 space-y-4">
+                        <div className="bg-[#111419] border border-white/5 rounded-t-2xl p-6 space-y-4">
                             <Link
                                 href={`/researchopportunities/apply/${opportunity.id}`}
                                 className="w-full bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-4 rounded-xl text-sm transition-all duration-300 flex items-center justify-center"
@@ -170,26 +134,28 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                         </div>
 
                         {/* Mentor Card */}
-                        <div className="bg-[#111419] border border-white/5 rounded-2xl p-8 space-y-8">
-                            <div>
-                                <p className="text-sm font-bold text-white mb-6 tracking-tight">Mentor</p>
-                                <div className="flex items-center gap-4">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1559839734-2b71f1536783?q=80&w=1470&auto=format&fit=crop"
-                                        alt="Mentor"
-                                        className="w-14 h-14 rounded-full object-cover border-2 border-[#00D1FF]/20"
-                                    />
-                                    <div>
-                                        <p className="text-white font-bold text-sm tracking-tight">{opportunity.mentor}</p>
-                                        <p className="text-[11px] text-[#A3A7AE] font-medium leading-tight mt-1 opacity-70">Professor of Cardiology</p>
+                        {opportunity.mentor && (
+                            <div className="bg-[#111419] border border-white/5 rounded-b-2xl p-8 space-y-8">
+                                <div>
+                                    <p className="text-sm font-bold text-white mb-6 tracking-tight">Mentor</p>
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            src={opportunity.mentor?.user?.avatar || "https://images.unsplash.com/photo-1559839734-2b71f1536783?q=80&w=1470&auto=format&fit=crop"}
+                                            alt="Mentor"
+                                            className="w-14 h-14 rounded-full object-cover border-2 border-[#00D1FF]/20"
+                                        />
+                                        <div>
+                                            <p className="text-white font-bold text-sm tracking-tight">{opportunity.mentor?.user?.name}</p>
+                                            <p className="text-[11px] text-[#A3A7AE] font-medium leading-tight mt-1 opacity-70">{opportunity.mentor?.department || "Mentor"}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <button className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300">
-                                <MessageSquare className="w-4 h-4" /> Contact Mentor
-                            </button>
-                        </div>
+                                <button className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300">
+                                    <MessageSquare className="w-4 h-4" /> Contact Mentor
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

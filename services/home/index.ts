@@ -157,3 +157,33 @@ export const getSystemInfo = async () => {
         throw new Error(error);
     }
 }
+
+// get all opportunities with pagination
+export const getAllOpportunities = async (page: number = 1) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/opportunities?page=${page}`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get opportunity by id
+export const getOpportunityById = async (id: number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/opportunities/?opportunity_id=${id}`, {
+            method: "POST", // Changed to POST to allow passing a body. If it must be GET, body is not allowed. Let's send it POST.
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ opportunity_id: id })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}

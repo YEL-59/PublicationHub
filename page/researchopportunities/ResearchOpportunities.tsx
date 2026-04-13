@@ -1,14 +1,40 @@
 "use client";
 
-import React from "react";
-import { Search, ChevronDown, Filter, Calendar, User, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { Search, ChevronDown, Filter, Calendar, User, ArrowRight, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-
-import { opportunities } from "@/lib/opportunities";
-
+import { getAllOpportunities } from "@/services/home";
+import { Opportunity } from "@/types/opportunity";
 
 const ResearchOpportunities = () => {
+    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [displayCount, setDisplayCount] = useState(6);
+    const [loading, setLoading] = useState(true);
+    const [total, setTotal] = useState(0);
+
+    useEffect(() => {
+        const fetchOpportunities = async () => {
+            setLoading(true);
+            try {
+                const res = await getAllOpportunities(1);
+                if (res?.status) {
+                    setOpportunities(res.data);
+                    setTotal(res.pagination?.total || 0);
+                }
+            } catch (error) {
+                console.error("Failed to fetch opportunities:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOpportunities();
+    }, []);
+
+    const handleLoadMore = () => {
+        setDisplayCount(opportunities.length);
+    };
+
     return (
         <section className="min-h-screen bg-[#0A0C0F] text-white py-12 px-6 md:px-12 lg:px-20 font-inter">
             <div className="container mx-auto">
@@ -45,85 +71,107 @@ const ResearchOpportunities = () => {
                 </div>
 
                 <div className="mb-8">
-                    <p className="text-[#64748B] text-sm font-medium">8 opportunities</p>
+                    <p className="text-[#64748B] text-sm font-medium">
+                        {loading ? "Loading..." : `${total} opportunities available`}
+                    </p>
                 </div>
 
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {opportunities.map((opp, index) => (
-                        <motion.div
-                            key={opp.id}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="group bg-[#111419] border border-white/5 rounded-[24px] overflow-hidden hover:border-[#00D1FF]/20 transition-all duration-500"
+                    {loading ? (
+                        [...Array(6)].map((_, i) => (
+                            <div key={i} className="bg-[#111419] border border-white/5 rounded-[24px] h-[500px] animate-pulse" />
+                        ))
+                    ) : (
+                        opportunities.slice(0, displayCount).map((opp, index) => (
+                            <motion.div
+                                key={opp.id}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                className="group bg-[#111419] border border-white/5 rounded-[24px] overflow-hidden hover:border-[#00D1FF]/20 transition-all duration-500"
+                            >
+                                {/* Card Image */}
+                                <div className="relative h-60 overflow-hidden">
+                                    <img
+                                        src={opp.thumbnail || "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=800"}
+                                        alt={opp.title}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#111419] via-transparent to-transparent opacity-30" />
+                                    {opp.categories?.[0] && (
+                                        <span className={`absolute top-5 left-5 px-4 py-2 rounded-full text-[11px] font-bold text-black bg-[#00E5FF] shadow-lg shadow-black/10`}>
+                                            {opp.categories[0].name}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Card Content */}
+                                <div className="p-8">
+                                    <h3 className="text-xl md:text-lg font-bold mb-3 text-white tracking-tight line-clamp-2 min-h-[56px]">{opp.title}</h3>
+                                    <p className="text-[#A3A7AE]/80 text-sm mb-8 line-clamp-2 leading-relaxed font-inter">
+                                        {opp.overview}
+                                    </p>
+
+                                    <div className="flex flex-col gap-4 mb-8">
+                                        <div className="flex items-center gap-3.5 group/info">
+                                            <User className="w-5 h-5 text-[#00D1FF]" strokeWidth={1.5} />
+                                            <span className="text-sm font-medium text-[#A3A7AE]">{opp.mentor?.user?.name || "Anonymous Mentor"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3.5 group/info">
+                                            <Calendar className="w-5 h-5 text-[#00D1FF]" strokeWidth={1.5} />
+                                            <span className="text-sm font-medium text-[#A3A7AE]">Deadline: {new Date(opp.dead_line).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full h-px bg-white/5 mb-8" />
+
+                                    <div className="flex items-center gap-3">
+                                        <Link
+                                            href={`/researchopportunities/apply/${opp.id}`}
+                                            className="flex-[3.5] bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-2.5 px-6 rounded-lg text-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-[0.98]"
+                                        >
+                                            Apply Now <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                        </Link>
+                                        <Link
+                                            href={`/researchopportunities/${opp.id}`}
+                                            className="flex-1 bg-[#111419] border border-white/10 hover:bg-white/5 text-white/90 font-medium py-2.5 px-2 rounded-lg text-sm transition-all duration-300 active:scale-[0.98] text-center"
+                                        >
+                                            Details
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))
+                    )}
+                </div>
+
+
+                {!loading && displayCount < opportunities.length && (
+                    <div className="flex justify-center mt-12">
+                        <button
+                            onClick={handleLoadMore}
+                            className="flex items-center gap-2 bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-3 px-8 rounded-lg text-sm transition-all duration-300 active:scale-[0.98]"
                         >
-                            {/* Card Image */}
-                            <div className="relative h-60 overflow-hidden">
-                                <img
-                                    src={opp.image}
-                                    alt={opp.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#111419] via-transparent to-transparent opacity-30" />
-                                <span className={`absolute top-5 left-5 px-4 py-2 rounded-full text-[11px] font-bold text-black ${opp.categoryColor} shadow-lg shadow-black/10`}>
-                                    {opp.category}
-                                </span>
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="p-8">
-                                <h3 className="text-xl md:text-2xl font-bold mb-3 text-white tracking-tight">{opp.title}</h3>
-                                <p className="text-[#A3A7AE]/80 text-sm md:text-base mb-8 line-clamp-2 leading-relaxed font-inter">
-                                    {opp.description}
-                                </p>
-
-                                <div className="flex flex-col gap-4 mb-8">
-                                    <div className="flex items-center gap-3.5 group/info">
-                                        <User className="w-5 h-5 text-[#00D1FF]" strokeWidth={1.5} />
-                                        <span className="text-sm font-medium text-[#A3A7AE]">{opp.mentor}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3.5 group/info">
-                                        <Calendar className="w-5 h-5 text-[#00D1FF]" strokeWidth={1.5} />
-                                        <span className="text-sm font-medium text-[#A3A7AE]">Deadline: {opp.deadline}</span>
-                                    </div>
-                                </div>
-
-                                <div className="w-full h-px bg-white/5 mb-8" />
-
-                                <div className="flex items-center gap-3">
-                                    <Link
-                                        href={`/researchopportunities/apply/${opp.id}`}
-                                        className="flex-[3.5] bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-2 px-6 rounded-lg text-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn active:scale-[0.98]"
-                                    >
-                                        Apply Now <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                                    </Link>
-                                    <Link
-                                        href={`/researchopportunities/${opp.id}`}
-                                        className="flex-1 bg-[#111419] border border-white/10 hover:bg-white/5 text-white/90 font-medium py-2 px-2 rounded-lg text-sm transition-all duration-300 active:scale-[0.98] text-center"
-                                    >
-                                        Details
-                                    </Link>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-
-
-                <div className="flex justify-center mt-12">
-                    <Link
-                        href="/researchopportunities/view-all"
-                        className="flex items-center gap-2 bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-bold py-3 px-8 rounded-lg text-sm transition-all duration-300 active:scale-[0.98]"
-                    >
-                        Load More <ArrowRight className="w-5 h-5" />
-                    </Link>
-                </div>
+                            View All <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                )}
+                
+                {!loading && displayCount >= opportunities.length && total > opportunities.length && (
+                     <div className="flex justify-center mt-12">
+                        <Link
+                            href="/researchopportunities/view-all"
+                            className="flex items-center gap-2 border border-[#00E5FF] text-[#00E5FF] hover:bg-[#00E5FF] hover:text-black font-bold py-3 px-8 rounded-lg text-sm transition-all duration-300 active:scale-[0.98]"
+                        >
+                            Explore Global Database <ArrowRight className="w-5 h-5" />
+                        </Link>
+                    </div>
+                )}
             </div>
         </section>
     );
 };
-
 
 export default ResearchOpportunities;
