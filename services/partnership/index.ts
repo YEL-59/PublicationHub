@@ -228,3 +228,24 @@ export const getResearchOppData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Why Partner Section data
+ */
+export const getWhyPartnerData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/why-partner-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch why partner data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching why partner data:", error);
+        throw error;
+    }
+};
