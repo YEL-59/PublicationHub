@@ -1,25 +1,54 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { getPartnershipAboutData } from "@/services/partnership";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
-// API-ready content
-const content = {
-    badge: "About Us",
-    heading: "What is",
-    headingAccent: "Publication Hub?",
-    paragraphs: [
-        "Publication Hub is a leading Saudi research organization, officially registered at the Ministry of Commerce and fully VAT-registered, dedicated to transforming raw data into high-quality, publishable scientific research.",
-        "We collaborate with universities, hospitals, and research centers to streamline research workflows and enhance scientific output.",
-    ],
-    // Replace with local assets or API URLs when available
-    images: {
-        left: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-        right: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80",
-    },
-};
+interface ApiAboutData {
+    id: number;
+    title: string;
+    sub_title: string;
+    description: string;
+    image: string;
+}
 
 const Whatpartnership = () => {
+    const [aboutData, setAboutData] = useState<ApiAboutData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getPartnershipAboutData();
+                if (res?.status) {
+                    setAboutData(res.data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!aboutData) return null;
+
+    // Split description into paragraphs if it has newlines
+    const paragraphs = aboutData.description
+        ? aboutData.description.split("\n").filter(p => p.trim() !== "")
+        : [];
+
     return (
         <section className="relative bg-[#0A0C0F] py-16 px-6 md:px-12 lg:px-20 overflow-hidden">
             {/* Ambient glow top-right */}
@@ -38,7 +67,7 @@ const Whatpartnership = () => {
                             transition={{ duration: 0.5 }}
                             className="inline-flex items-center px-3 py-1 bg-[#111419] border border-white/8 rounded-full text-[10px] font-semibold text-[#9CA3AF] tracking-wide mb-5"
                         >
-                            About Us
+                            {aboutData.title}
                         </motion.div>
 
                         {/* Heading */}
@@ -49,22 +78,19 @@ const Whatpartnership = () => {
                             transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                             className="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight mb-6"
                         >
-                            {content.heading}{" "}
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#4AB8FF]">
-                                {content.headingAccent}
-                            </span>
+                            {aboutData.sub_title}
                         </motion.h2>
 
                         {/* Paragraphs */}
-                        <div className="space-y-4 max-w-sm">
-                            {content.paragraphs.map((para, i) => (
+                        <div className="space-y-4 max-w-xl">
+                            {paragraphs.map((para, i) => (
                                 <motion.p
                                     key={i}
                                     initial={{ opacity: 0, y: 14 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.6, delay: 0.15 + i * 0.1 }}
-                                    className="text-[#6B7280] text-[13px] leading-relaxed"
+                                    className="text-[#6B7280] text-sm md:text-base leading-relaxed"
                                 >
                                     {para}
                                 </motion.p>
@@ -72,10 +98,29 @@ const Whatpartnership = () => {
                         </div>
                     </div>
 
-                    {/* ── RIGHT: Staggered image pair ── */}
-                    <div className="relative w-full md:w-[52%] shrink-0 flex items-end justify-center h-[340px] md:h-[400px]">
+                    {/* ── RIGHT: Single Image layout ── */}
+                    <div className="relative w-full md:w-[48%] shrink-0 flex items-center justify-center">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                            className="relative w-full aspect-[4/3] md:aspect-square rounded-3xl overflow-hidden border border-white/10 shadow-3xl shadow-black/80 group"
+                        >
+                            <Image
+                                src={aboutData.image}
+                                alt="Publication Hub Overview"
+                                fill
+                                className="object-fit  transition-transform duration-700 group-hover:scale-105"
+                            />
+                            {/* Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        </motion.div>
+                    </div>
 
-                        {/* Left image — tilted, shorter, positioned left-center */}
+                    {/* Old staggered image pair commented out */}
+                    {/* 
+                    <div className="relative w-full md:w-[52%] shrink-0 flex items-end justify-center h-[340px] md:h-[400px]">
                         <motion.div
                             initial={{ opacity: 0, rotate: -12, y: 30 }}
                             whileInView={{ opacity: 1, rotate: -6, y: 0 }}
@@ -84,17 +129,13 @@ const Whatpartnership = () => {
                             className="absolute left-[4%] bottom-0 w-[52%] aspect-[4/3] rounded-2xl overflow-hidden border border-white/8 shadow-2xl shadow-black/50"
                             style={{ zIndex: 1 }}
                         >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={content.images.left}
                                 alt="Research data analysis"
                                 className="w-full h-full object-cover"
                             />
-                            {/* Subtle dark vignette */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         </motion.div>
-
-                        {/* Right image — upright, taller, positioned right */}
                         <motion.div
                             initial={{ opacity: 0, y: 40 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -103,7 +144,6 @@ const Whatpartnership = () => {
                             className="absolute right-[4%] bottom-0 w-[40%] aspect-[3/4] rounded-2xl overflow-hidden border border-white/8 shadow-2xl shadow-black/50"
                             style={{ zIndex: 2 }}
                         >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={content.images.right}
                                 alt="Team collaboration"
@@ -111,8 +151,8 @@ const Whatpartnership = () => {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         </motion.div>
-
                     </div>
+                    */}
 
                 </div>
             </div>

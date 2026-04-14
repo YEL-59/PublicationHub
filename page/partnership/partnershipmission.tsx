@@ -1,38 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
-import missionImg from "@/assets/images/missionimg.png";
+import { getPartnershipMissionData } from "@/services/partnership";
+import { Loader2 } from "lucide-react";
 
-// API-ready data
-const MISSION_POINTS = [
-    "Enable researchers to produce impactful, high-quality studies",
-    "Provide cost-effective and efficient research services",
-    "Support scientific institutions in achieving strategic publishing goals",
-    "Integrate AI-driven solutions into modern research workflows",
-];
-
-const containerVariants: Variants = {
-    hidden: {},
-    visible: {
-        transition: { staggerChildren: 0.1 },
-    },
-};
-
-const itemVariants: Variants = {
-    hidden: { opacity: 0, x: -12 },
-    visible: { 
-        opacity: 1, 
-        x: 0, 
-        transition: { 
-            duration: 0.5, 
-            ease: [0.22, 1, 0.36, 1] 
-        } 
-    },
-};
+interface ApiMissionData {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+}
 
 const PartnershipMission = () => {
+    const [missionData, setMissionData] = useState<ApiMissionData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getPartnershipMissionData();
+                if (res?.status) {
+                    setMissionData(res.data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!missionData) return null;
+
     return (
         <section className="relative bg-[#0A0C0F] py-16 px-6 md:px-12 lg:px-20">
             {/* Subtle right-side ambient glow */}
@@ -51,7 +61,7 @@ const PartnershipMission = () => {
                     >
                         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
                             <Image
-                                src={missionImg}
+                                src={missionData.image}
                                 alt="Researcher at microscope"
                                 fill
                                 className="object-cover object-center"
@@ -70,10 +80,7 @@ const PartnershipMission = () => {
                             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                             className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight"
                         >
-                            Our{" "}
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#4AB8FF]">
-                                Mission
-                            </span>
+                            {missionData.title}
                         </motion.h2>
 
                         {/* Divider line */}
@@ -86,26 +93,46 @@ const PartnershipMission = () => {
                             className="h-px w-full bg-gradient-to-r from-[#00D1FF]/30 to-transparent mb-8"
                         />
 
-                        {/* Bullet list */}
-                        <motion.ul
-                            variants={containerVariants}
-                            initial="hidden"
-                            whileInView="visible"
+                        {/* Bullet list from API HTML */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-60px" }}
-                            className="space-y-4"
-                        >
-                            {MISSION_POINTS.map((point, i) => (
-                                <motion.li
-                                    key={i}
-                                    variants={itemVariants}
-                                    className="flex items-start gap-3 text-[#9CA3AF] text-sm leading-relaxed"
-                                >
-                                    {/* Bullet dot */}
-                                    <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-[#9CA3AF] shrink-0" />
-                                    {point}
-                                </motion.li>
-                            ))}
-                        </motion.ul>
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="text-[#9CA3AF] text-sm leading-relaxed mission-content"
+                            dangerouslySetInnerHTML={{ __html: missionData.description }}
+                        />
+
+                        <style jsx global>{`
+                            .mission-content ul {
+                                list-style: none;
+                                padding: 0;
+                                margin: 0;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 1rem;
+                            }
+                            .mission-content li {
+                                position: relative;
+                                padding-left: 1.5rem;
+                                color: #9CA3AF;
+                                font-size: 0.875rem;
+                                line-height: 1.625;
+                            }
+                            .mission-content li::before {
+                                content: "";
+                                position: absolute;
+                                left: 0;
+                                top: 0.5rem;
+                                width: 0.4rem;
+                                height: 0.4rem;
+                                border-radius: 50%;
+                                background-color: #9CA3AF;
+                            }
+                            .mission-content p {
+                                margin: 0;
+                            }
+                        `}</style>
                     </div>
 
                 </div>

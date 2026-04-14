@@ -9,11 +9,12 @@ const Partnership = () => {
     return (
         <main className="min-h-screen bg-[#0A0C0F]">
             <PartnershipHero />
+             <PartnershipMission />
             <Whatpartnership />
             <PartnershipValue />
             <CoreResearchValue />
             <Systematic />
-            <PartnershipMission />
+           
         </main>
     );
 };
