@@ -5,6 +5,7 @@ import PartnershipValue from "@/page/partnership/partnershipvalue";
 import CoreResearchValue from "@/page/partnership/Coreresearchvalue";
 import Systematic from "@/page/partnership/Systematic";
 import Manuscript from "@/page/partnership/Manuscript";
+import PartnershipModel from "@/page/partnership/Partnershipmodel";
 
 const Partnership = () => {
     return (
@@ -16,6 +17,7 @@ const Partnership = () => {
             <CoreResearchValue />
             <Systematic />
             <Manuscript />
+            <PartnershipModel />
            
         </main>
     );

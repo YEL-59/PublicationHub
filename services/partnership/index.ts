@@ -144,3 +144,24 @@ export const getManuscriptData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Partnership Model Section data
+ */
+export const getPartnershipModelData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/partnership-model-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch partnership model data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching partnership model data:", error);
+        throw error;
+    }
+};
