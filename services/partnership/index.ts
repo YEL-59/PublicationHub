@@ -186,3 +186,45 @@ export const getReviewerCommentData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Journal Handling Section data
+ */
+export const getJournalSupportData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/journal-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch journal support data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching journal support data:", error);
+        throw error;
+    }
+};
+
+/**
+ * Fetches the Research Opportunities Section data
+ */
+export const getResearchOppData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/research-opportunitie-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch research opportunities data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching research opportunities data:", error);
+        throw error;
+    }
+};

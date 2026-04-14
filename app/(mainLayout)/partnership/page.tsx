@@ -7,6 +7,8 @@ import Systematic from "@/page/partnership/Systematic";
 import Manuscript from "@/page/partnership/Manuscript";
 import PartnershipModel from "@/page/partnership/Partnershipmodel";
 import ReviewerModel from "@/page/partnership/Reviewermodel";
+import Journal from "@/page/partnership/Journal";
+import ResearchOpportunities from "@/page/partnership/ResearchOpportunities";
 
 const Partnership = () => {
     return (
@@ -20,6 +22,8 @@ const Partnership = () => {
             <Manuscript />
             <PartnershipModel />
             <ReviewerModel />
+            <Journal />
+            <ResearchOpportunities />
            
         </main>
     );
