@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 import {
     Database,
     TrendingUp,
@@ -9,41 +10,33 @@ import {
     Users,
     Zap,
     BrainCircuit,
+    Loader2,
 } from "lucide-react";
+import { getPartnershipValueData } from "@/services/partnership";
 
-// API-ready data
-const VALUE_ITEMS = [
-    {
-        icon: Database,
-        title: "Convert Data",
-        subtitle: "Transform existing data into publishable research",
+interface ValueItem {
+    id: number;
+    title: string;
+    description: string;
+}
+
+interface ApiValueData {
+    content: {
+        id: number;
+        title: string;
+        image: string;
     },
-    {
-        icon: TrendingUp,
-        title: "Increase Output",
-        subtitle: "Boost annual scientific publication rate",
-    },
-    {
-        icon: ShieldCheck,
-        title: "Enhance Reputation",
-        subtitle: "Strengthen institutional research standing",
-    },
-    {
-        icon: Users,
-        title: "Support Teams",
-        subtitle: "Help trainees, residents, and faculty excel",
-    },
-    {
-        icon: Zap,
-        title: "Reduce Workload",
-        subtitle: "Ease the burden on research units",
-    },
-    {
-        icon: BrainCircuit,
-        title: "AI Analytics",
-        subtitle: "Access advanced AI-driven data analysis",
-    },
-];
+    items: ValueItem[];
+}
+
+const ICON_MAP: Record<string, any> = {
+    "Convert Data": Database,
+    "Increase Output": TrendingUp,
+    "Enhance Reputation": ShieldCheck,
+    "Support Teams": Users,
+    "Reduce Workload": Zap,
+    "AI Analytics": BrainCircuit,
+};
 
 const containerVariants: Variants = {
     hidden: {},
@@ -63,6 +56,35 @@ const itemVariants: Variants = {
 };
 
 const PartnershipValue = () => {
+    const [valueData, setValueData] = useState<ApiValueData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getPartnershipValueData();
+                if (res?.status) {
+                    setValueData(res.data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!valueData) return null;
+
     return (
         <section className="relative bg-[#0A0C0F] py-16 px-6 md:px-12 lg:px-20 overflow-hidden">
             {/* Ambient glow */}
@@ -77,11 +99,7 @@ const PartnershipValue = () => {
                     transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                     className="text-2xl md:text-3xl lg:text-4xl font-black text-white text-center tracking-tight mb-12"
                 >
-                    Partnership{" "}
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#4AB8FF]">
-                        Value
-                    </span>{" "}
-                    Proposition
+                    {valueData.content.title}
                 </motion.h2>
 
                 {/* Two-column layout */}
@@ -95,29 +113,39 @@ const PartnershipValue = () => {
                         viewport={{ once: true, margin: "-60px" }}
                         className="flex-1 space-y-6"
                     >
-                        {VALUE_ITEMS.map(({ icon: Icon, title, subtitle }, i) => (
-                            <motion.li
-                                key={i}
-                                variants={itemVariants}
-                                className="flex items-start gap-4 group"
-                            >
-                                {/* Icon box */}
-                                <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#00D1FF]/10 border border-[#00D1FF]/15 flex items-center justify-center transition-colors duration-300 group-hover:bg-[#00D1FF]/18 group-hover:border-[#00D1FF]/30">
-                                    <Icon className="w-4 h-4 text-[#00D1FF]" strokeWidth={1.8} />
-                                </div>
+                        {valueData.items.map((item) => {
+                            const Icon = ICON_MAP[item.title] || Zap;
+                            return (
+                                <motion.li
+                                    key={item.id}
+                                    variants={itemVariants}
+                                    className="flex items-start gap-4 group"
+                                >
+                                    {/* Icon box */}
+                                    <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#00D1FF]/10 border border-[#00D1FF]/15 flex items-center justify-center transition-colors duration-300 group-hover:bg-[#00D1FF]/18 group-hover:border-[#00D1FF]/30">
+                                        <Icon className="w-4 h-4 text-[#00D1FF]" strokeWidth={1.8} />
+                                    </div>
 
-                                {/* Text */}
-                                <div>
-                                    <p className="text-white text-sm font-semibold leading-tight mb-0.5">
-                                        {title}
-                                    </p>
-                                    <p className="text-[#6B7280] text-[12px] leading-snug">
-                                        {subtitle}
-                                    </p>
-                                </div>
-                            </motion.li>
-                        ))}
+                                    {/* Text */}
+                                    <div>
+                                        <p className="text-white text-sm font-semibold leading-tight mb-0.5">
+                                            {item.title}
+                                        </p>
+                                        <div 
+                                            className="text-[#6B7280] text-[12px] leading-snug prose-styles"
+                                            dangerouslySetInnerHTML={{ __html: item.description }}
+                                        />
+                                    </div>
+                                </motion.li>
+                            );
+                        })}
                     </motion.ul>
+
+                    <style jsx global>{`
+                        .prose-styles p {
+                            margin: 0;
+                        }
+                    `}</style>
 
                     {/* ── Right: Image ── */}
                     <motion.div
@@ -128,11 +156,11 @@ const PartnershipValue = () => {
                         className="w-full md:w-[50%] shrink-0"
                     >
                         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/5 shadow-2xl shadow-black/50">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=900&q=80"
+                            <Image
+                                src={valueData.content.image}
                                 alt="Scientists working in laboratory"
-                                className="w-full h-full object-cover object-center"
+                                fill
+                                className="object-cover object-center"
                             />
                             {/* Subtle vignette */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />

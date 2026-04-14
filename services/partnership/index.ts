@@ -60,3 +60,24 @@ export const getPartnershipMissionData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Partnership Value Section data
+ */
+export const getPartnershipValueData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/partnership-value-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch partnership value data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching partnership value:", error);
+        throw error;
+    }
+};
