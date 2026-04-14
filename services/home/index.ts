@@ -1,5 +1,7 @@
 "use server"
 
+import { cookies } from "next/headers";
+
 // get all faq service
 export const getAllFaq = async (page: number = 1) => {
     try {
@@ -180,6 +182,35 @@ export const getOpportunityById = async (id: number) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ opportunity_id: id })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// resolves a single opportunity item from API response
+export const getSingleOpportunity = async (id: number) => {
+    const res = await getOpportunityById(id);
+
+    if (!res?.status || !Array.isArray(res.data) || res.data.length === 0) {
+        return null;
+    }
+
+    return res.data.find((o: { id: number }) => o.id === id) || res.data[0] || null;
+}
+
+// submit opportunity application
+export const submitOpportunityApplication = async (formData: FormData) => {
+    const token = (await cookies()).get("token")?.value;
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/researcher/opportunity-applications`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData,
         });
         const data = await response.json();
         return data;

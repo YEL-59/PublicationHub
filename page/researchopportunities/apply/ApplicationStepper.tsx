@@ -12,36 +12,46 @@ import {
     ChevronDown,
     Upload,
     CheckCircle2,
-    X
+    X,
+    Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Opportunity } from "@/lib/opportunities";
+import { Opportunity } from "@/types/opportunity";
+import { submitOpportunityApplication } from "@/services/home";
+import { toast } from "sonner";
 
 interface ApplicationStepperProps {
     opportunity: Opportunity;
 }
 
 type FormData = {
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     email: string;
-    phoneNumber: string;
-    educationLevel: string;
+    phone: string;
+    highest_edu_level: string;
     institution: string;
-    fieldOfStudy: string;
-    researchExperience: string;
-    portfolio: string;
-    linkedin: string;
-    message: string;
-    coverLetter: string;
+    field_of_study: string;
+    research_experience: string;
+    personal_website: string;
+    linkedin_profile: string;
+    current_position: string;
+    cover_letter: string;
+    accept_term: boolean;
 };
 
 const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    const { register, handleSubmit, trigger, formState: { errors } } = useForm<FormData>();
+    const { register, handleSubmit, trigger, formState: { errors } } = useForm<FormData>({
+        defaultValues: {
+            accept_term: true
+        }
+    });
 
     const steps = [
         { id: 1, name: "Personal Info", icon: User },
@@ -52,9 +62,9 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
     const nextStep = async () => {
         let fieldsToValidate: (keyof FormData)[] = [];
         if (currentStep === 1) {
-            fieldsToValidate = ['firstName', 'lastName', 'email'];
+            fieldsToValidate = ['first_name', 'last_name', 'email'];
         } else if (currentStep === 2) {
-            fieldsToValidate = ['educationLevel', 'institution', 'researchExperience'];
+            fieldsToValidate = ['highest_edu_level', 'institution', 'research_experience'];
         }
 
         const isValid = await trigger(fieldsToValidate);
@@ -65,9 +75,48 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
 
     const prevStep = () => currentStep > 1 && setCurrentStep(currentStep - 1);
 
-    const onSubmit = (data: FormData) => {
-        console.log("Submit Application Data:", data);
-        setIsSubmitted(true);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
+    const onSubmit = async (data: FormData) => {
+        setIsSubmitting(true);
+        try {
+            const formData = new window.FormData();
+            formData.append("opportunity_id", String(opportunity.id));
+            formData.append("first_name", data.first_name);
+            formData.append("last_name", data.last_name);
+            formData.append("email", data.email);
+            formData.append("phone", data.phone || "");
+            formData.append("highest_edu_level", data.highest_edu_level);
+            formData.append("institution", data.institution);
+            formData.append("field_of_study", data.field_of_study || "");
+            formData.append("research_experience", data.research_experience);
+            formData.append("current_position", data.current_position || "");
+            formData.append("linkedin_profile", data.linkedin_profile || "");
+            formData.append("personal_website", data.personal_website || "");
+            formData.append("cover_letter", data.cover_letter);
+            formData.append("accept_term", data.accept_term ? "1" : "0");
+
+            if (selectedFile) {
+                formData.append("documents[]", selectedFile);
+            }
+
+            const res = await submitOpportunityApplication(formData);
+            if (res.status) {
+                setIsSubmitted(true);
+                toast.success(res.message || "Application submitted successfully");
+            } else {
+                toast.error(res.message || "Something went wrong");
+            }
+        } catch (error) {
+            console.error("Submit Application Error:", error);
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -86,21 +135,27 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
 
                 {/* Opportunity Header Card */}
                 <div className="bg-[#111419] border border-white/5 rounded-2xl p-6 mb-12">
-                    <h1 className="text-lg md:text-xl font-bold mb-4 text-[#EBEEF1] tracking-tight">
+                    <h1 className="text-lg md:text-xl font-bold mb-4 text-[#EBEEF1] tracking-tight text-balance leading-tight">
                         {opportunity.title}
                     </h1>
                     <div className="flex flex-wrap gap-6 text-[#A3A7AE]">
                         <div className="flex items-center gap-2.5">
-                            <GraduationCap className="w-5 h-5 opacity-60" strokeWidth={1.5} />
-                            <span className="text-xs md:text-sm font-medium">Harvard University</span>
+                            <GraduationCap className="w-5 h-5 opacity-60 text-[#00D1FF]" strokeWidth={1.5} />
+                            <span className="text-xs md:text-sm font-medium">
+                                {opportunity.university_hospitals?.[0]?.name || "Collaborating Institution"}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2.5">
-                            <User className="w-5 h-5 opacity-60" strokeWidth={1.5} />
-                            <span className="text-xs md:text-sm font-medium">{opportunity.mentor}</span>
+                            <User className="w-5 h-5 opacity-60 text-[#00D1FF]" strokeWidth={1.5} />
+                            <span className="text-xs md:text-sm font-medium">
+                                {opportunity.mentor?.user?.name || "Mentor"}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2.5">
-                            <Calendar className="w-5 h-5 opacity-60" strokeWidth={1.5} />
-                            <span className="text-xs md:text-sm font-medium">Deadline: {opportunity.deadline}</span>
+                            <Calendar className="w-5 h-5 opacity-60 text-[#00D1FF]" strokeWidth={1.5} />
+                            <span className="text-xs md:text-sm font-medium">
+                                Deadline: {new Date(opportunity.dead_line).toLocaleDateString()}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -138,7 +193,7 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
 
                 {/* Step Content */}
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="bg-[#111419] border border-white/5 rounded-[28px] p-8 md:p-12 mb-8 relative overflow-hidden">
+                    <div className="bg-[#111419] border border-white/5 rounded-[28px] p-8 md:p-12 mb-8 relative overflow-hidden shadow-2xl">
                         <AnimatePresence mode="wait">
                             {currentStep === 1 && (
                                 <motion.div
@@ -154,19 +209,19 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">First Name *</label>
                                             <input
-                                                {...register("firstName", { required: true })}
+                                                {...register("first_name", { required: true })}
                                                 type="text"
                                                 placeholder="John"
-                                                className={`w-full bg-[#171A21] border ${errors.firstName ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
+                                                className={`w-full bg-[#171A21] border ${errors.first_name ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
                                             />
                                         </div>
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Last Name *</label>
                                             <input
-                                                {...register("lastName", { required: true })}
+                                                {...register("last_name", { required: true })}
                                                 type="text"
                                                 placeholder="Willson"
-                                                className={`w-full bg-[#171A21] border ${errors.lastName ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
+                                                className={`w-full bg-[#171A21] border ${errors.last_name ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
                                             />
                                         </div>
                                     </div>
@@ -182,7 +237,7 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                     <div className="space-y-2.5">
                                         <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Phone Number</label>
                                         <input
-                                            {...register("phoneNumber")}
+                                            {...register("phone")}
                                             type="tel"
                                             placeholder="+1 (555) 000-0000"
                                             className="w-full bg-[#171A21] border border-white/5 rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium"
@@ -203,19 +258,13 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                     <h2 className="text-xl font-bold text-white tracking-tight">Academic Background</h2>
                                     <div className="space-y-6">
                                         <div className="space-y-2.5">
-                                            <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Highest educationLevel *</label>
-                                            <div className="relative group">
-                                                <select
-                                                    {...register("educationLevel", { required: true })}
-                                                    className={`w-full bg-[#171A21] border ${errors.educationLevel ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base appearance-none focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium text-[#A3A7AE]`}
-                                                >
-                                                    <option value="">Select Level</option>
-                                                    <option value="PhD">PhD</option>
-                                                    <option value="Masters">Masters</option>
-                                                    <option value="Bachelors">Bachelors</option>
-                                                </select>
-                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
-                                            </div>
+                                            <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Highest Education Level *</label>
+                                            <input
+                                                {...register("highest_edu_level", { required: true })}
+                                                type="text"
+                                                placeholder="e.g., PhD, Masters, Bachelors"
+                                                className={`w-full bg-[#171A21] border ${errors.highest_edu_level ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
+                                            />
                                         </div>
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Institution *</label>
@@ -229,7 +278,7 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Field Of Study</label>
                                             <input
-                                                {...register("fieldOfStudy")}
+                                                {...register("field_of_study")}
                                                 type="text"
                                                 placeholder="e.g., Molecular Biology, Cardiology"
                                                 className="w-full bg-[#171A21] border border-white/5 rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium"
@@ -237,25 +286,19 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                         </div>
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Research Experience *</label>
-                                            <div className="relative group">
-                                                <select
-                                                    {...register("researchExperience", { required: true })}
-                                                    className={`w-full bg-[#171A21] border ${errors.researchExperience ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base appearance-none focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium text-[#A3A7AE]`}
-                                                >
-                                                    <option value="">Select experience level</option>
-                                                    <option value="expert">Expert (5+ years)</option>
-                                                    <option value="intermediate">Intermediate (2-5 years)</option>
-                                                    <option value="beginner">Beginner (0-2 years)</option>
-                                                </select>
-                                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B] pointer-events-none" />
-                                            </div>
+                                            <input
+                                                {...register("research_experience", { required: true })}
+                                                type="text"
+                                                placeholder="e.g., 2 years in Lab, Expert"
+                                                className={`w-full bg-[#171A21] border ${errors.research_experience ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium`}
+                                            />
                                         </div>
                                         <div className="space-y-2.5">
-                                            <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Portfolio Problem</label>
+                                            <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Personal Website / Portfolio</label>
                                             <input
-                                                {...register("portfolio")}
+                                                {...register("personal_website")}
                                                 type="text"
-                                                placeholder="e.g., Portfolio, Evidence of Past Deliverables"
+                                                placeholder="e.g., https://yourportfolio.com"
                                                 className="w-full bg-[#171A21] border border-white/5 rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium"
                                             />
                                         </div>
@@ -263,18 +306,18 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                             <div className="space-y-2.5">
                                                 <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">LinkedIn Profile</label>
                                                 <input
-                                                    {...register("linkedin")}
+                                                    {...register("linkedin_profile")}
                                                     type="text"
                                                     placeholder="linkedin.com/in/username"
                                                     className="w-full bg-[#171A21] border border-white/5 rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium"
                                                 />
                                             </div>
                                             <div className="space-y-2.5">
-                                                <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Personalized Message</label>
+                                                <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Current Position</label>
                                                 <input
-                                                    {...register("message")}
+                                                    {...register("current_position")}
                                                     type="text"
-                                                    placeholder="tell us a bit about yourself"
+                                                    placeholder="e.g., Research Assistant"
                                                     className="w-full bg-[#171A21] border border-white/5 rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium"
                                                 />
                                             </div>
@@ -300,30 +343,47 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#00D1FF]/10 transition-all">
                                                     <Upload className="w-5 h-5 text-[#A3A7AE] group-hover:text-[#00D1FF] transition-all" />
                                                 </div>
-                                                <div className="text-center">
-                                                    <p className="text-white font-bold text-sm mb-1">Click to upload or drag and drop</p>
-                                                    <p className="text-[#64748B] text-xs font-medium">PDF, DOC, or DOCX (max. 10MB)</p>
-                                                </div>
-                                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" />
+                                                {selectedFile ? (
+                                                    <div className="text-center">
+                                                        <p className="text-[#00D1FF] font-bold text-sm mb-1">{selectedFile.name}</p>
+                                                        <p className="text-[#64748B] text-xs font-medium">Click to change</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center">
+                                                        <p className="text-white font-bold text-sm mb-1">Click to upload or drag and drop</p>
+                                                        <p className="text-[#64748B] text-xs font-medium">PDF, DOC, or DOCX (max. 10MB)</p>
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="file"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={handleFileChange}
+                                                    accept=".pdf,.doc,.docx"
+                                                />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#A3A7AE] uppercase tracking-wider">Cover Letter / Statement of Interest *</label>
                                             <textarea
-                                                {...register("coverLetter", { required: true })}
+                                                {...register("cover_letter", { required: true })}
                                                 rows={6}
-                                                placeholder=""
-                                                className={`w-full bg-[#171A21] border ${errors.coverLetter ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium resize-none`}
+                                                placeholder="Explain why you are interested in this position..."
+                                                className={`w-full bg-[#171A21] border ${errors.cover_letter ? 'border-red-500/50' : 'border-white/5'} rounded-xl py-4 px-5 text-sm md:text-base placeholder:text-[#3B414A] focus:outline-none focus:border-[#00D1FF]/40 transition-all font-medium resize-none`}
                                             />
                                         </div>
 
                                         <div className="space-y-6">
                                             <div className="flex gap-3 text-xs md:text-sm text-[#A3A7AE] font-medium leading-relaxed">
-                                                <div className="w-5 h-5 rounded border border-[#00D1FF] bg-[#00D1FF]/10 shrink-0 mt-0.5 flex items-center justify-center">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-[#00D1FF]" />
-                                                </div>
-                                                <p>I confirm that all information provided is accurate and I agree to the <span className="text-[#00D1FF] cursor-pointer hover:underline">Privacy Policy</span> and <span className="text-[#00D1FF] cursor-pointer hover:underline">Terms of Service</span>.</p>
+                                                <input
+                                                    type="checkbox"
+                                                    id="accept_term"
+                                                    {...register("accept_term", { required: true })}
+                                                    className="w-5 h-5 rounded border border-[#00D1FF] bg-[#00D1FF]/10 shrink-0 mt-0.5 accent-[#00D1FF]"
+                                                />
+                                                <label htmlFor="accept_term">
+                                                    I confirm that all information provided is accurate and I agree to the <span className="text-[#00D1FF] cursor-pointer hover:underline">Privacy Policy</span> and <span className="text-[#00D1FF] cursor-pointer hover:underline">Terms of Service</span>.
+                                                </label>
                                             </div>
 
                                             <div className="bg-[#171A21] border-l-4 border-[#00D1FF] p-5 rounded-r-xl">
@@ -332,7 +392,7 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                                                         <Calendar className="w-3.5 h-3.5 text-[#00D1FF]" />
                                                     </div>
                                                     <p className="text-xs md:text-sm text-[#A3A7AE] font-semibold leading-relaxed">
-                                                        Your application will be reviewed by the research team. You will be notified via email of the outcome by March 25, 2026.
+                                                        Your application will be reviewed by the research team. You will be notified via email of the outcome.
                                                     </p>
                                                 </div>
                                             </div>
@@ -348,8 +408,8 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                         <button
                             type="button"
                             onClick={prevStep}
-                            className={`flex items-center gap-2 bg-[#171A21] border border-white/10 text-[#A3A7AE] hover:text-white font-bold py-3 px-8 rounded-xl text-sm transition-all duration-300 active:scale-[0.98] ${currentStep === 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-white/5 hover:border-white/20"}`}
-                            disabled={currentStep === 1}
+                            className={`flex items-center gap-2 bg-[#171A21] border border-white/10 text-[#A3A7AE] hover:text-white font-bold py-3 px-8 rounded-xl text-sm transition-all duration-300 active:scale-[0.98] ${currentStep === 1 || isSubmitting ? "opacity-30 cursor-not-allowed" : "hover:bg-white/5 hover:border-white/20"}`}
+                            disabled={currentStep === 1 || isSubmitting}
                         >
                             <ArrowLeft className="w-4 h-4" /> Previous
                         </button>
@@ -365,9 +425,18 @@ const ApplicationStepper = ({ opportunity }: ApplicationStepperProps) => {
                         ) : (
                             <button
                                 type="submit"
-                                className="flex items-center gap-2 bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-extrabold py-3.5 px-6 rounded-xl text-sm transition-all duration-300 active:scale-[0.98] shadow-lg shadow-[#00E5FF]/10"
+                                disabled={isSubmitting}
+                                className="flex items-center gap-2 bg-[#00E5FF] hover:bg-[#00D1FF] text-black font-extrabold py-3.5 px-6 rounded-xl text-sm transition-all duration-300 active:scale-[0.98] shadow-lg shadow-[#00E5FF]/10 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <CheckCircle2 className="w-4.5 h-4.5" /> Submit Application
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-4.5 h-4.5 animate-spin" /> Submitting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle2 className="w-4.5 h-4.5" /> Submit Application
+                                    </>
+                                )}
                             </button>
                         )}
                     </div>
