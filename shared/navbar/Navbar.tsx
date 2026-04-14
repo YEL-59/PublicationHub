@@ -129,12 +129,12 @@ const Navbar = () => {
                                         <p className="text-sm font-bold text-white truncate">{user.email}</p>
                                     </div>
                                     
-                                    <Link href="/profile" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                                    <Link href="/myprofile" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
                                         <User size={18} />
                                         <span className="text-sm font-medium">My Profile</span>
                                     </Link>
                                     
-                                    <Link href="/settings" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                                    <Link href="/myprofile/settings" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
                                         <Settings size={18} />
                                         <span className="text-sm font-medium">Settings</span>
                                     </Link>
@@ -215,7 +215,7 @@ const Navbar = () => {
                                      </div>
                                 </div>
                                 <Link 
-                                    href="/profile" 
+                                    href="/myprofile" 
                                     onClick={() => setIsOpen(false)}
                                     className="text-gray-300 text-lg font-medium px-4 flex items-center gap-3"
                                 >
