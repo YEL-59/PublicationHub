@@ -1,16 +1,25 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
+import { getSystematicReviewData } from "@/services/partnership";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
-// API-ready data
-const STEPS = [
-    "PRISMA-compliant methodology",
-    "Database search strategy",
-    "Data extraction & quality assessment",
-    "Meta-analysis (pairwise + network meta-analysis)",
-    "Publication-ready manuscript preparation",
-];
+interface StepItem {
+    id: number;
+    title: string;
+}
+
+interface ApiSystematicData {
+    content: {
+        id: number;
+        title: string;
+        description: string;
+        image: string;
+    };
+    items: StepItem[];
+}
 
 const containerVariants: Variants = {
     hidden: {},
@@ -30,6 +39,35 @@ const stepVariants: Variants = {
 };
 
 const Systematic = () => {
+    const [sysData, setSysData] = useState<ApiSystematicData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getSystematicReviewData();
+                if (res?.status) {
+                    setSysData(res.data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!sysData) return null;
+
     return (
         <section className="relative bg-[#0A0C0F] py-16 px-6 md:px-12 lg:px-20 overflow-hidden">
             {/* Ambient glow */}
@@ -46,13 +84,10 @@ const Systematic = () => {
                     className="text-center mb-12"
                 >
                     <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">
-                        Systematic{" "}
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#4AB8FF]">
-                            Reviews &amp; Meta-Analysis
-                        </span>
+                        {sysData.content.title}
                     </h2>
                     <p className="text-[#6B7280] text-sm">
-                        We deliver complete systematic review solutions:
+                        {sysData.content.description}
                     </p>
                 </motion.div>
 
@@ -67,9 +102,9 @@ const Systematic = () => {
                         viewport={{ once: true, margin: "-60px" }}
                         className="flex-1 flex flex-col gap-3 w-full"
                     >
-                        {STEPS.map((step, i) => (
+                        {sysData.items.map((step, i) => (
                             <motion.div
-                                key={i}
+                                key={step.id}
                                 variants={stepVariants}
                                 className="flex items-center gap-4 bg-[#0D1017] border border-white/[0.07] rounded-full px-5 py-3.5 hover:border-[#00D1FF]/20 transition-colors duration-300 group"
                             >
@@ -82,7 +117,7 @@ const Systematic = () => {
 
                                 {/* Step text */}
                                 <span className="text-white text-[13px] font-medium leading-tight">
-                                    {step}
+                                    {step.title}
                                 </span>
                             </motion.div>
                         ))}
@@ -97,11 +132,11 @@ const Systematic = () => {
                         className="w-full md:w-[46%] shrink-0"
                     >
                         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-white/5 shadow-2xl shadow-black/50">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src="https://images.unsplash.com/photo-1576086213369-97a306d36557?w=900&q=80"
+                            <Image
+                                src={sysData.content.image}
                                 alt="Scientific laboratory with blue lighting"
-                                className="w-full h-full object-cover object-center"
+                                fill
+                                className="object-cover object-center"
                             />
                             {/* Subtle vignette */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />

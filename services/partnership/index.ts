@@ -81,3 +81,66 @@ export const getPartnershipValueData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Core Research Section data
+ */
+export const getCoreResearchData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/core-research-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch core research data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching core research data:", error);
+        throw error;
+    }
+};
+
+/**
+ * Fetches the Systematic Review Section data
+ */
+export const getSystematicReviewData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/systematic-review-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch systematic review data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching systematic review data:", error);
+        throw error;
+    }
+};
+
+/**
+ * Fetches the Manuscript Section data
+ */
+export const getManuscriptData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/manuscript-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch manuscript data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching manuscript data:", error);
+        throw error;
+    }
+};
