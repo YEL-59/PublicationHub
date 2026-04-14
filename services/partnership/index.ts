@@ -165,3 +165,24 @@ export const getPartnershipModelData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Reviewer Comment Section data
+ */
+export const getReviewerCommentData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/reviewer-comment-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch reviewer comment data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching reviewer comment data:", error);
+        throw error;
+    }
+};

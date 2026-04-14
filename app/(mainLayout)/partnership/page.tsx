@@ -6,6 +6,7 @@ import CoreResearchValue from "@/page/partnership/Coreresearchvalue";
 import Systematic from "@/page/partnership/Systematic";
 import Manuscript from "@/page/partnership/Manuscript";
 import PartnershipModel from "@/page/partnership/Partnershipmodel";
+import ReviewerModel from "@/page/partnership/Reviewermodel";
 
 const Partnership = () => {
     return (
@@ -18,6 +19,7 @@ const Partnership = () => {
             <Systematic />
             <Manuscript />
             <PartnershipModel />
+            <ReviewerModel />
            
         </main>
     );
