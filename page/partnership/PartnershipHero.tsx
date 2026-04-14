@@ -1,18 +1,57 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2, CloudCog } from "lucide-react";
 import heroBg from "@/assets/images/hero-bg.png";
+import { getPartnershipHeroData } from "@/services/partnership";
 
-const TICKER_ITEMS = [
-    "Empowering Researchers",
-    "Accelerating Scientific Output",
-    "Delivering Excellence",
-];
+interface ApiHeroData {
+    id: number;
+    title: string;
+    sub_title: string;
+    description: string;
+    button_text: string;
+    button_text_2: string;
+    sub_description: string;
+}
 
 const PartnershipHero = () => {
+    const [heroData, setHeroData] = useState<ApiHeroData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getPartnershipHeroData();
+                if (res?.status) {
+                    setHeroData(res.data);
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-[76vh] bg-[#0A0C0F] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!heroData) return null;
+
+    // Handle ticker items from sub_description
+    const tickerItems = heroData.sub_description
+        ? heroData.sub_description.split("•").map((item) => item.trim())
+        : [];
+    console.log(tickerItems);
     return (
         <section className="relative w-full flex flex-col overflow-hidden bg-[#0A0C0F]">
             {/* ── Background image ── */}
@@ -39,7 +78,7 @@ const PartnershipHero = () => {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00D1FF]/8 border border-[#00D1FF]/20 text-[#00D1FF] text-[10px] font-semibold tracking-[0.18em] uppercase mb-8 backdrop-blur-sm"
                 >
                     <Sparkles size={10} strokeWidth={2.5} />
-                    Global Research Network
+                    {heroData.title}
                 </motion.div>
 
                 {/* Heading */}
@@ -49,7 +88,7 @@ const PartnershipHero = () => {
                     transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                     className="text-4xl md:text-5xl font-black tracking-tight mb-6 bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent"
                 >
-                    PublicationHub
+                    {heroData.sub_title}
                 </motion.h1>
 
                 {/* Sub-heading */}
@@ -57,9 +96,9 @@ const PartnershipHero = () => {
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
-                    className="text-white/85 text-lg md:text-xl font-normal leading-snug max-w-[300px] mb-10"
+                    className="text-white/85 text-lg md:text-xl font-normal leading-snug max-w-[400px] mb-10"
                 >
-                    Research Service &amp; Strategic<br className="hidden sm:block" /> Partnership Offer
+                    {heroData.description}
                 </motion.p>
 
                 {/* CTA Buttons */}
@@ -76,7 +115,7 @@ const PartnershipHero = () => {
                         className="px-7 py-3 rounded-xl text-[13px] font-bold text-white transition-all duration-300"
                         style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                     >
-                        Become a Partner
+                        {heroData.button_text}
                     </motion.button>
 
                     {/* Secondary — outline */}
@@ -85,7 +124,7 @@ const PartnershipHero = () => {
                         whileTap={{ scale: 0.97 }}
                         className="px-7 py-3 rounded-xl text-[13px] font-bold text-[#00D1FF] border border-[#00D1FF]/35 backdrop-blur-sm transition-all duration-300"
                     >
-                        Schedule Partnership Consultation
+                        {heroData.button_text_2}
                     </motion.button>
                 </motion.div>
             </div>
@@ -93,13 +132,13 @@ const PartnershipHero = () => {
             {/* ── Ticker strip ── */}
             <div className="relative z-10 w-full  bg-[#0A0C0F]/80 backdrop-blur-sm">
                 <div className="container mx-auto px-6 py-4 flex items-center justify-center gap-3 sm:gap-6 flex-wrap">
-                    {TICKER_ITEMS.map((item, i) => (
+                    {tickerItems.map((item, i) => (
                         <motion.span
                             key={i}
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.55 + i * 0.07 }}
-                            className="flex items-center gap-3 text-white/75 text-[13px] font-medium"
+                            className="flex items-center gap-3 text-white/75 text-lg font-medium"
                         >
                             {i !== 0 && (
                                 <span className="w-1 h-1 rounded-full bg-white/30" />

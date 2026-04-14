@@ -46,16 +46,14 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
             const firstName = nameParts[0] || "";
             const lastName = nameParts.slice(1).join(" ") || "";
 
-            const payload = {
+            const res = await updateProfile({
                 firstName,
                 lastName,
                 mobileNumber: formData.phone,
                 email: formData.email,
                 avatar: avatarFile || formData.avatar,
                 institution: formData.institution,
-            } as any;
-
-            const res = await updateProfile(payload);
+            });
             if (res?.status) {
                 toast.success("Profile updated successfully");
                 setIsEditing(false);
