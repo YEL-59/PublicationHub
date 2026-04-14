@@ -1,184 +1,113 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, ArrowUpRight, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { getAllPublications } from "@/services/home";
 
 // ── Types ──────────────────────────────────────────────────────────────
-interface Publication {
+interface ApiCategory {
     id: number;
-    category: string;
-    categoryColor: string;  // bg colour class
-    categoryText: string;   // text colour class
-    year: number;
-    title: string;
-    journal: string;
-    group: string;
-    link: string;
+    name: string;
 }
 
-// ── Static data (swap for API call) ────────────────────────────────────
-const ALL_PUBLICATIONS: Publication[] = [
-    {
-        id: 1,
-        category: "Cardiology",
-        categoryColor: "bg-emerald-500/10",
-        categoryText: "text-emerald-400",
-        year: 2025,
-        title: "TCT-235 Efficacy of Bioresorbable Vascular Scaffold vs Drug-Eluting Stents After PCI: A GRADE-Assessed Systematic Review and Meta-Analysis of Randomised Controlled Trials",
-        journal: "Journal of the American College of Cardiology",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 2,
-        category: "Pharmacology",
-        categoryColor: "bg-blue-500/10",
-        categoryText: "text-blue-400",
-        year: 2025,
-        title: "Decline in ESBL Production and Carbapenem Resistance in Urinary Tract Infections among Key Bacterial Species during the COVID-19 Pandemic",
-        journal: "Antibiotics (MDP)",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 3,
-        category: "Metabolic Disorders",
-        categoryColor: "bg-orange-500/10",
-        categoryText: "text-orange-400",
-        year: 2025,
-        title: "Long-term trends in diabetes mellitus and sepsis-related mortality in the united states: a population-based retrospective analysis (1999-2024)",
-        journal: "Journal of Diabetes & Metabolic Disorders",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 4,
-        category: "Endocrinology",
-        categoryColor: "bg-purple-500/10",
-        categoryText: "text-purple-400",
-        year: 2025,
-        title: "Glycemic control and body mass index (BMI) as risk factors for erectile dysfunction among Saudi men with diabetes: a systematic review and meta-analysis",
-        journal: "Annals of Medicine & Surgery",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 5,
-        category: "Infectious Disease",
-        categoryColor: "bg-cyan-500/10",
-        categoryText: "text-cyan-400",
-        year: 2025,
-        title: "Pandemic shadows in the operating room how COVID-19 altered the risk and timing of surgical site infections: a multivariable risk assessment and time-to-event analysis in a cohort of abdominal surgery patients",
-        journal: "BMC Infectious Diseases",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 6,
-        category: "Neurology",
-        categoryColor: "bg-pink-500/10",
-        categoryText: "text-pink-400",
-        year: 2025,
-        title: "Stroke incidence and outcomes in patients with atrial fibrillation: a population-based cohort analysis across five regional hospitals",
-        journal: "The Lancet Neurology",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 7,
-        category: "Oncology",
-        categoryColor: "bg-red-500/10",
-        categoryText: "text-red-400",
-        year: 2025,
-        title: "Survival outcomes of neoadjuvant chemotherapy in locally advanced breast cancer: a multicenter retrospective study",
-        journal: "Journal of Clinical Oncology",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 8,
-        category: "Cardiology",
-        categoryColor: "bg-emerald-500/10",
-        categoryText: "text-emerald-400",
-        year: 2024,
-        title: "Predictors of major adverse cardiac events following elective coronary artery bypass grafting: insights from the Saudi cardiac registry",
-        journal: "Journal of the American College of Cardiology",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 9,
-        category: "Pharmacology",
-        categoryColor: "bg-blue-500/10",
-        categoryText: "text-blue-400",
-        year: 2024,
-        title: "Antimicrobial resistance trends in nosocomial infections across ICUs in Saudi Arabia: a five-year surveillance study",
-        journal: "Antibiotics (MDP)",
-        group: "PublicationHub Group",
-        link: "#",
-    },
-    {
-        id: 10,
-        category: "Metabolic Disorders",
-        categoryColor: "bg-orange-500/10",
-        categoryText: "text-orange-400",
-        year: 2024,
-        title: "Association between visceral adiposity index and non-alcoholic fatty liver disease in Saudi adults: a cross-sectional study",
-        journal: "Journal of Diabetes & Metabolic Disorders",
-        group: "PublicationHub Group",
-        link: "#",
-    },
+interface ApiPublication {
+    id: number;
+    title: string;
+    overview: string;
+    description: string;
+    attachment: string | null;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    categories: ApiCategory[];
+}
+
+const CATEGORY_COLORS = [
+    { bg: "bg-emerald-500/10", text: "text-emerald-400" },
+    { bg: "bg-blue-500/10", text: "text-blue-400" },
+    { bg: "bg-orange-500/10", text: "text-orange-400" },
+    { bg: "bg-purple-500/10", text: "text-purple-400" },
+    { bg: "bg-cyan-500/10", text: "text-cyan-400" },
+    { bg: "bg-pink-500/10", text: "text-pink-400" },
+    { bg: "bg-red-500/10", text: "text-red-400" },
 ];
 
-const PER_PAGE = 5;
-const TOTAL_PAGES = Math.ceil(ALL_PUBLICATIONS.length / PER_PAGE);
+const getColorsForCategory = (id: number) => CATEGORY_COLORS[id % CATEGORY_COLORS.length];
 
 // ── Sub-components ─────────────────────────────────────────────────────
-const PublicationCard = ({ pub, index }: { pub: Publication; index: number }) => (
-    <motion.div
-        layout
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.4, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-[#111419] border border-white/5 rounded-2xl p-6 flex flex-col gap-4 hover:border-white/10 transition-colors duration-300 group"
-    >
-        {/* Top row: badge + year */}
-        <div className="flex items-center justify-between">
-            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${pub.categoryColor} ${pub.categoryText}`}>
-                {pub.category}
-            </span>
-            <span className="text-[#4B5563] text-xs font-semibold">{pub.year}</span>
-        </div>
+const PublicationCard = ({ pub, index }: { pub: ApiPublication; index: number }) => {
+    const year = pub.created_at ? new Date(pub.created_at).getFullYear() : new Date().getFullYear();
 
-        {/* Title */}
-        <h3 className="text-white text-[13px] md:text-sm font-semibold leading-snug line-clamp-3">
-            {pub.title}
-        </h3>
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+            className="bg-[#111419] border border-white/5 rounded-2xl p-6 flex flex-col gap-4 hover:border-white/10 transition-colors duration-300 group"
+        >
+            {/* Top row: badge + year */}
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap gap-1.5">
+                    {pub.categories && pub.categories.length > 0 ? (
+                        pub.categories.map((cat) => {
+                            const colors = getColorsForCategory(cat.id);
+                            return (
+                                <span key={cat.id} className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${colors.bg} ${colors.text}`}>
+                                    {cat.name}
+                                </span>
+                            );
+                        })
+                    ) : (
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${CATEGORY_COLORS[0].bg} ${CATEGORY_COLORS[0].text}`}>
+                            Uncategorized
+                        </span>
+                    )}
+                </div>
+                <span className="text-[#4B5563] text-xs font-semibold shrink-0 mt-0.5">{year}</span>
+            </div>
 
-        {/* Journal */}
-        <div className="flex items-center gap-2 text-[#6B7280] text-[11px]">
-            <FileText className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{pub.journal}</span>
-        </div>
+            {/* Title */}
+            <h3 className="text-white text-[13px] md:text-sm font-semibold leading-snug line-clamp-3">
+                {pub.title}
+            </h3>
 
-        {/* Bottom row: group + read link */}
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.04]">
-            <span className="text-[10px] font-bold text-[#374151] uppercase tracking-widest">
-                {pub.group}
-            </span>
-            <a
-                href={pub.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[#00D1FF] text-[11px] font-bold uppercase tracking-widest hover:gap-2 transition-all duration-200 group-hover:text-[#00E5FF]"
-            >
-                Read <ArrowUpRight className="w-3.5 h-3.5" />
-            </a>
-        </div>
-    </motion.div>
-);
+            {/* Journal / Overview */}
+            <div className="flex items-start gap-2 text-[#6B7280] text-[11px]">
+                <FileText className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <span className="line-clamp-2">{pub.overview || "PublicationHub Journal"}</span>
+            </div>
+
+            {/* Bottom row: group + read link */}
+            <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.04]">
+                <span className="text-[10px] font-bold text-[#374151] uppercase tracking-widest truncate max-w-[40%]">
+                    PublicationHub Group
+                </span>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={`/publications/${pub.id}`}
+                        className="text-[#A3A7AE] hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors duration-200"
+                    >
+                        Details
+                    </Link>
+                    {pub.attachment && (
+                        <a
+                            href={pub.attachment}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[#00D1FF] text-[11px] font-bold uppercase tracking-widest hover:gap-1.5 transition-all duration-200 group-hover:text-[#00E5FF]"
+                        >
+                            Read PDF <ArrowUpRight className="w-3.5 h-3.5" />
+                        </a>
+                    )}
+                </div>
+            </div>
+        </motion.div>
+    );
+};
 
 // ── Pagination ─────────────────────────────────────────────────────────
 const Pagination = ({
@@ -257,14 +186,30 @@ const Pagination = ({
 // ── Main Component ─────────────────────────────────────────────────────
 const RecentPublication = () => {
     const [currentPage, setCurrentPage] = useState(1);
+    const [publications, setPublications] = useState<ApiPublication[]>([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
 
-    const paginated = ALL_PUBLICATIONS.slice(
-        (currentPage - 1) * PER_PAGE,
-        currentPage * PER_PAGE
-    );
+    useEffect(() => {
+        const fetchPublications = async () => {
+            setLoading(true);
+            try {
+                const res = await getAllPublications(currentPage);
+                if (res?.status) {
+                    setPublications(res.data);
+                    setTotalPages(res.pagination?.last_page || 1);
+                }
+            } catch (error) {
+                console.error("Failed to fetch publications", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPublications();
+    }, [currentPage]);
 
     // Split into 2-column grid: last item full-width if odd count
-    const isOdd = paginated.length % 2 !== 0;
+    const isOdd = publications.length % 2 !== 0;
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -286,31 +231,39 @@ const RecentPublication = () => {
                 </motion.h2>
 
                 {/* Grid */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentPage}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-5"
-                    >
-                        {paginated.map((pub, i) => {
-                            const isLastOdd = isOdd && i === paginated.length - 1;
-                            return (
-                                <div
-                                    key={pub.id}
-                                    className={isLastOdd ? "md:col-span-2 md:max-w-[calc(50%-10px)]" : ""}
-                                >
-                                    <PublicationCard pub={pub} index={i} />
-                                </div>
-                            );
-                        })}
-                    </motion.div>
-                </AnimatePresence>
+                {loading ? (
+                    <div className="flex justify-center items-center h-48">
+                        <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+                    </div>
+                ) : (
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={currentPage}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-5"
+                        >
+                            {publications.map((pub, i) => {
+                                const isLastOdd = isOdd && i === publications.length - 1;
+                                return (
+                                    <div
+                                        key={pub.id}
+                                        className={isLastOdd ? "md:col-span-2 md:max-w-[calc(50%-10px)]" : ""}
+                                    >
+                                        <PublicationCard pub={pub} index={i} />
+                                    </div>
+                                );
+                            })}
+                        </motion.div>
+                    </AnimatePresence>
+                )}
 
                 {/* Pagination */}
-                <Pagination
-                    current={currentPage}
-                    total={TOTAL_PAGES}
-                    onChange={handlePageChange}
-                />
+                {totalPages > 1 && (
+                    <Pagination
+                        current={currentPage}
+                        total={totalPages}
+                        onChange={handlePageChange}
+                    />
+                )}
             </div>
         </section>
     );

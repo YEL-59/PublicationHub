@@ -218,3 +218,29 @@ export const submitOpportunityApplication = async (formData: FormData) => {
         throw new Error(error);
     }
 }
+
+// get all publications with pagination
+export const getAllPublications = async (page: number = 1) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/publications?page=${page}`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get single publication by id
+export const getSinglePublication = async (id: number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/publications/${id}`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
