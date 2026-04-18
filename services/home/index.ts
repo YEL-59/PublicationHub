@@ -244,3 +244,72 @@ export const getSinglePublication = async (id: number) => {
         throw new Error(error);
     }
 }
+
+// get all courses with pagination
+export const getAllCourses = async (page: number = 1, categoryId?: number) => {
+    try {
+        let url = `${process.env.NEXT_PUBLIC_BASE_API}/courses?page=${page}`;
+        if (categoryId) {
+            url += `&category_id=${categoryId}`;
+        }
+        const response = await fetch(url, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get course categories
+export const getCourseCategories = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/courses-categories`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get course details by id
+export const getCourseDetails = async (id: string | number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/courses/${id}`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get meta academy hero content
+export const getMetaAcademyHero = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/meta-academy-page/hero-section`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
+
+// get meta academy counter content
+export const getMetaAcademyCounter = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/meta-academy-page/counter-section`, {
+            method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        throw new Error(error);
+    }
+}
