@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -109,14 +110,16 @@ const PartnershipHero = () => {
                     className="flex flex-col sm:flex-row items-center gap-3"
                 >
                     {/* Primary — filled teal-to-purple gradient */}
-                    <motion.button
-                        whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(42,157,144,0.35)" }}
-                        whileTap={{ scale: 0.97 }}
-                        className="px-7 py-3 rounded-xl text-[13px] font-bold text-white transition-all duration-300"
-                        style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
-                    >
-                        {heroData.button_text}
-                    </motion.button>
+                    <Link href="/partnership/enquiry">
+                        <motion.button
+                            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(42,157,144,0.35)" }}
+                            whileTap={{ scale: 0.97 }}
+                            className="px-7 py-3 rounded-xl text-[13px] font-bold text-white transition-all duration-300"
+                            style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
+                        >
+                            {heroData.button_text}
+                        </motion.button>
+                    </Link>
 
                     {/* Secondary — outline */}
                     <motion.button

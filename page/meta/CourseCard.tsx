@@ -38,12 +38,18 @@ const CourseCard = ({ course, onPlay }: CourseCardProps) => {
                 className="relative aspect-video overflow-hidden cursor-pointer"
                 onClick={onPlay}
             >
-                <Image
-                    src={course.thumbnail}
-                    alt={course.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {course.thumbnail ? (
+                    <Image
+                        src={course.thumbnail}
+                        alt={course.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                        <Play className="w-12 h-12 text-gray-700" />
+                    </div>
+                )}
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors" />
 
                 {/* Play Button Overlay */}
@@ -57,12 +63,18 @@ const CourseCard = ({ course, onPlay }: CourseCardProps) => {
             {/* Instructor Row */}
             <div className="px-5 py-4 flex items-center gap-3 bg-[#111419] border-b border-white/5">
                 <div className="relative w-9 h-9 rounded-full overflow-hidden border border-white/10">
-                    <Image
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
-                        fill
-                        className="object-cover"
-                    />
+                    {course.instructor.avatar ? (
+                        <Image
+                            src={course.instructor.avatar}
+                            alt={course.instructor.name}
+                            fill
+                            className="object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                            <User size={18} className="text-gray-500" />
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="text-sm font-medium text-gray-300">{course.instructor.name}</span>

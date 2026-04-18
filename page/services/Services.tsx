@@ -63,12 +63,18 @@ const ServiceCard = ({
                         transform: isHovered ? "scale(1.1)" : "scale(1)"
                     }}
                 >
-                    <Image 
-                        src={service.icon} 
-                        alt={service.title} 
-                        fill 
-                        className="object-cover" 
-                    />
+                    {service.icon ? (
+                        <Image 
+                            src={service.icon} 
+                            alt={service.title} 
+                            fill 
+                            className="object-cover" 
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#00D1FF]/20 text-[#00D1FF]">
+                            <span className="text-xs font-bold uppercase tracking-tighter">SVC</span>
+                        </div>
+                    )}
                 </div>
                 <motion.div
                     animate={{ rotate: isHovered ? 180 : 0 }}

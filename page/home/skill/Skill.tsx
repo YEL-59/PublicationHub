@@ -5,8 +5,16 @@ import Image from "next/image";
 import { CheckCircle2, BookOpen, ArrowRight } from "lucide-react";
 import { getMetaAcademyContent } from "@/services/home";
 
+interface MetaAcademyContent {
+    title: string;
+    sub_title: string;
+    description: string;
+    button_text: string;
+    image: string;
+}
+
 const Skill = () => {
-    const [content, setContent] = useState<any>(null);
+    const [content, setContent] = useState<MetaAcademyContent | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {

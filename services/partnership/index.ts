@@ -249,3 +249,46 @@ export const getWhyPartnerData = async () => {
         throw error;
     }
 };
+
+/**
+ * Fetches the Partner Model Section data
+ */
+export const getPartnerModelSectionData = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/partnership-page/partner-model-section`, {
+            method: "GET",
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch partner model section data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching partner model section data:", error);
+        throw error;
+    }
+};
+
+/**
+ * Submits a partnership enquiry request
+ */
+export const submitPartnershipRequest = async (formData: any) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/partnership-requests`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error submitting partnership request:", error);
+        throw error;
+    }
+};
+

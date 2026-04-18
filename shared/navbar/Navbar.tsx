@@ -10,6 +10,7 @@ import { getCurrentUser, logoutService } from "@/services/auth";
 import { ICurrentUser } from "@/types/auth/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getSystemInfo } from "@/services/home";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,12 +19,20 @@ const Navbar = () => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
+    const [systemInfo, setSystemInfo] = useState<any>(null);
+
     useEffect(() => {
-        const fetchUser = async () => {
-            const currentUser = await getCurrentUser();
+        const fetchData = async () => {
+            const [currentUser, systemRes] = await Promise.all([
+                getCurrentUser(),
+                getSystemInfo()
+            ]);
             setUser(currentUser);
+            if (systemRes?.status) {
+                setSystemInfo(systemRes.data);
+            }
         };
-        fetchUser();
+        fetchData();
     }, []);
 
     // Close dropdown when clicking outside
@@ -66,11 +75,12 @@ const Navbar = () => {
                 <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
                     <div className="relative w-44 h-10 md:w-52 md:h-12">
                         <Image
-                            src={navLogo}
-                            alt="PublicationHub Logo"
+                            src={systemInfo?.logo || navLogo}
+                            alt={systemInfo?.system_name || "PublicationHub Logo"}
                             fill
                             className="object-contain object-left"
                             priority
+                            unoptimized={!!systemInfo?.logo}
                         />
                     </div>
                 </Link>

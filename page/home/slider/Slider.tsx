@@ -19,6 +19,10 @@ interface SliderData {
     image: string;
 }
 
+interface SliderContent {
+    title: string;
+}
+
 const sliderData: SliderData[] = [
     {
         id: 1,
@@ -52,7 +56,7 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
                 boxShadow: "0 1.593px 6.373px 0 rgba(29, 126, 135, 0.10)",
             }}
         >
-            <div className="flex-1 flex flex-col items-start gap-6">
+            <div className="flex-1 min-w-0 flex flex-col items-start gap-6">
                 {/* Number Badge */}
                 <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shrink-0"
@@ -70,7 +74,7 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
                         {data.title}
                     </h3>
                     <p
-                        className="text-[#A3A7AE] text-base font-medium leading-[28px]"
+                        className="text-[#A3A7AE] text-base font-medium leading-[28px] line-clamp-4 break-all"
                         style={{ fontFamily: "'Inter', sans-serif", }}
                     >
                         {data.description}
@@ -79,17 +83,19 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
             </div>
 
             {/* Image Container */}
-            <div
-                className="relative shrink-0 rounded-2xl overflow-hidden border border-white/5 mx-auto md:mx-0"
-                style={{ width: "266px", height: "284px", aspectRatio: "133/142" }}
-            >
-                <Image
-                    src={data.image}
-                    alt={data.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-            </div>
+            {data.image && (
+                <div
+                    className="relative shrink-0 rounded-3xl overflow-hidden border border-white/5 mx-auto md:mx-0 w-full md:w-[300px] aspect-square md:aspect-[4/5] shadow-2xl"
+                >
+                    <Image
+                        src={data.image}
+                        alt={data.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        unoptimized
+                    />
+                </div>
+            )}
         </div>
     );
 };
@@ -97,7 +103,7 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
 const Slider = () => {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
-    const [content, setContent] = useState<any>(null);
+    const [content, setContent] = useState<SliderContent | null>(null);
     const [items, setItems] = useState<SliderData[]>([]);
 
     useEffect(() => {

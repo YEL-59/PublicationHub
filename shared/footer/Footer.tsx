@@ -10,11 +10,19 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter, getSystemInfo } from "@/services/home";
 
+interface SystemInfo {
+    system_name: string;
+    logo: string;
+    favicon: string;
+    copyright_text: string;
+    description: string | null;
+}
+
 const Footer = () => {
     const currentYear = new Date().getFullYear();
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-    const [systemInfo, setSystemInfo] = useState<any>(null);
+    const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
 
     useEffect(() => {
         const fetchSystemInfo = async () => {
@@ -98,6 +106,7 @@ const Footer = () => {
                                     fill
                                     className="object-contain object-left"
                                     priority
+                                    unoptimized={!!systemInfo?.logo}
                                 />
                             </div>
                         </Link>

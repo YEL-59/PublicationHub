@@ -137,7 +137,7 @@ const Featured = () => {
                             Explore handpicked opportunities from top institutions worldwide.
                         </p>
                     </div>
-                    <Link href="#" className="flex items-center gap-2 text-[#00D1FF] font-medium hover:gap-3 transition-all">
+                    <Link href="/researchopportunities" className="flex items-center gap-2 text-[#00D1FF] font-medium hover:gap-3 transition-all">
                         View All Opportunities
                         <ArrowRight size={18} />
                     </Link>

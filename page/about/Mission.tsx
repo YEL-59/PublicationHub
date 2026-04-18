@@ -1,24 +1,62 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import { getOurMissionData } from "@/services/about";
 
-// API-ready data structure
-const missionData = {
-    badge: "Excellence in Saudi Arabia",
-    heading: "Our",
-    headingAccent: "Mission",
-    description:
-        "ResearchHub is the premier medical research support network in the Kingdom. We bridge the gap between clinical practice and academic success with world-class mentorship, statistical rigor, and publication expertise.",
-    stats: [
-        { value: "300+", label: "Publications" },
-        { value: "10k+", label: "Delivered" },
-    ],
-    // Replace with your actual image path/URL
-    image: "https://images.unsplash.com/photo-1532094349884-543559165b43?w=900&q=80",
-};
+interface MissionItem {
+    id: number;
+    title: string;
+    sub_title: string;
+}
+
+interface ApiMissionData {
+    id: number;
+    title: string;
+    sub_title: string;
+    description: string;
+    items: MissionItem[];
+}
 
 const Mission = () => {
+    const [data, setData] = useState<ApiMissionData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await getOurMissionData();
+                if (res?.status) {
+                    setData(res.data);
+                }
+            } catch (error) {
+                console.error("Error fetching about mission data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center min-h-[300px]">
+                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+            </div>
+        );
+    }
+
+    if (!data) return null;
+
+    // Helper to split "Our Mission" into "Our" and "Mission" (if space exists)
+    const titleWords = data.sub_title.split(" ");
+    const head = titleWords.length > 1 ? titleWords[0] : "";
+    const tail = titleWords.length > 1 ? titleWords.slice(1).join(" ") : titleWords[0];
+
+    // Image isn't provided by the API yet, keeping placeholder
+    const imageUrl = "https://images.unsplash.com/photo-1532094349884-543559165b43?w=900&q=80";
+
     return (
         <section className="relative py-20 px-6 md:px-12 lg:px-40 bg-[#0A0C0F]">
             <div className="container mx-auto ">
@@ -34,7 +72,7 @@ const Mission = () => {
                             transition={{ duration: 0.5 }}
                             className="inline-flex items-center px-3 py-1.5 border border-[#00D1FF]/40 bg-[#00D1FF]/5 rounded-full text-[9px] font-bold text-[#00D1FF] uppercase tracking-[0.18em] mb-5 w-fit"
                         >
-                            {missionData.badge}
+                            {data.title}
                         </motion.div>
 
                         {/* Heading */}
@@ -45,10 +83,9 @@ const Mission = () => {
                             transition={{ duration: 0.6, delay: 0.1 }}
                             className="text-3xl md:text-4xl font-black text-white leading-tight mb-4"
                         >
-                            {missionData.heading}
-                            <br />
+                            {head && <>{head}<br /></>}
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#4AB8FF]">
-                                {missionData.headingAccent}
+                                {tail}
                             </span>
                         </motion.h2>
 
@@ -60,7 +97,7 @@ const Mission = () => {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="text-[#6B7280] text-[13px] leading-relaxed max-w-xs mb-8"
                         >
-                            {missionData.description}
+                            {data.description}
                         </motion.p>
 
                         {/* Stats */}
@@ -71,13 +108,13 @@ const Mission = () => {
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="flex items-center gap-10"
                         >
-                            {missionData.stats.map((stat, i) => (
-                                <div key={i}>
+                            {data.items.map((stat, i) => (
+                                <div key={stat.id || i}>
                                     <p className="text-2xl md:text-3xl font-black text-white tracking-tight leading-none">
-                                        {stat.value}
+                                        {stat.title}
                                     </p>
                                     <p className="text-[10px] font-bold text-[#4B5563] uppercase tracking-[0.15em] mt-1">
-                                        {stat.label}
+                                        {stat.sub_title}
                                     </p>
                                 </div>
                             ))}
@@ -94,7 +131,7 @@ const Mission = () => {
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src={missionData.image}
+                            src={imageUrl}
                             alt="Medical research laboratory"
                             className="absolute inset-0 w-full h-full object-cover"
                         />
