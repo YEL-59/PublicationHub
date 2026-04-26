@@ -9,6 +9,7 @@ import { ArrowRight, Loader2, Send } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { subscribeNewsletter, getSystemInfo } from "@/services/home";
+import { getDynamicPages } from "@/services/dynamicPages";
 
 interface SystemInfo {
     system_name: string;
@@ -23,19 +24,28 @@ const Footer = () => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
+    const [dynamicPages, setDynamicPages] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchSystemInfo = async () => {
+        const fetchData = async () => {
             try {
-                const res = await getSystemInfo();
-                if (res?.status) {
-                    setSystemInfo(res.data);
+                const [systemRes, pagesRes] = await Promise.all([
+                    getSystemInfo(),
+                    getDynamicPages()
+                ]);
+                
+                if (systemRes?.status) {
+                    setSystemInfo(systemRes.data);
+                }
+                
+                if (pagesRes?.status) {
+                    setDynamicPages(pagesRes.data);
                 }
             } catch (error) {
-                console.error("Failed to fetch system info:", error);
+                console.error("Failed to fetch footer data:", error);
             }
         };
-        fetchSystemInfo();
+        fetchData();
     }, []);
 
     const handleSubscribe = async (e: React.FormEvent) => {
@@ -72,7 +82,7 @@ const Footer = () => {
         ],
         resources: [
             { name: "FAQ", href: "/faq" },
-            { name: "Blog", href: "/blog" },
+           
             { name: "Mentors", href: "/mentors" },
             { name: "Contact", href: "/contact" },
         ],
@@ -163,13 +173,13 @@ const Footer = () => {
                     <div className="lg:col-span-2">
                         <h4 className="text-white font-semibold mb-7 text-[16px]">Legal</h4>
                         <ul className="flex flex-col gap-4">
-                            {footerLinks.legal.map((link) => (
-                                <li key={link.name}>
+                            {dynamicPages.map((page) => (
+                                <li key={page.id}>
                                     <Link
-                                        href={link.href}
+                                        href={`/${page.page_slug}`}
                                         className="hover:text-[#00D1FF] text-[#A3A7AE]  text-sm font-normal leading-5 transition-colors duration-200"
                                     >
-                                        {link.name}
+                                        {page.page_title}
                                     </Link>
                                 </li>
                             ))}
