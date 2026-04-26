@@ -12,6 +12,12 @@ import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { getSystemInfo } from "@/services/home";
 
+interface ISystemInfo {
+    logo: string;
+    system_name: string;
+    [key: string]: any;
+}
+
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<ICurrentUser | null>(null);
@@ -20,7 +26,7 @@ const Navbar = () => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const [systemInfo, setSystemInfo] = useState<any>(null);
+    const [systemInfo, setSystemInfo] = useState<ISystemInfo | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -61,7 +67,7 @@ const Navbar = () => {
             setIsProfileOpen(false);
             toast.success("Logged out successfully");
             router.push("/login"); // Updated to your login route
-        } catch (error: any) {
+        } catch (error) {
             toast.error("Logout failed");
         }
     };
@@ -81,14 +87,14 @@ const Navbar = () => {
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
-                    <div className="relative w-44 h-10 md:w-52 md:h-12">
+                    <div className="relative w-44 h-10 md:w-52 md:h-12 ">
                         <Image
                             src={systemInfo?.logo || navLogo}
                             alt={systemInfo?.system_name || "PublicationHub Logo"}
                             fill
                             className="object-contain object-left"
                             priority
-                            unoptimized={!!systemInfo?.logo}
+                            unoptimized={!!systemInfo?.logo}    
                         />
                     </div>
                 </Link>

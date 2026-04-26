@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, School, Building2, Upload, Save, X, Edit3, Loader2 } from "lucide-react";
+import { User, Mail, School, Building2, Upload, Save, X, Edit3, Loader2, Lock } from "lucide-react";
 import { ICurrentUser } from "@/types/auth/auth";
 import { updateProfile } from "@/services/auth";
 import { toast } from "sonner";
+import PasswordChange from "./Passwordchange";
 
 interface ProfileSettingsProps {
     user: ICurrentUser;
@@ -16,11 +17,12 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     
     const [formData, setFormData] = useState({
         name: user.name,
         email: user.email,
-        institution: user.institution || "Stanford University",
+        institution: user.institution || "Stanford Universitycv",
         department: "Biomedical Engineering",
         avatar: user.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300",
         phone: user.phone || "",
@@ -78,12 +80,20 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
             <div className="flex items-center justify-between">
                 <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">Profile Settings</h2>
                 {!isEditing ? (
-                    <button 
-                        onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-2 bg-[#00D1FF] hover:bg-[#00A3FF] text-black font-bold py-2.5 px-6 rounded-xl text-sm transition-all active:scale-95 shadow-lg shadow-[#00D1FF]/20"
-                    >
-                        <Edit3 className="w-4 h-4" /> Edit Profile
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => setIsPasswordModalOpen(true)}
+                            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all active:scale-95 border border-white/5"
+                        >
+                            <Lock className="w-4 h-4" /> Change Password
+                        </button>
+                        <button 
+                            onClick={() => setIsEditing(true)}
+                            className="flex items-center gap-2 bg-[#00D1FF] hover:bg-[#00A3FF] text-black font-bold py-2.5 px-6 rounded-xl text-sm transition-all active:scale-95 shadow-lg shadow-[#00D1FF]/20"
+                        >
+                            <Edit3 className="w-4 h-4" /> Edit Profile
+                        </button>
+                    </div>
                 ) : (
                     <div className="flex items-center gap-3">
                          <button 
@@ -243,6 +253,11 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
                     </div>
                 </div>
             </div>
+
+            <PasswordChange 
+                isOpen={isPasswordModalOpen} 
+                onClose={() => setIsPasswordModalOpen(false)} 
+            />
         </div>
     );
 };

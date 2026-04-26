@@ -103,9 +103,9 @@ export const changePassword = async (data: FieldValues) => {
     const token = (await cookies()).get("token")?.value;
 
     const formData = new FormData();
-    formData.append("old_password", data.currentPassword);
-    formData.append("password", data.newPassword);
-    formData.append("password_confirmation", data.confirmPassword);
+    formData.append("current_password", data.currentPassword);
+    formData.append("new_password", data.newPassword);
+    formData.append("new_password_confirmation", data.confirmPassword);
 
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/update-password`, {
