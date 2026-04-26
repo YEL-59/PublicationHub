@@ -127,7 +127,7 @@ export const changePassword = async (data: FieldValues) => {
 export const getUserInfo = async () => {
     const token = (await cookies()).get("token")?.value;
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user-info`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/me`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -139,13 +139,11 @@ export const getUserInfo = async () => {
             return { status: false, message: "Failed to fetch user info" };
         }
 
-        const text = await response.text();
-        try {
-            return JSON.parse(text);
-        } catch (e) {
-            console.error("Failed to parse user info JSON:", text.substring(0, 100));
-            return { status: false, message: "Invalid response from server" };
+        const responseData = await response.json();
+        if (responseData?.status && responseData?.data) {
+            (await cookies()).set("user", JSON.stringify(responseData.data));
         }
+        return responseData;
     } catch (error: any) {
         return { status: false, message: error.message || "An error occurred" };
     }
@@ -156,11 +154,15 @@ export const updateProfile = async (data: FieldValues) => {
     const token = (await cookies()).get("token")?.value;
 
     const formData = new FormData();
+    formData.append("name", data.name || `${data.firstName} ${data.lastName}`.trim());
     formData.append("first_name", data.firstName);
     formData.append("last_name", data.lastName);
     formData.append("phone", data.mobileNumber);
     formData.append("address", data.address || "");
-    formData.append("birthday", data.birthday || "");
+    formData.append("birthday", data.birthday || data.birthdate || "");
+    formData.append("birthdate", data.birthdate || data.birthday || "");
+    formData.append("gender", data.gender || "");
+    formData.append("institution", data.institution || "");
     formData.append("website", data.website || "");
     formData.append("about", data.about || "");
 

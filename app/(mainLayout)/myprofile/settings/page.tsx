@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import ProfileSettings from "@/page/myprofile/ProfileSettings";
-import { getCurrentUser } from "@/services/auth";
+import { getCurrentUser, getUserInfo } from "@/services/auth";
 import { ICurrentUser } from "@/types/auth/auth";
 import { Loader2 } from "lucide-react";
 
@@ -11,8 +11,13 @@ export default function MySettingsPage() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const currentUser = await getCurrentUser();
-            setUser(currentUser);
+            const userRes = await getUserInfo();
+            if (userRes?.status) {
+                setUser(userRes.data);
+            } else {
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            }
         };
         fetchUser();
     }, []);

@@ -24,6 +24,8 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
         department: "Biomedical Engineering",
         avatar: user.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300",
         phone: user.phone || "",
+        gender: user.gender || "male",
+        birthdate: user.birthdate || "",
     });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,12 +49,15 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
             const lastName = nameParts.slice(1).join(" ") || "";
 
             const res = await updateProfile({
+                name: formData.name,
                 firstName,
                 lastName,
                 mobileNumber: formData.phone,
                 email: formData.email,
                 avatar: avatarFile || formData.avatar,
                 institution: formData.institution,
+                gender: formData.gender,
+                birthdate: formData.birthdate,
             });
             if (res?.status) {
                 toast.success("Profile updated successfully");
@@ -132,6 +137,32 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
                                     value={formData.email}
                                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                                     className="w-full bg-[#1F242D] border border-white/5 rounded-xl py-3.5 pl-11 pr-5 text-sm text-white focus:outline-none focus:border-[#00D1FF]/30 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Gender</label>
+                                <select 
+                                    disabled={!isEditing}
+                                    value={formData.gender}
+                                    onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                                    className="w-full bg-[#1F242D] border border-white/5 rounded-xl py-3.5 px-4 text-sm text-white focus:outline-none focus:border-[#00D1FF]/30 disabled:opacity-60 disabled:cursor-not-allowed transition-all appearance-none"
+                                >
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Birthdate</label>
+                                <input 
+                                    type="date" 
+                                    disabled={!isEditing}
+                                    value={formData.birthdate}
+                                    onChange={(e) => setFormData({...formData, birthdate: e.target.value})}
+                                    className="w-full bg-[#1F242D] border border-white/5 rounded-xl py-3.5 px-4 text-sm text-white focus:outline-none focus:border-[#00D1FF]/30 disabled:opacity-60 disabled:cursor-not-allowed transition-all [color-scheme:dark]"
                                 />
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ArrowLeft, Search, Paperclip, Send, MoreVertical, UserGroupIcon, Users } from "lucide-react";
+import { ArrowLeft, Search, Paperclip, Send, MoreVertical, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";

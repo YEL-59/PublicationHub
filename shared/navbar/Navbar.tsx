@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Search, Menu, X, User, LogOut, ChevronDown, Settings } from "lucide-react";
 import navLogo from "@/assets/images/nav-logo.png";
 import CTAButton from "@/components/CTAButton";
-import { getCurrentUser, logoutService } from "@/services/auth";
+import { getCurrentUser, logoutService, getUserInfo } from "@/services/auth";
 import { ICurrentUser } from "@/types/auth/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -24,11 +24,18 @@ const Navbar = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const [currentUser, systemRes] = await Promise.all([
-                getCurrentUser(),
+            const [userRes, systemRes] = await Promise.all([
+                getUserInfo(),
                 getSystemInfo()
             ]);
-            setUser(currentUser);
+            
+            if (userRes?.status) {
+                setUser(userRes.data);
+            } else {
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            }
+
             if (systemRes?.status) {
                 setSystemInfo(systemRes.data);
             }
