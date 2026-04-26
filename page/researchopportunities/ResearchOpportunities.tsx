@@ -57,7 +57,7 @@ const ResearchOpportunities = () => {
                         />
                     </div>
 
-                    <div className="flex items-center flex-wrap gap-3 w-full lg:w-auto">
+                    {/* <div className="flex items-center flex-wrap gap-3 w-full lg:w-auto">
                         <button className="flex items-center justify-between gap-2.5 bg-[#111419] border border-white/5 rounded-[12px] px-5 py-3.5 text-sm min-w-[190px] hover:bg-white/5 transition-all text-[#A3A7AE] group">
                             All Specializations <ChevronDown className="w-4 h-4 group-hover:text-white transition-colors" />
                         </button>
@@ -67,7 +67,7 @@ const ResearchOpportunities = () => {
                         <button className="flex items-center gap-2.5 bg-[#111419] border border-white/5 rounded-[12px] px-5 py-3.5 text-sm hover:bg-white/5 transition-all text-[#A3A7AE] group">
                             <Filter className="w-4 h-4 group-hover:text-white transition-colors" /> More Filters
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="mb-8">
