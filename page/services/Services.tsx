@@ -24,12 +24,12 @@ interface ServiceData {
 
 const ServiceCard = ({
     service,
-    isHovered,
-    onHover
+    isOpen,
+    onClick
 }: {
     service: ServiceData;
-    isHovered: boolean;
-    onHover: (active: boolean) => void;
+    isOpen: boolean;
+    onClick: () => void;
 }) => {
     // Helper to parse HTML from API description
     const parseFeatures = (html: string) => {
@@ -47,20 +47,19 @@ const ServiceCard = ({
 
     return (
         <motion.div
-            onMouseEnter={() => onHover(true)}
-            onMouseLeave={() => onHover(false)}
-            layout
+            onClick={onClick}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`relative bg-[#111419] border border-white/5 rounded-[24px] p-8 transition-all duration-500 cursor-pointer overflow-hidden ${isHovered ? "border-[#00D1FF]/30 shadow-2xl shadow-[#00D1FF]/5" : "hover:border-white/10"
+            whileHover={{ y: -5 }}
+            className={`relative bg-[#111419] border border-white/5 rounded-[24px] p-8 transition-all duration-300 cursor-pointer overflow-hidden ${isOpen ? "border-[#00D1FF]/40 shadow-2xl shadow-[#00D1FF]/5 ring-1 ring-[#00D1FF]/10" : "hover:border-white/10"
                 }`}
         >
             <div className="flex items-start justify-between mb-6">
                 <div
                     className="w-14 h-14 rounded-2xl transition-transform duration-500 flex items-center justify-center overflow-hidden bg-[#00D1FF]/10 relative"
                     style={{
-                        transform: isHovered ? "scale(1.1)" : "scale(1)"
+                        transform: isOpen ? "scale(1.1)" : "scale(1)"
                     }}
                 >
                     {service.icon ? (
@@ -77,7 +76,7 @@ const ServiceCard = ({
                     )}
                 </div>
                 <motion.div
-                    animate={{ rotate: isHovered ? 180 : 0 }}
+                    animate={{ rotate: isOpen ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                 >
                     <ChevronDown className="w-5 h-5 text-[#3B414A]" />
@@ -93,7 +92,7 @@ const ServiceCard = ({
             </p>
 
             <AnimatePresence>
-                {isHovered && (
+                {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -237,8 +236,8 @@ const Services = () => {
                             >
                                 <ServiceCard
                                     service={service}
-                                    isHovered={activeId === service.id}
-                                    onHover={(active) => setActiveId(active ? service.id : null)}
+                                    isOpen={activeId === service.id}
+                                    onClick={() => setActiveId(activeId === service.id ? null : service.id)}
                                 />
                             </motion.div>
                         ))

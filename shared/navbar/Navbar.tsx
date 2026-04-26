@@ -8,7 +8,7 @@ import navLogo from "@/assets/images/nav-logo.png";
 import CTAButton from "@/components/CTAButton";
 import { getCurrentUser, logoutService } from "@/services/auth";
 import { ICurrentUser } from "@/types/auth/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { getSystemInfo } from "@/services/home";
 
@@ -18,6 +18,7 @@ const Navbar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const pathname = usePathname();
 
     const [systemInfo, setSystemInfo] = useState<any>(null);
 
@@ -59,7 +60,7 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        { name: "Home", href: "/", active: true },
+        { name: "Home", href: "/" },
         { name: "Research Opportunities", href: "/researchopportunities" },
         { name: "Services", href: "/service" },
         { name: "Meta Academy", href: "/meta" },
@@ -87,16 +88,19 @@ const Navbar = () => {
 
                 {/* Desktop Navigation Links */}
                 <div className="hidden lg:flex items-center gap-6 xl:gap-9">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            className={`text-[15px] font-medium transition-colors duration-200 hover:text-[#00D1FF] ${link.active ? "text-[#00D1FF]" : "text-[#94A3B8]"
-                                }`}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = pathname === link.href;
+                        return (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className={`text-[15px] font-medium transition-colors duration-200 hover:text-[#00D1FF] ${isActive ? "text-[#00D1FF]" : "text-[#94A3B8]"
+                                    }`}
+                            >
+                                {link.name}
+                            </Link>
+                        );
+                    })}
                 </div>
 
                 {/* Right Section: Search, User Profile or Sign In, CTA */}
@@ -195,17 +199,20 @@ const Navbar = () => {
                     }`}
             >
                 <div className="flex flex-col gap-1 p-6">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            onClick={() => setIsOpen(false)}
-                            className={`text-lg font-medium transition-colors ${link.active ? "text-[#00D1FF]" : "text-gray-400"
-                                } hover:text-white py-3 px-4 rounded-lg hover:bg-white/5`}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = pathname === link.href;
+                        return (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                onClick={() => setIsOpen(false)}
+                                className={`text-lg font-medium transition-colors ${isActive ? "text-[#00D1FF]" : "text-gray-400"
+                                    } hover:text-white py-3 px-4 rounded-lg hover:bg-white/5`}
+                            >
+                                {link.name}
+                            </Link>
+                        );
+                    })}
                     <div className="mt-4 pt-6 border-t border-white/10 flex flex-col gap-5">
                         {user ? (
                             <div className="flex flex-col gap-4">
