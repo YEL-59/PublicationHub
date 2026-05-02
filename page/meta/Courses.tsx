@@ -19,7 +19,7 @@ const Courses = () => {
         setActiveCategoryId
     } = useCourses();
 
-    const [selectedVideo, setSelectedVideo] = useState<{ title: string } | null>(null);
+    const [selectedVideo, setSelectedVideo] = useState<{ title: string; videoUrl?: string | null } | null>(null);
 
     // Helpers for pagination
     const totalPages = pagination?.last_page || 1;
@@ -82,7 +82,7 @@ const Courses = () => {
                                     <CourseCard
                                         key={course.id}
                                         course={course}
-                                        onPlay={() => setSelectedVideo({ title: course.title })}
+                                        onPlay={() => setSelectedVideo({ title: course.title, videoUrl: course.intro_video })}
                                     />
                                 ))
                             ) : (
@@ -137,6 +137,7 @@ const Courses = () => {
                 isOpen={!!selectedVideo}
                 onClose={() => setSelectedVideo(null)}
                 title={selectedVideo?.title || ""}
+                videoUrl={selectedVideo?.videoUrl || undefined}
             />
         </section>
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X } from "lucide-react";
+import { X, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface VideoModalProps {
@@ -46,18 +46,25 @@ const VideoModal = ({ isOpen, onClose, videoUrl, title }: VideoModalProps) => {
                         </button>
                     </div>
 
-                    {/* Video Player (Mock) */}
+                    {/* Video Player */}
                     <div className="w-full h-full flex items-center justify-center bg-black">
-                        {/* In a real app, you would use a video tag or a player like ReactPlayer */}
-                        <video
-                            controls
-                            className="w-full h-full object-contain"
-                            autoPlay
-                            poster="https://images.unsplash.com/photo-1551288049-bbda48642153?q=80&w=800&auto=format&fit=crop"
-                        >
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video>
+                        {videoUrl ? (
+                            <video
+                                controls
+                                className="w-full h-full object-contain"
+                                autoPlay
+                            >
+                                <source src={videoUrl} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        ) : (
+                            <div className="text-center p-8">
+                                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+                                    <Play size={40} className="text-gray-600" />
+                                </div>
+                                <p className="text-gray-400 font-medium text-lg">Intro video not available for this course</p>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </motion.div>

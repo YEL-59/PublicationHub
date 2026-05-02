@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ibraheemaltamim.thesyndicates.team",
       },
+      {
+        protocol: "https",
+        hostname: "dashboard.hooray-entertainment.online",
+      },
     ],
   },
 };
