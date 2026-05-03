@@ -15,33 +15,29 @@ interface MetaAcademyContent {
 
 const Skill = () => {
     const [content, setContent] = useState<MetaAcademyContent | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
             const res = await getMetaAcademyContent();
             if (res?.status) {
                 setContent(res.data);
             }
+            setIsLoading(false);
         };
         fetchData();
     }, []);
 
-    const defaultFeatures = [
-        "Access expert-led courses at your own pace",
-        "Earn certificates upon completion",
-        "Apply learnings to real research projects",
-        "Join a community of active learners",
-    ];
-
     // Simple helper to extract text from <p> tags if we want to keep the icon styling
     const parseFeatures = (html: string) => {
-        if (!html) return defaultFeatures;
+        if (!html) return [];
         const div = document.createElement("div");
         div.innerHTML = html;
         return Array.from(div.querySelectorAll("p")).map(p => p.textContent || "");
     };
 
-    const features = content?.description ? parseFeatures(content.description) : defaultFeatures;
+    const features = content?.description ? parseFeatures(content.description) : [];
 
     return (
         <section className="w-full bg-[#0A0C0F] py-24 px-4 md:px-8 lg:px-12 overflow-hidden">
@@ -58,34 +54,59 @@ const Skill = () => {
                         </div>
 
                         {/* Heading Section */}
-                        <div className="space-y-4">
-                            <h2
-                                className="text-4xl md:text-5xl font-bold text-white leading-tight"
-                                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                            >
-                                {content?.title || "Level Up Your Research Skills"}
-                            </h2>
-                            <p
-                                className="text-[#A3A7AE] font-inter text-base font-normal leading-7 max-w-xl"
-                            >
-                                {content?.sub_title || "Comprehensive courses designed by leading researchers to help you master essential skills—from methodology to publication."}
-                            </p>
+                        <div className="space-y-4 w-full">
+                            {isLoading ? (
+                                <div className="space-y-3">
+                                    <div className="h-10 md:h-12 w-3/4 bg-white/10 animate-pulse rounded"></div>
+                                    <div className="h-10 md:h-12 w-1/2 bg-white/10 animate-pulse rounded"></div>
+                                </div>
+                            ) : (
+                                <h2
+                                    className="text-4xl md:text-5xl font-bold text-white leading-tight"
+                                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                                >
+                                    {content?.title || "Level Up Your Research Skills"}
+                                </h2>
+                            )}
+                            
+                            {isLoading ? (
+                                <div className="space-y-2 pt-2 w-full max-w-xl">
+                                    <div className="h-5 w-full bg-white/10 animate-pulse rounded"></div>
+                                    <div className="h-5 w-full bg-white/10 animate-pulse rounded"></div>
+                                    <div className="h-5 w-2/3 bg-white/10 animate-pulse rounded"></div>
+                                </div>
+                            ) : (
+                                <p
+                                    className="text-[#A3A7AE] font-inter text-base font-normal leading-7 max-w-xl"
+                                >
+                                    {content?.sub_title || "Comprehensive courses designed by leading researchers to help you master essential skills—from methodology to publication."}
+                                </p>
+                            )}
                         </div>
 
                         {/* Features List */}
-                        <div className="space-y-4 pt-4">
-                            {features.map((feature, idx) => (
-                                <div key={idx} className="flex items-center gap-3 group">
-                                    <div className="flex-shrink-0">
-                                        <CheckCircle2 size={18} className="text-[#2A9D90] group-hover:scale-110 transition-transform" />
+                        <div className="space-y-4 pt-4 w-full">
+                            {isLoading ? (
+                                [1, 2, 3, 4].map((idx) => (
+                                    <div key={idx} className="flex items-center gap-3">
+                                        <div className="w-[18px] h-[18px] rounded-full bg-white/10 animate-pulse flex-shrink-0"></div>
+                                        <div className="h-5 w-3/4 bg-white/10 animate-pulse rounded"></div>
                                     </div>
-                                    <span
-                                        className="text-[#E5E7EB] font-inter text-base font-medium leading-6"
-                                    >
-                                        {feature}
-                                    </span>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                features.map((feature, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 group">
+                                        <div className="flex-shrink-0">
+                                            <CheckCircle2 size={18} className="text-[#2A9D90] group-hover:scale-110 transition-transform" />
+                                        </div>
+                                        <span
+                                            className="text-[#E5E7EB] font-inter text-base font-medium leading-6"
+                                        >
+                                            {feature}
+                                        </span>
+                                    </div>
+                                ))
+                            )}
                         </div>
 
                         {/* Action Button */}
@@ -101,15 +122,21 @@ const Skill = () => {
                     </div>
 
                     {/* Right Image Container */}
-                    <div className="relative w-full aspect-[4/3] lg:aspect-square xl:aspect-[1.2/1] rounded-[32px] overflow-hidden border border-white/10 group shadow-2xl">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-[#00D1FF]/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <Image
-                            src={content?.image || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200&auto=format&fit=crop"}
-                            alt={content?.title || "Researchers working in lab"}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            priority
-                        />
+                    <div className="relative w-full aspect-[4/3] lg:aspect-square xl:aspect-[1.2/1] rounded-[32px] overflow-hidden border border-white/10 group shadow-2xl bg-white/5">
+                        {isLoading ? (
+                            <div className="absolute inset-0 bg-white/10 animate-pulse w-full h-full"></div>
+                        ) : (
+                            <>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[#00D1FF]/10 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <Image
+                                    src={content?.image || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200&auto=format&fit=crop"}
+                                    alt={content?.title || "Researchers working in lab"}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    priority
+                                />
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

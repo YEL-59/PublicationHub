@@ -9,9 +9,11 @@ import heroBg from "@/assets/images/hero-bg.png";
 const Banner = () => {
     const [banner, setBanner] = useState<any>(null);
     const [stats, setStats] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
             const [bannerRes, statsRes] = await Promise.all([
                 getBannerContent(),
                 getCounterContent()
@@ -19,18 +21,12 @@ const Banner = () => {
             
             if (bannerRes?.status) setBanner(bannerRes.data);
             if (statsRes?.status) setStats(statsRes.data.items);
+            setIsLoading(false);
         };
         fetchData();
     }, []);
 
-    const defaultStats = [
-        { count_number: "500+", sub_title: "Research Opportunities" },
-        { count_number: "150+", sub_title: "Expert Mentors" },
-        { count_number: "10K+", label: "Active Researchers" },
-        { count_number: "95%", label: "Satisfaction Rate" },
-    ];
-
-    const displayStats = stats.length > 0 ? stats : defaultStats;
+    const displayStats = stats;
 
     return (
         <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center pt-28 pb-12 overflow-visible">
@@ -49,20 +45,35 @@ const Banner = () => {
 
             <div className="container mx-auto px-4 relative z-10 flex flex-col items-center text-center">
                 {/* Badge */}
-                <div className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00E6FF]/10 border border-[#00E6FF]/20 text-[#00E6FF] text-sm font-medium leading-5 shadow-lg backdrop-blur-sm">
-                    <Sparkles size={14} className="text-[#00E6FF]" />
-                    {banner?.sub_title || "Global Research Network"}
-                </div>
+                {isLoading ? (
+                    <div className="mb-8 w-48 h-8 rounded-full bg-white/10 animate-pulse border border-[#00E6FF]/20 shadow-lg backdrop-blur-sm"></div>
+                ) : (
+                    <div className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00E6FF]/10 border border-[#00E6FF]/20 text-[#00E6FF] text-sm font-medium leading-5 shadow-lg backdrop-blur-sm">
+                        <Sparkles size={14} className="text-[#00E6FF]" />
+                        {banner?.sub_title || "Global Research Network"}
+                    </div>
+                )}
 
                 {/* Heading */}
-                <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent pb-2">
-                    {banner?.title || "PublicationHub"}
-                </h1>
+                {isLoading ? (
+                    <div className="mb-6 h-16 md:h-20 w-3/4 md:w-1/2 bg-white/10 animate-pulse rounded-lg"></div>
+                ) : (
+                    <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent pb-2">
+                        {banner?.title || "PublicationHub"}
+                    </h1>
+                )}
 
                 {/* Subheading */}
-                <p className="max-w-xl text-[#A3A7AE] text-lg md:text-xl font-normal leading-relaxed mb-12">
-                    {banner?.description || "Advancing clinical excellence and evidence-based medicine across the Kingdom."}
-                </p>
+                {isLoading ? (
+                    <div className="mb-12 space-y-3 w-full max-w-xl">
+                        <div className="h-6 w-full bg-white/10 animate-pulse rounded"></div>
+                        <div className="h-6 w-4/5 bg-white/10 animate-pulse rounded mx-auto"></div>
+                    </div>
+                ) : (
+                    <p className="max-w-xl text-[#A3A7AE] text-lg md:text-xl font-normal leading-relaxed mb-12">
+                        {banner?.description || "Advancing clinical excellence and evidence-based medicine across the Kingdom."}
+                    </p>
+                )}
 
                 {/* Search Bar */}
                 <div className="w-full max-w-2xl relative mb-24 group">
@@ -87,23 +98,35 @@ const Banner = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl translate-y-24 relative z-20">
-                    {displayStats.map((stat, idx) => (
-                        <div
-                            key={idx}
-                            className="border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center group transition-all duration-300 hover:border-[#00D1FF]/30 hover:-translate-y-2 backdrop-blur-md"
-                            style={{
-                                background: "linear-gradient(136deg, #20232D 99.19%, #171A21 1.35%)",
-                                boxShadow: "0 1.593px 6.373px 0 rgba(29, 126, 135, 0.10)"
-                            }}
-                        >
-                            <h3 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-br from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                                {stat.count_number}
-                            </h3>
-                            <p className="text-[#fff] text-sm font-medium text-center leading-tight uppercase tracking-wider">
-                                {stat.sub_title}
-                            </p>
-                        </div>
-                    ))}
+                    {isLoading ? (
+                        [1, 2, 3, 4].map((idx) => (
+                            <div
+                                key={idx}
+                                className="border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[160px] bg-white/5 animate-pulse backdrop-blur-md"
+                            >
+                                <div className="h-10 w-24 bg-white/10 rounded mb-3"></div>
+                                <div className="h-4 w-32 bg-white/10 rounded"></div>
+                            </div>
+                        ))
+                    ) : (
+                        displayStats.map((stat, idx) => (
+                            <div
+                                key={idx}
+                                className="border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center group transition-all duration-300 hover:border-[#00D1FF]/30 hover:-translate-y-2 backdrop-blur-md"
+                                style={{
+                                    background: "linear-gradient(136deg, #20232D 99.19%, #171A21 1.35%)",
+                                    boxShadow: "0 1.593px 6.373px 0 rgba(29, 126, 135, 0.10)"
+                                }}
+                            >
+                                <h3 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-br from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
+                                    {stat.count_number}
+                                </h3>
+                                <p className="text-[#fff] text-sm font-medium text-center leading-tight uppercase tracking-wider">
+                                    {stat.sub_title}
+                                </p>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </section>

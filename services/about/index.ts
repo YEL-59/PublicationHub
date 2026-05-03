@@ -7,10 +7,6 @@ export const getAboutHeroData = async () => {
             method: "GET",
         });
         
-        if (!response.ok) {
-            throw new Error(`Failed to fetch about hero data: ${response.statusText}`);
-        }
-
         const data = await response.json();
         return data;
     } catch (error) {
@@ -28,10 +24,6 @@ export const getOurMissionData = async () => {
             method: "GET",
         });
         
-        if (!response.ok) {
-            throw new Error(`Failed to fetch about mission data: ${response.statusText}`);
-        }
-
         const data = await response.json();
         return data;
     } catch (error) {

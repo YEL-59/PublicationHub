@@ -144,9 +144,13 @@ const Faq = () => {
                 {/* FAQ List */}
                 <div className="flex flex-col gap-4">
                     {loading ? (
-                        <div className="flex flex-col items-center py-20 gap-4">
-                            <Loader2 className="w-10 h-10 text-[#00D1FF] animate-spin" />
-                            <p className="text-[#A3A7AE] font-medium">Loading FAQs...</p>
+                        <div className="flex flex-col gap-4">
+                            {[1, 2, 3, 4, 5].map((idx) => (
+                                <div key={idx} className="w-full rounded-2xl border border-white/5 bg-[#171A21]/40 p-6 flex justify-between animate-pulse">
+                                    <div className="h-6 w-3/4 bg-white/10 rounded"></div>
+                                    <div className="h-6 w-6 bg-white/10 rounded-full shrink-0"></div>
+                                </div>
+                            ))}
                         </div>
                     ) : (
                         <>

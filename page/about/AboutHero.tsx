@@ -35,9 +35,21 @@ const AboutHero = () => {
 
     if (loading) {
         return (
-            <div className="py-32 bg-[#0A0C0F] flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
-            </div>
+            <section className="relative pt-12 pb-20 px-6 md:px-12 lg:px-20 overflow-hidden bg-[#0A0C0F]">
+                <div className="container mx-auto">
+                    <div className="relative w-full aspect-[21/9] md:aspect-[21/7] rounded-[32px] overflow-hidden border border-white/5 bg-[#171A21] animate-pulse">
+                        <div className="absolute inset-0 flex flex-col justify-center px-10 md:px-16 lg:px-24">
+                            <div className="w-24 h-6 rounded-full bg-white/10 mb-6"></div>
+                            <div className="w-3/4 md:w-1/2 h-12 md:h-16 bg-white/10 rounded mb-5"></div>
+                            <div className="space-y-3 w-full max-w-sm md:max-w-md">
+                                <div className="h-4 w-full bg-white/10 rounded"></div>
+                                <div className="h-4 w-5/6 bg-white/10 rounded"></div>
+                                <div className="h-4 w-4/5 bg-white/10 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         );
     }
 

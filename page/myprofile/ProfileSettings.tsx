@@ -20,11 +20,11 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     
     const [formData, setFormData] = useState({
-        name: user.name,
-        email: user.email,
-        institution: user.institution || "Stanford Universitycv",
-        department: "Biomedical Engineering",
-        avatar: user.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300",
+        name: user.name || "",
+        email: user.email || "",
+        institution: user.institution || "",
+        department: user.department || "",
+        avatar: user.avatar || "",
         phone: user.phone || "",
         gender: user.gender || "male",
         birthdate: user.birthdate || "",
@@ -217,8 +217,12 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
                         </div>
 
                         <div className="relative mb-8">
-                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#00D1FF]/30 overflow-hidden relative group shadow-2xl shadow-[#00D1FF]/10">
-                                <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#00D1FF]/30 overflow-hidden relative group shadow-2xl shadow-[#00D1FF]/10 flex items-center justify-center bg-[#1F242D]">
+                                {formData.avatar ? (
+                                    <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User size={64} className="text-[#00D1FF]/50" />
+                                )}
                                 {isEditing && (
                                     <div 
                                         onClick={() => fileInputRef.current?.click()}

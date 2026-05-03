@@ -232,8 +232,27 @@ const RecentPublication = () => {
 
                 {/* Grid */}
                 {loading ? (
-                    <div className="flex justify-center items-center h-48">
-                        <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {[1, 2, 3, 4].map((idx) => (
+                            <div key={idx} className="bg-[#111419] border border-white/5 rounded-2xl p-6 flex flex-col gap-4 animate-pulse min-h-[160px]">
+                                <div className="flex justify-between gap-4">
+                                    <div className="w-20 h-6 bg-white/10 rounded-full"></div>
+                                    <div className="w-12 h-4 bg-white/10 rounded"></div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="h-4 w-full bg-white/10 rounded"></div>
+                                    <div className="h-4 w-3/4 bg-white/10 rounded"></div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className="w-4 h-4 bg-white/10 rounded-full shrink-0"></div>
+                                    <div className="h-3 w-1/2 bg-white/10 rounded"></div>
+                                </div>
+                                <div className="mt-auto pt-3 border-t border-white/[0.04] flex justify-between">
+                                    <div className="h-3 w-24 bg-white/10 rounded"></div>
+                                    <div className="h-3 w-16 bg-white/10 rounded"></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <AnimatePresence mode="wait">

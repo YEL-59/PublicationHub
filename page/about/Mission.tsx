@@ -41,9 +41,32 @@ const Mission = () => {
 
     if (loading) {
         return (
-            <div className="py-20 bg-[#0A0C0F] flex items-center justify-center min-h-[300px]">
-                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
-            </div>
+            <section className="relative py-20 px-6 md:px-12 lg:px-40 bg-[#0A0C0F]">
+                <div className="container mx-auto">
+                    <div className="relative w-full rounded-[24px] overflow-hidden border border-white/5 bg-[#0E1117] flex flex-col md:flex-row min-h-[220px] md:min-h-[260px] animate-pulse">
+                        <div className="relative z-10 flex flex-col justify-center px-8 md:px-12 py-10 flex-1">
+                            <div className="w-24 h-6 bg-white/10 rounded-full mb-5"></div>
+                            <div className="h-10 w-3/4 bg-white/10 rounded mb-4"></div>
+                            <div className="space-y-2 mb-8 max-w-xs">
+                                <div className="h-3 w-full bg-white/10 rounded"></div>
+                                <div className="h-3 w-5/6 bg-white/10 rounded"></div>
+                                <div className="h-3 w-4/5 bg-white/10 rounded"></div>
+                            </div>
+                            <div className="flex items-center gap-10">
+                                <div>
+                                    <div className="h-8 w-16 bg-white/10 rounded mb-1"></div>
+                                    <div className="h-3 w-20 bg-white/10 rounded"></div>
+                                </div>
+                                <div>
+                                    <div className="h-8 w-16 bg-white/10 rounded mb-1"></div>
+                                    <div className="h-3 w-20 bg-white/10 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="relative w-full md:w-[45%] shrink-0 min-h-[220px] md:min-h-0 bg-white/5"></div>
+                    </div>
+                </div>
+            </section>
         );
     }
 

@@ -6,13 +6,16 @@ import { getResearchJourneyContent } from "@/services/home";
 
 const Career = () => {
     const [content, setContent] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchContent = async () => {
+            setIsLoading(true);
             const res = await getResearchJourneyContent();
             if (res?.status) {
                 setContent(res.data);
             }
+            setIsLoading(false);
         };
         fetchContent();
     }, []);
@@ -29,44 +32,62 @@ const Career = () => {
 
             <div className="container mx-auto relative z-10 flex flex-col items-center text-center">
                 {/* Badge */}
-                <div
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#2A9D90]/30 mb-8"
-                    style={{ background: "rgba(0, 230, 255, 0.05)" }}
-                >
-                    <Sparkles size={14} className="text-[#00D1FF]" />
-                    <span className="text-[#00D1FF] text-[13px] font-medium tracking-wide font-inter">
-                        {content?.title || "Start Your Research Journey"}
-                    </span>
-                </div>
+                {isLoading ? (
+                    <div className="w-48 h-8 rounded-full bg-white/10 animate-pulse border border-[#2A9D90]/30 mb-8"></div>
+                ) : (
+                    <div
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#2A9D90]/30 mb-8"
+                        style={{ background: "rgba(0, 230, 255, 0.05)" }}
+                    >
+                        <Sparkles size={14} className="text-[#00D1FF]" />
+                        <span className="text-[#00D1FF] text-[13px] font-medium tracking-wide font-inter">
+                            {content?.title || "Start Your Research Journey"}
+                        </span>
+                    </div>
+                )}
 
                 {/* Main Heading */}
-                <h2
-                    className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 max-w-4xl leading-[1.1]"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                    {content?.sub_title ? (
-                        <>
-                            {content.sub_title.split("Research Career?")[0]}
-                            <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                                Research Career?
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            Ready to Accelerate Your <br />
-                            <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                                Research Career?
-                            </span>
-                        </>
-                    )}
-                </h2>
+                {isLoading ? (
+                    <div className="flex flex-col items-center gap-2 mb-8 w-full max-w-4xl">
+                        <div className="h-12 md:h-16 w-3/4 bg-white/10 animate-pulse rounded"></div>
+                        <div className="h-12 md:h-16 w-1/2 bg-white/10 animate-pulse rounded"></div>
+                    </div>
+                ) : (
+                    <h2
+                        className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 max-w-4xl leading-[1.1]"
+                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                        {content?.sub_title ? (
+                            <>
+                                {content.sub_title.split("Research Career?")[0]}
+                                <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
+                                    Research Career?
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                Ready to Accelerate Your <br />
+                                <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
+                                    Research Career?
+                                </span>
+                            </>
+                        )}
+                    </h2>
+                )}
 
                 {/* Subtext */}
-                <p
-                    className="text-[#A3A7AE] text-base md:text-lg font-normal leading-7 max-w-2xl mb-12 font-inter whitespace-pre-line"
-                >
-                    {content?.description || "Join thousands of researchers who have found their perfect opportunities, connected with expert mentors, and advanced their careers through ResearchHub+."}
-                </p>
+                {isLoading ? (
+                    <div className="flex flex-col items-center gap-2 mb-12 w-full max-w-2xl">
+                        <div className="h-5 w-full bg-white/10 animate-pulse rounded"></div>
+                        <div className="h-5 w-4/5 bg-white/10 animate-pulse rounded"></div>
+                    </div>
+                ) : (
+                    <p
+                        className="text-[#A3A7AE] text-base md:text-lg font-normal leading-7 max-w-2xl mb-12 font-inter whitespace-pre-line"
+                    >
+                        {content?.description || "Join thousands of researchers who have found their perfect opportunities, connected with expert mentors, and advanced their careers through ResearchHub+."}
+                    </p>
+                )}
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row items-center gap-5 mb-8">

@@ -27,9 +27,11 @@ const Navbar = () => {
     const pathname = usePathname();
 
     const [systemInfo, setSystemInfo] = useState<ISystemInfo | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
             const [userRes, systemRes] = await Promise.all([
                 getUserInfo(),
                 getSystemInfo()
@@ -45,6 +47,7 @@ const Navbar = () => {
             if (systemRes?.status) {
                 setSystemInfo(systemRes.data);
             }
+            setIsLoading(false);
         };
         fetchData();
     }, []);
@@ -87,7 +90,9 @@ const Navbar = () => {
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
-                    {systemInfo?.logo ? (
+                    {isLoading ? (
+                        <div className="h-10 md:h-12 w-40 bg-white/10 animate-pulse rounded"></div>
+                    ) : systemInfo?.logo ? (
                         <img
                             src={systemInfo.logo}
                             alt={systemInfo.system_name || "PublicationHub Logo"}
@@ -126,7 +131,15 @@ const Navbar = () => {
                         <Search size={22} strokeWidth={2.5} />
                     </button> */}
 
-                    {user ? (
+                    {isLoading ? (
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse border-2 border-[#00D1FF]/30"></div>
+                            <div className="flex flex-col items-start gap-1">
+                                <div className="h-3.5 w-20 bg-white/10 animate-pulse rounded"></div>
+                                <div className="h-2 w-12 bg-white/10 animate-pulse rounded"></div>
+                            </div>
+                        </div>
+                    ) : user ? (
                         <div className="relative" ref={dropdownRef}>
                             <button 
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -237,7 +250,21 @@ const Navbar = () => {
                         );
                     })}
                     <div className="mt-4 pt-6 border-t border-white/10 flex flex-col gap-5">
-                        {user ? (
+                        {isLoading ? (
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-3 px-4">
+                                    <div className="w-12 h-12 rounded-full bg-white/10 animate-pulse border border-[#00D1FF]/30"></div>
+                                    <div className="flex flex-col gap-2 justify-center">
+                                        <div className="h-4 w-24 bg-white/10 animate-pulse rounded"></div>
+                                        <div className="h-3 w-32 bg-white/10 animate-pulse rounded"></div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-3 px-4 mt-2">
+                                    <div className="h-6 w-28 bg-white/10 animate-pulse rounded"></div>
+                                    <div className="h-6 w-24 bg-white/10 animate-pulse rounded"></div>
+                                </div>
+                            </div>
+                        ) : user ? (
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-3 px-4">
                                      <div className="w-12 h-12 rounded-full border border-[#00D1FF]/30 overflow-hidden relative">

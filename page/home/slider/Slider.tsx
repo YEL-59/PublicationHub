@@ -23,29 +23,7 @@ interface SliderContent {
     title: string;
 }
 
-const sliderData: SliderData[] = [
-    {
-        id: 1,
-        title: "High-Quality Research Services",
-        description:
-            "At Publication Hub, we are committed to advancing research excellence by empowering researchers and increasing both the quality and impact of scientific publications.",
-        image: "https://images.unsplash.com/photo-1579165466511-703398321689?q=80&w=600&auto=format&fit=crop",
-    },
-    {
-        id: 2,
-        title: "Career Growth Focus",
-        description:
-            "At Publication Hub, we are committed to advancing research excellence by empowering researchers and increasing both the quality and impact of scientific publications across Saudi Arabia and the Middle East.",
-        image: "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?q=80&w=600&auto=format&fit=crop",
-    },
-    {
-        id: 3,
-        title: "Expert Mentorship",
-        description:
-            "Connect with world-class mentors who guide you through complex research methodologies and help accelerate your academic publishing journey.",
-        image: "https://images.unsplash.com/photo-1532094349884-543bb11783cf?q=80&w=600&auto=format&fit=crop",
-    },
-];
+
 
 const ResearcherCard = ({ data }: { data: SliderData }) => {
     return (
@@ -106,41 +84,42 @@ const Slider = () => {
     const [content, setContent] = useState<SliderContent | null>(null);
     const [items, setItems] = useState<SliderData[]>([]);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
         const fetchSlider = async () => {
+            setIsLoading(true);
             const res = await getWhyChooseContent();
             if (res?.status) {
                 setContent(res.data.content);
                 setItems(res.data.items);
             }
+            setIsLoading(false);
         };
         fetchSlider();
     }, []);
 
-    const defaultData: SliderData[] = [
-        {
-            id: 1,
-            title: "High-Quality Research Services",
-            description: "At Publication Hub, we are committed to advancing research excellence by empowering researchers and increasing both the quality and impact of scientific publications.",
-            image: "https://images.unsplash.com/photo-1579165466511-703398321689?q=80&w=600&auto=format&fit=crop",
-        }
-    ];
-
-    const displayItems = items.length > 0 ? items : defaultData;
+    const displayItems = items;
 
     return (
         <section className="w-full bg-[#0A0C0F] pt-40 pb-20 px-4 md:px-8 overflow-hidden border border-t-[#2A9D90]/20">
             <div className="container mx-auto">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-                        {content?.title || "Why Researchers Choose"}{" "}
-                        {!content?.title && (
-                            <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
-                                PublicationHub
-                            </span>
-                        )}
-                    </h2>
+                    {isLoading ? (
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="h-10 w-64 md:w-96 bg-white/10 animate-pulse rounded"></div>
+                        </div>
+                    ) : (
+                        <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+                            {content?.title || "Why Researchers Choose"}{" "}
+                            {!content?.title && (
+                                <span className="bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent">
+                                    PublicationHub
+                                </span>
+                            )}
+                        </h2>
+                    )}
                 </div>
 
                 {/* Swiper Slider */}
@@ -160,11 +139,32 @@ const Slider = () => {
                         }}
                         className="!pb-16"
                     >
-                        {displayItems.map((item, idx) => (
-                            <SwiperSlide key={item.id || idx}>
-                                <ResearcherCard data={item} />
-                            </SwiperSlide>
-                        ))}
+                        {isLoading ? (
+                            [1, 2].map((idx) => (
+                                <SwiperSlide key={`skeleton-${idx}`}>
+                                    <div className="relative overflow-hidden rounded-[16px] border border-white/10 p-8 md:p-14 flex flex-col md:flex-row gap-8 items-start group min-h-[350px] bg-white/5 animate-pulse">
+                                        <div className="flex-1 min-w-0 flex flex-col items-start gap-6 w-full">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 shrink-0"></div>
+                                            <div className="space-y-4 w-full">
+                                                <div className="h-8 w-3/4 bg-white/10 rounded"></div>
+                                                <div className="space-y-2 w-full">
+                                                    <div className="h-4 w-full bg-white/10 rounded"></div>
+                                                    <div className="h-4 w-full bg-white/10 rounded"></div>
+                                                    <div className="h-4 w-5/6 bg-white/10 rounded"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="relative shrink-0 rounded-3xl overflow-hidden border border-white/5 mx-auto md:mx-0 w-full md:w-[300px] aspect-square md:aspect-[4/5] bg-white/10"></div>
+                                    </div>
+                                </SwiperSlide>
+                            ))
+                        ) : (
+                            displayItems.map((item, idx) => (
+                                <SwiperSlide key={item.id || idx}>
+                                    <ResearcherCard data={item} />
+                                </SwiperSlide>
+                            ))
+                        )}
                     </Swiper>
 
                     {/* Custom Navigation */}

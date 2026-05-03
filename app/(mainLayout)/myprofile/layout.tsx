@@ -65,15 +65,15 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
                             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-[#64748B] text-xs md:text-sm">
                                 <div className="flex items-center gap-1.5">
                                     <MapPin className="w-4 h-4 text-[#00D1FF]" />
-                                    <span>{user.institution || "Stanford University"}</span>
+                                    <span>{user.institution || "Institution not set"}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <Briefcase className="w-4 h-4 text-[#00D1FF]" />
-                                    <span>{user.role === 'mentor' ? 'Senior Researcher' : 'Biomedical Engineering'}</span>
+                                    <span className="capitalize">{user.role || "User"}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <Calendar className="w-4 h-4 text-[#00D1FF]" />
-                                    <span>Member since January 2024</span>
+                                    <span>Joined recently</span>
                                 </div>
                             </div>
                         </div>

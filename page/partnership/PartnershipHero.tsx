@@ -40,9 +40,20 @@ const PartnershipHero = () => {
 
     if (loading) {
         return (
-            <div className="min-h-[76vh] bg-[#0A0C0F] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
-            </div>
+            <section className="relative w-full flex flex-col overflow-hidden bg-[#0A0C0F] animate-pulse">
+                <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-28 pb-16 min-h-[76vh]">
+                    <div className="w-32 h-6 rounded-full bg-white/10 mb-8"></div>
+                    <div className="h-12 md:h-16 w-3/4 md:w-1/2 bg-white/10 rounded mb-6"></div>
+                    <div className="space-y-3 w-full max-w-[400px] mb-10">
+                        <div className="h-4 w-full bg-white/10 rounded"></div>
+                        <div className="h-4 w-5/6 bg-white/10 rounded mx-auto"></div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                        <div className="w-32 h-12 rounded-xl bg-white/10"></div>
+                        <div className="w-32 h-12 rounded-xl bg-white/10"></div>
+                    </div>
+                </div>
+            </section>
         );
     }
 

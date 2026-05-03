@@ -9,24 +9,27 @@ import { toast } from "sonner";
 
 const ProfileSettings = () => {
   const [user, setUser] = useState<ICurrentUser | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "Dr. Sarah Johnson",
-    email: "sarah.johnson@research.edu",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop"
+    name: "",
+    email: "",
+    avatar: ""
   });
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoadingUser(true);
       const currentUser = await getCurrentUser();
       if (currentUser) {
         setFormData({
-            name: currentUser.name,
-            email: currentUser.email,
-            avatar: currentUser.avatar || formData.avatar
+            name: currentUser.name || "",
+            email: currentUser.email || "",
+            avatar: currentUser.avatar || ""
         });
         setUser(currentUser);
       }
+      setIsLoadingUser(false);
     };
     fetchUser();
   }, []);
@@ -83,18 +86,22 @@ const ProfileSettings = () => {
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Full Name</label>
                 <div className="relative">
                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
-                   <input 
-                    type="text" 
-                    value={formData.name}
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="Dr. Sarah Johnson"
-                    className={`w-full bg-[#0A0C0F] border rounded-2xl py-4 pl-12 pr-4 text-sm text-white transition-all ${
-                      isEditing 
-                        ? "border-cyan-400/30 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10" 
-                        : "border-white/5 opacity-60 cursor-not-allowed"
-                    }`}
-                   />
+                   {isLoadingUser ? (
+                       <div className="w-full h-[54px] bg-white/5 animate-pulse rounded-2xl border border-white/5"></div>
+                   ) : (
+                       <input 
+                        type="text" 
+                        value={formData.name}
+                        disabled={!isEditing}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        placeholder="Your Name"
+                        className={`w-full bg-[#0A0C0F] border rounded-2xl py-4 pl-12 pr-4 text-sm text-white transition-all ${
+                          isEditing 
+                            ? "border-cyan-400/30 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10" 
+                            : "border-white/5 opacity-60 cursor-not-allowed"
+                        }`}
+                       />
+                   )}
                 </div>
               </div>
 
@@ -102,18 +109,22 @@ const ProfileSettings = () => {
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Email Address</label>
                 <div className="relative">
                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
-                   <input 
-                    type="email" 
-                    value={formData.email}
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    placeholder="sarah.johnson@research.edu"
-                    className={`w-full bg-[#0A0C0F] border rounded-2xl py-4 pl-12 pr-4 text-sm text-white transition-all ${
-                      isEditing 
-                        ? "border-cyan-400/30 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10" 
-                        : "border-white/5 opacity-60 cursor-not-allowed"
-                    }`}
-                   />
+                   {isLoadingUser ? (
+                       <div className="w-full h-[54px] bg-white/5 animate-pulse rounded-2xl border border-white/5"></div>
+                   ) : (
+                       <input 
+                        type="email" 
+                        value={formData.email}
+                        disabled={!isEditing}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        placeholder="your.email@research.edu"
+                        className={`w-full bg-[#0A0C0F] border rounded-2xl py-4 pl-12 pr-4 text-sm text-white transition-all ${
+                          isEditing 
+                            ? "border-cyan-400/30 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10" 
+                            : "border-white/5 opacity-60 cursor-not-allowed"
+                        }`}
+                       />
+                   )}
                 </div>
               </div>
             </div>
@@ -133,7 +144,9 @@ const ProfileSettings = () => {
             <div className="flex flex-col items-center gap-8 py-4">
                <div className="relative group">
                   <div className="w-40 h-40 rounded-full border-4 border-cyan-400/20 group-hover:border-cyan-400/50 transition-all overflow-hidden relative shadow-2xl">
-                     {formData.avatar ? (
+                     {isLoadingUser ? (
+                        <div className="w-full h-full bg-white/5 animate-pulse"></div>
+                     ) : formData.avatar ? (
                         <Image 
                            src={formData.avatar} 
                            alt="Profile Picture" 
