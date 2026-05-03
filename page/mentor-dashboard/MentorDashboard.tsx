@@ -47,7 +47,7 @@ const MentorDashboard = () => {
   const fetchIdeas = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
-      const res = await getResearchIdeas(page, 2);
+      const res = await getResearchIdeas(page, 5);
       if (res?.status) {
         const formattedData = res.data.map((item: IResearchIdeaRaw) => ({
           id: item.id,

@@ -76,7 +76,7 @@ const ResearchSubmissions = ({ submissions, currentPage = 1, totalPages = 1, onP
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-5 overflow-y-auto max-h-[600px] pr-1">
+          <div className="flex flex-col gap-6 overflow-y-scroll h-[700px] pr-4 custom-scrollbar">
             {submissions.map((submission, index) => {
               const isAccepted = submission.status === "Accepted";
               const isPending  = submission.status === "Pending Review";
@@ -87,83 +87,84 @@ const ResearchSubmissions = ({ submissions, currentPage = 1, totalPages = 1, onP
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`border rounded-2xl p-6 transition-all flex flex-col gap-5 group relative overflow-hidden ${
+                  className={`border rounded-3xl p-5 min-h-[380px] transition-all flex flex-col gap-2 group relative overflow-hidden ${
                     isAccepted
                       ? "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40"
                       : "bg-[#1F2937]/30 border-white/5 hover:border-white/20"
                   }`}
                 >
-                  {/* Header */}
+                  {/* Top Section: Title & Status */}
                   <div className="flex items-start justify-between relative z-10">
-                    <div className="flex flex-col gap-1.5 flex-1">
-                      <div className="flex items-center gap-2">
-                        {isAccepted && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
-                        <h3 className={`text-xl font-bold leading-tight pr-10 transition-colors ${
-                          isAccepted ? "text-white group-hover:text-emerald-400" : "text-white group-hover:text-blue-400"
-                        }`}>
-                          {submission.title}
-                        </h3>
-                      </div>
-                      <p className="text-sm text-gray-400 line-clamp-1 max-w-2xl">{submission.description}</p>
-                      <p className="text-xs text-gray-500 mt-1 font-medium">Submitted: {submission.submittedAt}</p>
+                    <div className="flex items-center gap-4">
+                      {isAccepted && <CheckCircle2 size={28} className="text-emerald-500 shrink-0" />}
+                      <h3 className={`text-2xl md:text-3xl font-bold leading-tight transition-colors ${
+                        isAccepted ? "text-white group-hover:text-emerald-400" : "text-white group-hover:text-blue-400"
+                      }`}>
+                        {submission.title}
+                      </h3>
                     </div>
-
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest shrink-0 ${getStatusStyle(submission.status)}`}>
+                    <span className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shrink-0 ${getStatusStyle(submission.status)}`}>
                       {submission.status}
                     </span>
                   </div>
 
+                  {/* Middle Section: Description & Date */}
+                  <div className="flex flex-col gap-5 relative z-10">
+                    <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-4xl line-clamp-2">
+                      {submission.description}
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium tracking-wide">
+                      Submitted: {submission.submittedAt}
+                    </p>
+                  </div>
+
                   {/* Accepted: Deadline bar */}
                   {isAccepted && submission.deadline && (
-                    <div className="flex flex-col gap-3 relative z-10">
-                      <div className="bg-[#1F2937]/80 border border-emerald-500/10 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <Clock size={16} className="text-emerald-400" />
-                          <p className="text-sm text-emerald-200">
-                            Deadline: <span className="font-bold">{submission.deadline}</span>
-                          </p>
-                        </div>
-                        {submission.startDate && submission.endDate && (
-                          <p className="text-xs text-gray-400">
-                            {submission.startDate} → {submission.endDate}
-                          </p>
-                        )}
+                    <div className="bg-[#1F2937]/80 border border-emerald-500/10 rounded-2xl px-6 py-2 flex flex-wrap items-center justify-between gap-4 relative z-10">
+                      <div className="flex items-center gap-4">
+                        <Clock size={20} className="text-emerald-400" />
+                        <p className="text-base text-emerald-200">
+                          Deadline: <span className="font-bold">{submission.deadline}</span>
+                        </p>
                       </div>
+                      {submission.startDate && submission.endDate && (
+                        <p className="text-sm text-gray-400 font-medium">
+                          {submission.startDate} — {submission.endDate}
+                        </p>
+                      )}
                     </div>
                   )}
 
-                  {/* Actions Bar */}
-                  <div className="flex flex-wrap items-center gap-3 relative z-10">
-                    {/* Always show View Details */}
+                  {/* Bottom Section: Actions */}
+                  <div className="flex flex-wrap items-center gap-5 relative z-10 mt-auto">
                     <button
                       onClick={() => handleOpenDetails(submission)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-300 text-xs font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5"
+                      className="flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 text-gray-200 text-sm font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5 shadow-xl"
                     >
-                      <Eye size={14} /> View Details
+                      <Eye size={18} /> View Details
                     </button>
 
-                    {/* Only show these when Accepted */}
                     {isAccepted && (
                       <>
                         <button
                           onClick={() => handleOpenUpload(submission)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-300 text-xs font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5"
+                          className="flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 text-gray-200 text-sm font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5 shadow-xl"
                         >
-                          <Upload size={14} /> Upload Submission Proof
+                          <Upload size={18} /> Upload Submission Proof
                         </button>
                         <Link
                           href="/mentor-dashboard/conversation"
-                          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-300 text-xs font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5"
+                          className="flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 text-gray-200 text-sm font-bold hover:bg-white/10 hover:text-white transition-all border border-white/5 shadow-xl"
                         >
-                          <MessageSquare size={14} /> Conversation
+                          <MessageSquare size={18} /> Conversation
                         </Link>
                       </>
                     )}
                   </div>
 
                   {/* Decorative glow */}
-                  <div className={`absolute top-0 right-0 w-32 h-32 blur-[50px] pointer-events-none ${
-                    isAccepted ? "bg-emerald-500/5" : "bg-blue-500/5"
+                  <div className={`absolute top-0 right-0 w-64 h-64 blur-[100px] pointer-events-none opacity-10 ${
+                    isAccepted ? "bg-emerald-500" : "bg-blue-500"
                   }`} />
                 </motion.div>
               );
@@ -173,22 +174,22 @@ const ResearchSubmissions = ({ submissions, currentPage = 1, totalPages = 1, onP
 
         {/* Pagination Controls */}
         {!isLoading && totalPages > 1 && (
-          <div className="flex items-center justify-between pt-6 border-t border-white/5">
+          <div className="flex items-center justify-between pt-8 pb-2 border-t border-white/10 mt-2">
             <button
               onClick={() => onPageChange?.(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-5 py-2.5 rounded-xl bg-white/5 text-gray-300 text-sm font-bold hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed border border-white/5"
+              className="px-6 py-3 rounded-xl bg-white/5 text-gray-300 text-sm font-bold hover:bg-white/10 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/5"
             >
               ← Previous
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
                   onClick={() => onPageChange?.(page)}
-                  className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                  className={`w-11 h-11 rounded-xl text-sm font-bold transition-all ${
                     page === currentPage
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                      ? "bg-blue-600 text-white shadow-xl shadow-blue-500/20 border border-blue-400/20"
                       : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/5"
                   }`}
                 >
@@ -199,7 +200,7 @@ const ResearchSubmissions = ({ submissions, currentPage = 1, totalPages = 1, onP
             <button
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-5 py-2.5 rounded-xl bg-white/5 text-gray-300 text-sm font-bold hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed border border-white/5"
+              className="px-6 py-3 rounded-xl bg-white/5 text-gray-300 text-sm font-bold hover:bg-white/10 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed border border-white/5"
             >
               Next →
             </button>
