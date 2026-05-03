@@ -28,7 +28,11 @@ const LoginForm = () => {
       const res = await loginService(data.email, data.password);
       if (res?.status) {
         toast.success(res.message || "Logged in successfully!");
-        router.push("/");
+        if (res.data?.role === "mentor") {
+          router.push("/mentor-dashboard");
+        } else {
+          router.push("/");
+        }
       } else {
         // Show the specific error message from the API (e.g. "No account found...")
         toast.error(res?.message || "Invalid credentials. Please try again.");

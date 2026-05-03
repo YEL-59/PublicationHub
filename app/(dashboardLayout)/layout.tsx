@@ -13,17 +13,20 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<ICurrentUser | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoadingUser(true);
       const currentUser = await getCurrentUser();
       if (!currentUser) {
         // router.push("/login");
       }
       setUser(currentUser);
+      setIsLoadingUser(false);
     };
     fetchUser();
   }, [router]);
@@ -80,15 +83,26 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   className="flex items-center gap-3 pl-6 border-l border-white/10 hover:opacity-80 transition-all focus:outline-none group"
                 >
                   <div className="flex flex-col items-end hidden sm:flex">
-                    <span className="text-sm font-bold text-white line-clamp-1 group-hover:text-blue-400 transition-colors">
-                      {user?.name || "Dr. Sarah Smith"}
-                    </span>
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                      {user?.role || "Research Mentor"}
-                    </span>
+                    {isLoadingUser ? (
+                      <>
+                        <div className="h-4 w-24 bg-white/10 animate-pulse rounded mb-1"></div>
+                        <div className="h-2.5 w-16 bg-white/10 animate-pulse rounded"></div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-sm font-bold text-white line-clamp-1 group-hover:text-blue-400 transition-colors">
+                          {user?.name}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                          {user?.role}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div className="w-10 h-10 rounded-full border-2 border-white/10 group-hover:border-blue-500/50 transition-all overflow-hidden relative bg-[#1F2937]">
-                     {user?.avatar ? (
+                     {isLoadingUser ? (
+                        <div className="w-full h-full bg-white/10 animate-pulse"></div>
+                     ) : user?.avatar ? (
                         <Image src={user.avatar} alt="Avatar" fill className="object-cover" />
                      ) : (
                         <User size={24} className="absolute inset-0 m-auto text-gray-400" />
@@ -107,7 +121,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     >
                       <div className="px-4 py-3 border-b border-white/5 mb-2">
                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Account</p>
-                        <p className="text-sm font-bold text-white truncate">{user?.email || "sarah@research.edu"}</p>
+                        {isLoadingUser ? (
+                          <div className="h-4 w-32 bg-white/10 animate-pulse rounded mt-1"></div>
+                        ) : (
+                          <p className="text-sm font-bold text-white truncate">{user?.email}</p>
+                        )}
                       </div>
                       
                       <Link 

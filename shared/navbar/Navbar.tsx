@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Menu, X, User, LogOut, ChevronDown, Settings } from "lucide-react";
+import { Search, Menu, X, User, LogOut, ChevronDown, Settings, LayoutDashboard } from "lucide-react";
 import navLogo from "@/assets/images/nav-logo.png";
 import CTAButton from "@/components/CTAButton";
 import { getCurrentUser, logoutService, getUserInfo } from "@/services/auth";
@@ -159,6 +159,12 @@ const Navbar = () => {
                                         <p className="text-xs text-gray-400 mb-0.5">Signed in as</p>
                                         <p className="text-sm font-bold text-white truncate">{user.email}</p>
                                     </div>
+                                    {user.role === "mentor" && (
+                                        <Link href="/mentor-dashboard" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                                            <LayoutDashboard size={18} />
+                                            <span className="text-sm font-medium">Dashboard</span>
+                                        </Link>
+                                    )}
                                     
                                     <Link href="/myprofile" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
                                         <User size={18} />
@@ -248,6 +254,15 @@ const Navbar = () => {
                                         <p className="text-xs text-gray-400">{user.email}</p>
                                      </div>
                                 </div>
+                                {user.role === "mentor" && (
+                                    <Link 
+                                        href="/mentor-dashboard" 
+                                        onClick={() => setIsOpen(false)}
+                                        className="text-gray-300 text-lg font-medium px-4 flex items-center gap-3"
+                                    >
+                                        <LayoutDashboard size={20} /> Dashboard
+                                    </Link>
+                                )}
                                 <Link 
                                     href="/myprofile" 
                                     onClick={() => setIsOpen(false)}
