@@ -10,8 +10,8 @@ export const getAllFaq = async (page: number = 1) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -23,8 +23,8 @@ export const getBannerContent = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -36,8 +36,8 @@ export const getCounterContent = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -49,8 +49,8 @@ export const getWhyChooseContent = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -62,8 +62,8 @@ export const getMetaAcademyContent = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -75,8 +75,8 @@ export const getResearchJourneyContent = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -88,8 +88,8 @@ export const getAllServices = async (page: number = 1) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -101,8 +101,8 @@ export const getFaqCategories = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -114,8 +114,8 @@ export const getFaqsByCategory = async (categoryId: number) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -128,8 +128,8 @@ export const sendContactMessage = async (formData: FormData) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -142,8 +142,8 @@ export const subscribeNewsletter = async (formData: FormData) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -155,8 +155,8 @@ export const getSystemInfo = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -168,8 +168,8 @@ export const getAllOpportunities = async (page: number = 1) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -185,8 +185,8 @@ export const getOpportunityById = async (id: number) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -214,8 +214,8 @@ export const submitOpportunityApplication = async (formData: FormData) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -227,8 +227,8 @@ export const getAllPublications = async (page: number = 1) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -240,8 +240,8 @@ export const getSinglePublication = async (id: number) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -257,8 +257,8 @@ export const getAllCourses = async (page: number = 1, categoryId?: number) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -270,8 +270,8 @@ export const getCourseCategories = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -283,8 +283,8 @@ export const getCourseDetails = async (id: string | number) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -296,8 +296,8 @@ export const getMetaAcademyHero = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -309,7 +309,7 @@ export const getMetaAcademyCounter = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }

@@ -15,7 +15,6 @@ import { getSystemInfo } from "@/services/home";
 interface ISystemInfo {
     logo: string;
     system_name: string;
-    [key: string]: any;
 }
 
 const Navbar = () => {

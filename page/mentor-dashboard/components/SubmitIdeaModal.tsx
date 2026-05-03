@@ -4,6 +4,7 @@ import { X, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { submitResearchIdea } from "@/services/mentor";
 
 interface SubmitIdeaModalProps {
   isOpen: boolean;
@@ -16,15 +17,24 @@ const SubmitIdeaModal = ({ isOpen, onClose, onSubmitSuccess }: SubmitIdeaModalPr
 
   const onSubmit = async (data: any) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log("Submitted Data:", data);
-      toast.success("Research idea submitted for review!");
-      onSubmitSuccess?.(data);
-      reset();
-      onClose();
+      const formData = new FormData();
+      formData.append("study_title", data.title);
+      formData.append("study_descritions", data.description);
+      formData.append("research_objectives", data.objectives);
+      formData.append("perposed_methodology", data.methodology);
+
+      const res = await submitResearchIdea(formData);
+      
+      if (res?.status) {
+        toast.success(res.message || "Research idea submitted for review!");
+        onSubmitSuccess?.(res.data);
+        reset();
+        onClose();
+      } else {
+        toast.error(res?.message || "Failed to submit research idea");
+      }
     } catch (error) {
-      toast.error("Failed to submit research idea");
+      toast.error("An error occurred while submitting.");
     }
   };
 

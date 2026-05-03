@@ -6,9 +6,20 @@ import Image from "next/image";
 import { Search, Sparkles } from "lucide-react";
 import heroBg from "@/assets/images/hero-bg.png";
 
+interface IBannerContent {
+    title: string;
+    sub_title: string;
+    description: string;
+}
+
+interface IStatItem {
+    count_number: string | number;
+    sub_title: string;
+}
+
 const Banner = () => {
-    const [banner, setBanner] = useState<any>(null);
-    const [stats, setStats] = useState<any[]>([]);
+    const [banner, setBanner] = useState<IBannerContent | null>(null);
+    const [stats, setStats] = useState<IStatItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

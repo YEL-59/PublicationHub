@@ -7,8 +7,8 @@ export const getDynamicPages = async () => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -19,7 +19,7 @@ export const getSingleDynamicPage = async (slug: string) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }

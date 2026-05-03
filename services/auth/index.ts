@@ -26,8 +26,8 @@ export const registerService = async (data: FieldValues) => {
             (await cookies()).set("user", JSON.stringify(responseData.data));
         }
         return responseData;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -49,8 +49,8 @@ export const loginService = async (email: string, password: string) => {
             (await cookies()).set("user", JSON.stringify(responseData.data));
         }
         return responseData;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -76,8 +76,8 @@ export const googleLogin = async (token: string) => {
         }
         
         return responseData;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -117,8 +117,8 @@ export const changePassword = async (data: FieldValues) => {
         });
         const responseData = await response.json();
         return responseData;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -144,8 +144,9 @@ export const getUserInfo = async () => {
             (await cookies()).set("user", JSON.stringify(responseData.data));
         }
         return responseData;
-    } catch (error: any) {
-        return { status: false, message: error.message || "An error occurred" };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "An error occurred";
+        return { status: false, message };
     }
 }
 
@@ -188,8 +189,8 @@ export const updateProfile = async (data: FieldValues) => {
             revalidateTag("user-info", "max");
         }
         return responseData;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -207,8 +208,8 @@ export const forgotPasswordService = async (email: string) => {
         });
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -227,8 +228,8 @@ export const resetPasswordService = async (data : FieldValues) => {
         });
         const responseData = await response.json();
         return responseData;
-    } catch (error : any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -244,8 +245,8 @@ export const verifyForgotPasswordOtpService = async (email: string, otp: string)
         });
         const responseData = await response.json();
         return responseData;
-    } catch (error : any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -268,8 +269,8 @@ export const verifyOtpService = async (email: string, otp: string) => {
         }
         
         return responseData;
-    } catch (error : any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -289,7 +290,7 @@ export const resendOtpService = async (email: string) => {
         });
         const data = await response.json();
         return data;
-    } catch (error : any) {
-        throw new Error(error);
+    } catch (error) {
+        throw error;
     }
 }
