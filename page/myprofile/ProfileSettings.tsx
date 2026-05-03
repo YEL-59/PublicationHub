@@ -23,7 +23,7 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
         name: user.name || "",
         email: user.email || "",
         institution: user.institution || "",
-        department: user.department || "",
+        department: "",
         avatar: user.avatar || "",
         phone: user.phone || "",
         gender: user.gender || "male",
