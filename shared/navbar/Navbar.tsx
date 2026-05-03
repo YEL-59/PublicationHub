@@ -87,16 +87,20 @@ const Navbar = () => {
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo Section */}
                 <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
-                    <div className="relative w-44 h-10 md:w-52 md:h-12 ">
-                        <Image
-                            src={systemInfo?.logo || navLogo}
-                            alt={systemInfo?.system_name || "PublicationHub Logo"}
-                            fill
-                            className="object-contain object-left"
-                            priority
-                            unoptimized={!!systemInfo?.logo}    
+                    {systemInfo?.logo ? (
+                        <img
+                            src={systemInfo.logo}
+                            alt={systemInfo.system_name || "PublicationHub Logo"}
+                            className="h-10 md:h-12 w-auto object-contain"
                         />
-                    </div>
+                    ) : (
+                        <Image
+                            src={navLogo}
+                            alt="PublicationHub Logo"
+                            className="h-10 md:h-12 w-auto object-contain"
+                            priority
+                        />
+                    )}
                 </Link>
 
                 {/* Desktop Navigation Links */}
@@ -130,7 +134,7 @@ const Navbar = () => {
                             >
                                 <div className="w-10 h-10 rounded-full border-2 border-[#00D1FF]/30 group-hover:border-[#00D1FF] transition-all overflow-hidden relative bg-[#1F242D]">
                                     {user.avatar ? (
-                                        <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                                        <Image src={user.avatar} alt={user.name || "User avatar"} fill className="object-cover" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-[#00D1FF]">
                                             <User size={20} />
@@ -232,7 +236,7 @@ const Navbar = () => {
                                 <div className="flex items-center gap-3 px-4">
                                      <div className="w-12 h-12 rounded-full border border-[#00D1FF]/30 overflow-hidden relative">
                                         {user.avatar ? (
-                                            <Image src={user.avatar} alt={user.name} fill className="object-cover" />
+                                            <Image src={user.avatar} alt={user.name || "User avatar"} fill className="object-cover" />
                                         ) : (
                                             <div className="w-full h-full bg-[#1F242D] flex items-center justify-center text-[#00D1FF]">
                                                 <User size={24} />
