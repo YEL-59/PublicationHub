@@ -5,31 +5,47 @@ import Link from "next/link";
 import { Bell, LogOut, User, ChevronDown } from "lucide-react";
 import navLogo from "@/assets/images/nav-logo.png";
 import { getCurrentUser, logoutService } from "@/services/auth";
+import { getSystemInfo } from "@/services/home";
 import { ICurrentUser } from "@/types/auth/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SmoothScroll from "@/components/SmoothScroll";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface ISystemInfo {
+  logo: string;
+  system_name: string;
+}
+
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<ICurrentUser | null>(null);
+  const [systemInfo, setSystemInfo] = useState<ISystemInfo | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isLoadingSystem, setIsLoadingSystem] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       setIsLoadingUser(true);
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        // router.push("/login");
-      }
+      setIsLoadingSystem(true);
+      
+      const [currentUser, systemRes] = await Promise.all([
+        getCurrentUser(),
+        getSystemInfo()
+      ]);
+
       setUser(currentUser);
       setIsLoadingUser(false);
+
+      if (systemRes?.status) {
+        setSystemInfo(systemRes.data);
+      }
+      setIsLoadingSystem(false);
     };
-    fetchUser();
-  }, [router]);
+    fetchData();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -58,15 +74,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         {/* Dashboard Header */}
         <header className="sticky top-0 z-[50] w-full bg-[#0A0C0F]/80 backdrop-blur-md border-b border-white/5 py-4 px-4 md:px-8 lg:px-12">
           <div className="container mx-auto flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="relative w-40 h-10">
+            <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
+              {isLoadingSystem ? (
+                <div className="h-9 md:h-10 w-40 bg-white/5 animate-pulse rounded"></div>
+              ) : systemInfo?.logo ? (
+                <img
+                  src={systemInfo.logo}
+                  alt={systemInfo.system_name || "PublicationHub Logo"}
+                  className="h-9 md:h-10 w-auto object-contain"
+                />
+              ) : (
                 <Image
                   src={navLogo}
                   alt="PublicationHub Logo"
-                  fill
-                  className="object-contain object-left"
+                  className="h-9 md:h-10 w-auto object-contain"
+                  priority
                 />
-              </div>
+              )}
             </Link>
 
             <div className="flex items-center gap-6">
