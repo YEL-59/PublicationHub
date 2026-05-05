@@ -279,6 +279,10 @@ export const logoutService = async () => {
     (await cookies()).delete("user");
 }
 
+export const getToken = async () => {
+    return (await cookies()).get("token")?.value;
+}
+
 // resend otp
 export const resendOtpService = async (email: string) => {
     const formData = new FormData();

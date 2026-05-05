@@ -1,33 +1,189 @@
 "use client";
-import React, { useState } from "react";
-import { ArrowLeft, Search, Paperclip, Send, MoreVertical, Users } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { getChats, getChatMessages, sendMessage } from "@/services/mentor";
+import { getCurrentUser, getToken } from "@/services/auth";
+import { Chat, Message } from "@/types/chat";
+import { ICurrentUser } from "@/types/auth/auth";
+import initEcho from "@/lib/echo";
 
-const conversations = [
-  { id: 1, title: "Cancer Genomics Study", members: 8, lastMessage: "I need more information about", time: "9:30 AM", unread: 2 },
-  { id: 2, title: "Drug Development Study", members: 5, lastMessage: "The protocol looks good.", time: "Yesterday", unread: 0 },
-  { id: 3, title: "COVID-19 Vaccine Study", members: 12, lastMessage: "Sure! I'd be happy to discuss.", time: "Yesterday", unread: 0, active: true },
-  { id: 4, title: "Gene Therapy Study", members: 6, lastMessage: "When is the next meeting?", time: "Wednesday", unread: 0 },
-  { id: 5, title: "Genetic Sequencing", members: 4, lastMessage: "Jenny, have you reviewed", time: "Monday", unread: 1 },
-];
-
-const messages = [
-  { id: 1, sender: "Jhon Smith", role: "Mentor", text: "Hi Jenny! I wanted to discuss the telemedicine project details with you.", time: "9:30 AM", isMe: false },
-  { id: 2, sender: "Me", role: "Researcher", text: "Sure! I'd be happy to discuss. What specific aspects are you interested in?", time: "9:32 AM", isMe: true },
-  { id: 3, sender: "Jhon Smith", role: "Mentor", text: "Hi Jenny! I wanted to discuss the telemedicine project details with you.", time: "9:33 AM", isMe: false },
-  { id: 4, sender: "Dr. Sarah Lee", role: "Coordinator", text: "Jenny, have you reviewed the orthopedic study results yet?", time: "9:40 AM", isMe: false },
-  { id: 5, sender: "Me", role: "Researcher", text: "Sure! I'd be happy to discuss. What specific aspects are you interested in?", time: "9:50 AM", isMe: true },
-];
+// Components
+import ChatList from "./components/ChatList";
+import ChatWindow from "./components/ChatWindow";
 
 const ConversationPage = () => {
-  const [activeConv, setActiveConv] = useState(conversations[2]);
-  const [message, setMessage] = useState("");
+  const [conversations, setConversations] = useState<Chat[]>([]);
+  const [activeConv, setActiveConv] = useState<Chat | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const echoRef = useRef<any>(null);
+  const activeConvRef = useRef<Chat | null>(null);
+
+  // Keep ref in sync for Echo callback
+  useEffect(() => {
+    activeConvRef.current = activeConv;
+  }, [activeConv]);
+
+  // Initialize Data
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const [chatsData, userData, token] = await Promise.all([
+          getChats(),
+          getCurrentUser(),
+          getToken()
+        ]);
+
+        if (chatsData.status) {
+          setConversations(chatsData.data);
+          if (chatsData.data.length > 0) {
+            setActiveConv(chatsData.data[0]);
+          }
+        }
+        setCurrentUser(userData);
+
+        if (token) {
+          echoRef.current = initEcho(token);
+        }
+      } catch (error) {
+        console.error("Failed to initialize chat:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+
+    return () => {
+      if (echoRef.current) {
+        // Cleanup all listeners if needed
+      }
+    };
+  }, []);
+
+  // Listen to ALL conversations for real-time updates in the list (WebSockets)
+  useEffect(() => {
+    if (!echoRef.current || conversations.length === 0) return;
+
+    conversations.forEach(conv => {
+      echoRef.current.private(`opportunity_chat.${conv.id}`)
+        .listen('.opportunity.chat', (e: any) => {
+          console.log(`Socket message in chat ${conv.id}:`, e);
+          const newMessage = e.data;
+
+          if (!newMessage) return;
+
+          // If this message is for the ACTIVE conversation, add it to the messages list
+          if (activeConvRef.current?.id === conv.id) {
+            setMessages(prev => {
+              const exists = prev.some(m => m.id === newMessage.id);
+              if (exists) return prev;
+              return [...prev, newMessage];
+            });
+          }
+        });
+    });
+
+    return () => {
+      conversations.forEach(conv => {
+        echoRef.current.leave(`opportunity_chat.${conv.id}`);
+      });
+    };
+  }, [conversations.length, !!echoRef.current]);
+
+  // Polling mechanism as requested (Fallback for real-time)
+  useEffect(() => {
+    if (!activeConv) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const data = await getChatMessages(activeConv.id);
+        if (data.status) {
+          const fetchedMessages = data.data.messages.data.reverse();
+
+          // Compare and update if there are new messages
+          setMessages(prev => {
+            if (prev.length === fetchedMessages.length) return prev;
+
+            // Filter out messages we already have (to avoid duplicates with Echo)
+            const existingIds = new Set(prev.map(m => m.id));
+            const newMessages = fetchedMessages.filter(m => !existingIds.has(m.id));
+
+            if (newMessages.length === 0) return prev;
+            return [...prev, ...newMessages];
+          });
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 5000); // Polling every 5 seconds (adjustable)
+
+    return () => clearInterval(pollInterval);
+  }, [activeConv?.id]);
+
+  // Initial Fetch messages when activeConv changes
+  useEffect(() => {
+    if (!activeConv) return;
+
+    const fetchMessages = async () => {
+      try {
+        const data = await getChatMessages(activeConv.id);
+        if (data.status) {
+          setMessages(data.data.messages.data.reverse());
+        }
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+      }
+    };
+
+    fetchMessages();
+  }, [activeConv?.id]);
+
+  // Scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSendMessage = useCallback(async () => {
+    if (!messageInput.trim() || !activeConv || sending) return;
+
+    const text = messageInput;
+    setMessageInput("");
+    setSending(true);
+
+    try {
+      const res = await sendMessage(activeConv.id, text);
+      if (res.status) {
+        setMessages(prev => {
+          const exists = prev.some(m => m.id === res.data.id);
+          if (exists) return prev;
+          return [...prev, res.data];
+        });
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setMessageInput(text);
+    } finally {
+      setSending(false);
+    }
+  }, [messageInput, activeConv, sending]);
+
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-120px)] flex flex-col items-center justify-center bg-[#0B0F1A]">
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+        <p className="text-gray-400 font-medium">Loading your conversations...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8 h-[calc(100vh-120px)] flex flex-col">
-      {/* Top Bar */}
       <div className="flex items-center gap-4 mb-6">
         <Link href="/mentor-dashboard" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
           <ArrowLeft size={18} />
@@ -38,131 +194,24 @@ const ConversationPage = () => {
       <h1 className="text-3xl font-extrabold text-white mb-8">Conversation</h1>
 
       <div className="flex-1 flex gap-6 overflow-hidden">
-        {/* Left Sidebar - Chat List */}
-        <div className="w-80 flex flex-col gap-4 overflow-hidden">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search messages..."
-              className="w-full bg-[#111827] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
-            />
-          </div>
+        <ChatList
+          conversations={conversations}
+          activeConv={activeConv}
+          setActiveConv={setActiveConv}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
 
-          <div className="flex-1 overflow-y-auto flex flex-col gap-2 pr-2 custom-scrollbar">
-            {conversations.map((conv) => (
-              <motion.button
-                key={conv.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveConv(conv)}
-                className={`flex items-center gap-3 p-4 rounded-2xl transition-all border ${
-                  activeConv.id === conv.id 
-                    ? "bg-blue-600/10 border-blue-500/30 shadow-lg shadow-blue-500/5" 
-                    : "bg-[#111827] border-white/5 hover:border-white/10"
-                }`}
-              >
-                <div className="w-12 h-12 rounded-full bg-[#1F2937] flex items-center justify-center text-blue-400 shrink-0 border border-white/5">
-                   <Users size={24} />
-                </div>
-                <div className="flex-1 text-left overflow-hidden">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <h3 className="text-sm font-bold text-white truncate">{conv.title}</h3>
-                    <span className="text-[10px] text-gray-500 font-medium">{conv.time}</span>
-                  </div>
-                  <p className="text-xs text-gray-400 truncate">{conv.lastMessage}</p>
-                </div>
-                {conv.unread > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-blue-500 text-[10px] font-bold flex items-center justify-center text-white">
-                    {conv.unread}
-                  </span>
-                )}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Area - Chat Window */}
-        <div className="flex-1 bg-[#111827] border border-white/5 rounded-3xl flex flex-col overflow-hidden shadow-2xl relative">
-          {/* Chat Header */}
-          <div className="p-6 border-b border-white/5 flex items-center justify-between bg-[#111827]/80 backdrop-blur-md">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#1F2937] text-blue-400 flex items-center justify-center border border-white/5">
-                <Users size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white leading-tight">{activeConv.title}</h2>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <span>{activeConv.members} members</span>
-                </div>
-              </div>
-            </div>
-            <button className="text-gray-500 hover:text-white transition-colors">
-              <MoreVertical size={24} />
-            </button>
-          </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-8 custom-scrollbar">
-            {messages.map((msg, index) => (
-              <div key={msg.id} className={`flex ${msg.isMe ? "justify-end" : "justify-start"} items-end gap-3`}>
-                {!msg.isMe && (
-                   <div className="w-10 h-10 rounded-full bg-[#1F2937] border border-white/5 overflow-hidden shrink-0">
-                      <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs">IMG</div>
-                   </div>
-                )}
-                <div className={`flex flex-col gap-1.5 max-w-[70%]`}>
-                  {!msg.isMe && (
-                    <p className="text-[11px] font-bold text-gray-400 pl-1">{msg.sender} <span className="text-gray-600 font-normal ml-2">{msg.time}</span></p>
-                  )}
-                  <div className={`px-6 py-4 text-sm font-medium leading-relaxed ${
-                    msg.isMe 
-                      ? "bg-blue-600 text-white rounded-3xl rounded-tr-none shadow-lg shadow-blue-500/10" 
-                      : "bg-[#1F2937] text-gray-200 rounded-3xl rounded-tl-none border border-white/5 shadow-inner"
-                  }`}>
-                    {msg.text}
-                  </div>
-                  {msg.isMe && (
-                    <p className="text-[11px] font-medium text-gray-500 text-right pr-1">{msg.time}</p>
-                  )}
-                </div>
-                {msg.isMe && (
-                   <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/20 overflow-hidden shrink-0">
-                      <div className="w-full h-full flex items-center justify-center text-blue-400 text-xs">Me</div>
-                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Input Area */}
-          <div className="p-6 bg-[#111827]/80 backdrop-blur-md">
-            <div className="relative flex items-center gap-3">
-              <div className="flex-1 relative">
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
-                  <Paperclip size={20} />
-                </button>
-                <input 
-                  type="text" 
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="w-full bg-[#1F2937] border border-white/5 rounded-2xl py-4 pl-12 pr-12 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all shadow-inner"
-                  onKeyPress={(e) => e.key === 'Enter' && setMessage("")}
-                />
-                <button 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-blue-600 p-2 rounded-lg text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"
-                  onClick={() => setMessage("")}
-                >
-                  <Send size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Decorative background glow */}
-          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
-        </div>
+        <ChatWindow
+          activeConv={activeConv}
+          messages={messages}
+          currentUser={currentUser}
+          messageInput={messageInput}
+          setMessageInput={setMessageInput}
+          onSendMessage={handleSendMessage}
+          sending={sending}
+          messagesEndRef={messagesEndRef}
+        />
       </div>
     </div>
   );
