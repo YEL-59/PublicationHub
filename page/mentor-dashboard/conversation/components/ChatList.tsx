@@ -20,7 +20,7 @@ const ChatList = ({ conversations, activeConv, setActiveConv, searchQuery, setSe
 
   return (
     <div className="w-80 flex flex-col gap-4 overflow-hidden">
-      <div className="relative">
+      <div className="relative shrink-0">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
         <input
           type="text"

@@ -11,7 +11,7 @@ interface ChatInputProps {
 
 const ChatInput = ({ messageInput, setMessageInput, onSendMessage, sending }: ChatInputProps) => {
   return (
-    <div className="p-6 bg-[#111827]/80 backdrop-blur-md">
+    <div className="p-6 bg-[#111827]/80 backdrop-blur-md shrink-0">
       <div className="relative flex items-center gap-3">
         <div className="flex-1 relative">
           <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">

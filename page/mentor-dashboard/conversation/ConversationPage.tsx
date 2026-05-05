@@ -21,7 +21,6 @@ const ConversationPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const echoRef = useRef<any>(null);
   const activeConvRef = useRef<Chat | null>(null);
 
@@ -131,6 +130,7 @@ const ConversationPage = () => {
     if (!activeConv) return;
 
     const fetchMessages = async () => {
+      setMessages([]); // Clear current messages while loading new ones
       try {
         const data = await getChatMessages(activeConv.id);
         if (data.status) {
@@ -143,11 +143,6 @@ const ConversationPage = () => {
 
     fetchMessages();
   }, [activeConv?.id]);
-
-  // Scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const handleSendMessage = useCallback(async () => {
     if (!messageInput.trim() || !activeConv || sending) return;
@@ -183,17 +178,33 @@ const ConversationPage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8 h-[calc(100vh-120px)] flex flex-col">
-      <div className="flex items-center gap-4 mb-6">
+    <div className="container mx-auto px-4 py-4 md:px-6 lg:px-8 h-[calc(100vh-100px)] flex flex-col overflow-hidden">
+      <div className="flex items-center gap-4 mb-4 shrink-0">
         <Link href="/mentor-dashboard" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
           <ArrowLeft size={18} />
           Back to Dashboard
         </Link>
       </div>
 
-      <h1 className="text-3xl font-extrabold text-white mb-8">Conversation</h1>
+      <h1 className="text-2xl font-extrabold text-white mb-6 shrink-0">Conversation</h1>
 
-      <div className="flex-1 flex gap-6 overflow-hidden">
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `}</style>
+
+      <div className="flex-1 flex gap-6 overflow-hidden h-full min-h-0">
         <ChatList
           conversations={conversations}
           activeConv={activeConv}
@@ -203,6 +214,7 @@ const ConversationPage = () => {
         />
 
         <ChatWindow
+          key={activeConv?.id || "empty"}
           activeConv={activeConv}
           messages={messages}
           currentUser={currentUser}
@@ -210,7 +222,6 @@ const ConversationPage = () => {
           setMessageInput={setMessageInput}
           onSendMessage={handleSendMessage}
           sending={sending}
-          messagesEndRef={messagesEndRef}
         />
       </div>
     </div>
