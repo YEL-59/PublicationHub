@@ -7,6 +7,7 @@ import { getCurrentUser, getToken } from "@/services/auth";
 import { Chat, Message } from "@/types/chat";
 import { ICurrentUser } from "@/types/auth/auth";
 import initEcho from "@/lib/echo";
+import { toast } from "sonner";
 
 // Components
 import ChatList from "./components/ChatList";
@@ -21,6 +22,7 @@ const ConversationPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const echoRef = useRef<any>(null);
   const activeConvRef = useRef<Chat | null>(null);
 
@@ -102,8 +104,8 @@ const ConversationPage = () => {
     const pollInterval = setInterval(async () => {
       try {
         const data = await getChatMessages(activeConv.id);
-        if (data.status) {
-          const fetchedMessages = data.data.messages.data.reverse();
+        if (data?.status && data?.data?.messages?.data) {
+          const fetchedMessages = [...data.data.messages.data].reverse();
 
           // Compare and update if there are new messages
           setMessages(prev => {
@@ -133,8 +135,8 @@ const ConversationPage = () => {
       setMessages([]); // Clear current messages while loading new ones
       try {
         const data = await getChatMessages(activeConv.id);
-        if (data.status) {
-          setMessages(data.data.messages.data.reverse());
+        if (data?.status && data?.data?.messages?.data) {
+          setMessages([...data.data.messages.data].reverse());
         }
       } catch (error) {
         console.error("Failed to fetch messages:", error);
@@ -145,28 +147,37 @@ const ConversationPage = () => {
   }, [activeConv?.id]);
 
   const handleSendMessage = useCallback(async () => {
-    if (!messageInput.trim() || !activeConv || sending) return;
+    if ((!messageInput.trim() && !selectedFile) || !activeConv || sending) return;
 
     const text = messageInput;
+    const file = selectedFile;
+    
     setMessageInput("");
+    setSelectedFile(null);
     setSending(true);
 
     try {
-      const res = await sendMessage(activeConv.id, text);
+      const res = await sendMessage(activeConv.id, text, file || undefined);
       if (res.status) {
         setMessages(prev => {
           const exists = prev.some(m => m.id === res.data.id);
           if (exists) return prev;
           return [...prev, res.data];
         });
+      } else {
+        toast.error(res.message || "Failed to send message");
+        setMessageInput(text);
+        setSelectedFile(file);
       }
     } catch (error) {
       console.error("Failed to send message:", error);
+      toast.error("An unexpected error occurred while sending");
       setMessageInput(text);
+      setSelectedFile(file);
     } finally {
       setSending(false);
     }
-  }, [messageInput, activeConv, sending]);
+  }, [messageInput, selectedFile, activeConv, sending]);
 
   if (loading) {
     return (
@@ -222,6 +233,8 @@ const ConversationPage = () => {
           setMessageInput={setMessageInput}
           onSendMessage={handleSendMessage}
           sending={sending}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
         />
       </div>
     </div>

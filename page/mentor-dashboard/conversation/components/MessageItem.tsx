@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { format } from "date-fns";
+import { Paperclip } from "lucide-react";
 import { Message } from "@/types/chat";
 import { ICurrentUser } from "@/types/auth/auth";
 
@@ -16,6 +17,7 @@ const MessageItem = ({ msg, currentUser, isFirstInGroup = true }: MessageItemPro
   const time = format(new Date(msg.created_at), "h:mm a");
 
   const renderMessage = (text: string) => {
+    if (!text) return "";
     // Basic bold text support (**text**)
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
@@ -51,7 +53,32 @@ const MessageItem = ({ msg, currentUser, isFirstInGroup = true }: MessageItemPro
               : "bg-[#1F2937] text-gray-100 rounded-[22px] rounded-tl-[4px] border border-white/5 hover:bg-[#262f3f]"
             } ${!isFirstInGroup ? (isMe ? "rounded-tr-[22px]" : "rounded-tl-[22px]") : ""}`}
         >
-          {renderMessage(msg.message)}
+          {msg.file && (
+            <div className="mb-2 max-w-sm rounded-lg overflow-hidden border border-white/10">
+              {msg.file.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                <a href={msg.file} target="_blank" rel="noopener noreferrer">
+                  <Image 
+                    src={msg.file} 
+                    alt="attachment" 
+                    width={300} 
+                    height={200} 
+                    className="object-cover w-full h-auto hover:opacity-90 transition-opacity"
+                  />
+                </a>
+              ) : (
+                <a 
+                  href={msg.file} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 p-3 bg-white/5 hover:bg-white/10 transition-colors"
+                >
+                  <Paperclip size={16} />
+                  <span className="text-xs truncate">{msg.file.split('/').pop()}</span>
+                </a>
+              )}
+            </div>
+          )}
+          {msg.message && renderMessage(msg.message)}
         </div>
         {isMe && isFirstInGroup && <p className="text-[10px] font-medium text-gray-500 text-right pr-2 mt-0.5 tracking-tight">{time}</p>}
       </div>

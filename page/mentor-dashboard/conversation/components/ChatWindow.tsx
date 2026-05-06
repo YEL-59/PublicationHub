@@ -15,6 +15,8 @@ interface ChatWindowProps {
   setMessageInput: (val: string) => void;
   onSendMessage: () => void;
   sending: boolean;
+  selectedFile: File | null;
+  setSelectedFile: (file: File | null) => void;
   messagesEndRef?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -26,8 +28,19 @@ const ChatWindow = ({
   setMessageInput,
   onSendMessage,
   sending,
+  selectedFile,
+  setSelectedFile,
 }: ChatWindowProps) => {
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const internalMessagesEndRef = useRef<HTMLDivElement>(null);
+  const isAtBottom = useRef(true);
+
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    // If we are within 100px of the bottom, we consider it "at bottom"
+    isAtBottom.current = scrollHeight - scrollTop - clientHeight < 100;
+  };
 
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     if (internalMessagesEndRef.current) {
@@ -36,13 +49,14 @@ const ChatWindow = ({
   };
 
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && isAtBottom.current) {
       const timer = setTimeout(() => scrollToBottom("smooth"), 100);
       return () => clearTimeout(timer);
     }
   }, [messages]);
 
   useEffect(() => {
+    isAtBottom.current = true;
     const timer = setTimeout(() => scrollToBottom("auto"), 50);
     return () => clearTimeout(timer);
   }, [activeConv?.id]);
@@ -88,7 +102,11 @@ const ChatWindow = ({
       </div>
 
       {/* Messages Area - Scrollable */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-8 flex flex-col custom-scrollbar relative bg-[#0B0F1A]">
+      <div 
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto min-h-0 px-6 py-8 flex flex-col custom-scrollbar relative bg-[#0B0F1A]"
+      >
         <div className="flex flex-col">
           {messages.length > 0 ? (
             messages.map((msg, index) => {
@@ -121,6 +139,8 @@ const ChatWindow = ({
           setMessageInput={setMessageInput}
           onSendMessage={onSendMessage}
           sending={sending}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
         />
       </div>
 

@@ -95,17 +95,38 @@ export const uploadSubmissionProof = async (id: string | number, files: File[]) 
 export const getChats = async () => {
     try {
         const token = (await cookies()).get("token")?.value;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/mentor/chats`, {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_API;
+        
+        if (!baseUrl) {
+            console.error("NEXT_PUBLIC_BASE_API is not defined");
+            return { status: false, message: "API configuration missing" };
+        }
+
+        const url = `${baseUrl}/mentor/chats`;
+        console.log("Fetching chats from:", url);
+        
+        const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`
-            }
+            },
+            cache: 'no-store'
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Fetch failed with status ${response.status}:`, errorText);
+            return { status: false, message: `API error: ${response.status}` };
+        }
 
         const data = await response.json();
         return data;
     } catch (error) {
-        throw error;
+        console.error("getChats error:", error);
+        return { 
+            status: false, 
+            message: error instanceof Error ? error.message : "Failed to fetch chats" 
+        };
     }
 };
 
@@ -135,23 +156,57 @@ export const getChatMessages = async (chatId: string | number, page: number = 1)
 export const sendMessage = async (chatId: string | number, message: string, file?: File) => {
     try {
         const token = (await cookies()).get("token")?.value;
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_API;
+
+        if (!token) {
+            console.error("Token missing in cookies");
+            return { status: false, message: "Authentication token missing. Please log in." };
+        }
+
+        if (!baseUrl) {
+            console.error("NEXT_PUBLIC_BASE_API is not defined");
+            return { status: false, message: "API configuration missing" };
+        }
+
         const formData = new FormData();
-        formData.append("message", message);
+        formData.append("chat_id", chatId.toString());
+
+        // Only add message if it's not empty
+        if (message && message.trim() !== "") {
+            formData.append("message", message);
+        }
+        
+        // Only add file if it exists
         if (file) {
             formData.append("file", file);
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/mentor/chats/${chatId}/messages`, {
+        const url = `${baseUrl}/mentor/chats/${chatId}/messages`;
+        console.log(`Sending message to ${url}`);
+
+        const response = await fetch(url, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
             },
             body: formData,
         });
 
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            const errorText = errorData?.message || await response.text().catch(() => "Unknown error");
+            console.error(`Send message failed (${response.status}):`, errorText);
+            return { status: false, message: errorText || `Failed to send: ${response.status}` };
+        }
+
         const data = await response.json();
         return data;
     } catch (error) {
-        throw error;
+        console.error("sendMessage error:", error);
+        return { 
+            status: false, 
+            message: error instanceof Error ? error.message : "An unexpected error occurred" 
+        };
     }
 };
