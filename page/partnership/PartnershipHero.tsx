@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Loader2, CloudCog } from "lucide-react";
 import heroBg from "@/assets/images/hero-bg.png";
 import { getPartnershipHeroData } from "@/services/partnership";
+import { getSystemInfo } from "@/services/home";
 
 interface ApiHeroData {
     id: number;
@@ -20,14 +21,21 @@ interface ApiHeroData {
 
 const PartnershipHero = () => {
     const [heroData, setHeroData] = useState<ApiHeroData | null>(null);
+    const [systemInfo, setSystemInfo] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await getPartnershipHeroData();
-                if (res?.status) {
-                    setHeroData(res.data);
+                const [heroRes, sysRes] = await Promise.all([
+                    getPartnershipHeroData(),
+                    getSystemInfo()
+                ]);
+                if (heroRes?.status) {
+                    setHeroData(heroRes.data);
+                }
+                if (sysRes?.status) {
+                    setSystemInfo(sysRes.data);
                 }
             } catch (error) {
                 console.error(error);
@@ -41,7 +49,7 @@ const PartnershipHero = () => {
     if (loading) {
         return (
             <section className="relative w-full flex flex-col overflow-hidden bg-[#0A0C0F] animate-pulse">
-                <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-28 pb-16 min-h-[76vh]">
+                <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-16 pb-16 min-h-[76vh]">
                     <div className="w-32 h-6 rounded-full bg-white/10 mb-8"></div>
                     <div className="h-12 md:h-16 w-3/4 md:w-1/2 bg-white/10 rounded mb-6"></div>
                     <div className="space-y-3 w-full max-w-[400px] mb-10">
@@ -80,14 +88,14 @@ const PartnershipHero = () => {
             </div>
 
             {/* ── Main centred content ── */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-28 pb-16 min-h-[76vh]">
+            <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-16 pb-16 min-h-[70vh]">
 
                 {/* Badge */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.88 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00D1FF]/8 border border-[#00D1FF]/20 text-[#00D1FF] text-[10px] font-semibold tracking-[0.18em] uppercase mb-8 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00D1FF]/8 border border-[#00D1FF]/20 text-[#00D1FF] text-sm font-semibold tracking-[0.18em] uppercase mb-8 backdrop-blur-sm"
                 >
                     <Sparkles size={10} strokeWidth={2.5} />
                     {heroData.title}
@@ -98,7 +106,7 @@ const PartnershipHero = () => {
                     initial={{ opacity: 0, y: 28 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                    className="text-4xl md:text-5xl font-black tracking-tight mb-6 bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent"
+                    className="text-4xl md:text-7xl font-black tracking-tight mb-6 bg-gradient-to-r from-[#00D1FF] to-[#7B61FF] bg-clip-text text-transparent"
                 >
                     {heroData.sub_title}
                 </motion.h1>
@@ -108,7 +116,7 @@ const PartnershipHero = () => {
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
-                    className="text-white/85 text-lg md:text-xl font-normal leading-snug max-w-[400px] mb-10"
+                    className="text-white/85 text-lg md:text-xl font-normal leading-snug max-w-[420px] mb-10"
                 >
                     {heroData.description}
                 </motion.p>
@@ -133,13 +141,25 @@ const PartnershipHero = () => {
                     </Link>
 
                     {/* Secondary — outline */}
-                    <motion.button
-                        whileHover={{ scale: 1.04, backgroundColor: "rgba(0,209,255,0.07)" }}
-                        whileTap={{ scale: 0.97 }}
-                        className="px-7 py-3 rounded-xl text-[13px] font-bold text-[#00D1FF] border border-[#00D1FF]/35 backdrop-blur-sm transition-all duration-300"
-                    >
-                        {heroData.button_text_2}
-                    </motion.button>
+                    {systemInfo?.calendly_scheduling_url ? (
+                        <Link href={systemInfo.calendly_scheduling_url} target="_blank" rel="noopener noreferrer">
+                            <motion.button
+                                whileHover={{ scale: 1.04, backgroundColor: "rgba(0,209,255,0.07)" }}
+                                whileTap={{ scale: 0.97 }}
+                                className="px-7 py-3 rounded-xl text-[13px] font-bold text-[#00D1FF] border border-[#00D1FF]/35 backdrop-blur-sm transition-all duration-300"
+                            >
+                                {heroData.button_text_2}
+                            </motion.button>
+                        </Link>
+                    ) : (
+                        <motion.button
+                            whileHover={{ scale: 1.04, backgroundColor: "rgba(0,209,255,0.07)" }}
+                            whileTap={{ scale: 0.97 }}
+                            className="px-7 py-3 rounded-xl text-[13px] font-bold text-[#00D1FF] border border-[#00D1FF]/35 backdrop-blur-sm transition-all duration-300"
+                        >
+                            {heroData.button_text_2}
+                        </motion.button>
+                    )}
                 </motion.div>
             </div>
 

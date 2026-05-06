@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { CheckCircle2, BookOpen, ArrowRight } from "lucide-react";
 import { getMetaAcademyContent } from "@/services/home";
+import Link from "next/link";
 
 interface MetaAcademyContent {
     title: string;
@@ -109,15 +110,19 @@ const Skill = () => {
                             )}
                         </div>
 
-                        {/* Action Button */}
+                        {/* Action Button  link /meta*/}
                         <div className="pt-6">
+                            <Link
+                            href="/meta"
+                            >
                             <button
-                                className="group flex items-center gap-3 px-8 py-4 rounded-xl text-white font-bold transition-all duration-300 shadow-[0_0_20px_rgba(42,157,144,0.2)] hover:shadow-[0_0_30px_rgba(100,103,242,0.4)] hover:scale-[1.02] active:scale-[0.98]"
+                                className="group flex items-center cursor-pointer gap-3 px-8 py-4 rounded-xl text-white font-bold transition-all duration-300 shadow-[0_0_20px_rgba(42,157,144,0.2)] hover:shadow-[0_0_30px_rgba(100,103,242,0.4)] hover:scale-[1.02] active:scale-[0.98]"
                                 style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                             >
                                 <span>{content?.button_text || "Explore Courses"}</span>
                                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </button>
+                            </Link>
                         </div>
                     </div>
 

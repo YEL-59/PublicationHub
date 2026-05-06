@@ -123,14 +123,14 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             >
                                 Apply Now
                             </Link>
-                            <div className="flex gap-3">
+                            {/* <div className="flex gap-3">
                                 <button className="flex-1 bg-[#111419] border border-white/5 hover:bg-white/5 text-white/90 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
                                     <Bookmark className="w-4 h-4" /> Save
                                 </button>
                                 <button className="flex-1 bg-[#111419] border border-white/5 hover:bg-white/5 text-white/90 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
                                     <Share2 className="w-4 h-4" /> Share
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Mentor Card */}
@@ -151,9 +151,9 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300">
+                                {/* <button className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300">
                                     <MessageSquare className="w-4 h-4" /> Contact Mentor
-                                </button>
+                                </button> */}
                             </div>
                         )}
                     </div>
