@@ -1,10 +1,12 @@
 "use client";
 
-import { getBannerContent, getCounterContent } from "@/services/home";
+import { getBannerContent, getCounterContent, getAllOpportunities } from "@/services/home";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Search, Sparkles } from "lucide-react";
 import heroBg from "@/assets/images/hero-bg.png";
+import { useRouter } from "next/navigation";
+import { Opportunity } from "@/types/opportunity";
 
 interface IBannerContent {
     title: string;
@@ -20,22 +22,42 @@ interface IStatItem {
 const Banner = () => {
     const [banner, setBanner] = useState<IBannerContent | null>(null);
     const [stats, setStats] = useState<IStatItem[]>([]);
+    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            const [bannerRes, statsRes] = await Promise.all([
+            const [bannerRes, statsRes, oppsRes] = await Promise.all([
                 getBannerContent(),
-                getCounterContent()
+                getCounterContent(),
+                getAllOpportunities(1)
             ]);
             
             if (bannerRes?.status) setBanner(bannerRes.data);
             if (statsRes?.status) setStats(statsRes.data.items);
+            if (oppsRes?.status) setOpportunities(oppsRes.data);
             setIsLoading(false);
         };
         fetchData();
     }, []);
+
+    const filteredOpportunities = opportunities.filter((opp: any) => {
+        if (!searchQuery) return true;
+        const lowerQuery = searchQuery.toLowerCase();
+        
+        const matchTitle = opp.title?.toLowerCase().includes(lowerQuery);
+        const matchOverview = opp.overview?.toLowerCase().includes(lowerQuery);
+        const matchMentor = opp.mentor?.user?.name?.toLowerCase().includes(lowerQuery);
+        const matchInstitution = opp.university_hospitals?.some((inst: any) => 
+            inst.name?.toLowerCase().includes(lowerQuery)
+        );
+
+        return matchTitle || matchOverview || matchMentor || matchInstitution;
+    });
 
     const displayStats = stats;
 
@@ -87,24 +109,58 @@ const Banner = () => {
                 )}
 
                 {/* Search Bar */}
-                <div className="w-full max-w-2xl relative mb-24 group">
+                <div className="w-full max-w-2xl relative mb-24 group z-30">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#2A9D90]/20 to-[#6467F2]/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative flex items-center bg-[#171A21]/90 border border-white/10 rounded-2xl p-1.5 shadow-2xl backdrop-blur-md">
                         <div className="flex-1 flex items-center px-4 gap-3">
                             <Search className="text-[#A3A7AE]" size={20} />
                             <input
                                 type="text"
-                                placeholder="Search opportunities, mentors, or courses..."
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setShowDropdown(true);
+                                }}
+                                onFocus={() => setShowDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                placeholder="Search opportunities, mentors, or institutions..."
                                 className="w-full bg-transparent border-none outline-none text-white text-sm placeholder:text-[#5F6368] py-3"
                             />
                         </div>
                         <button
+                            onClick={() => router.push('/researchopportunities')}
                             className="px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 active:scale-95"
                             style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                         >
                             Search
                         </button>
                     </div>
+
+                    {/* Dropdown Results */}
+                    {searchQuery && showDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#111419] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
+                            {filteredOpportunities.length > 0 ? (
+                                filteredOpportunities.slice(0, 5).map((opp: any) => (
+                                    <div 
+                                        key={opp.id}
+                                        onClick={() => router.push(`/researchopportunities/${opp.id}`)}
+                                        className="p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors text-left"
+                                    >
+                                        <h4 className="text-white text-sm font-semibold mb-1 line-clamp-1">{opp.title}</h4>
+                                        <div className="flex items-center gap-4 text-xs text-[#A3A7AE]">
+                                            <span>{opp.mentor?.user?.name || "Anonymous Mentor"}</span>
+                                            <span>•</span>
+                                            <span className="text-[#00D1FF]">{opp.categories?.[0]?.name || "Uncategorized"}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="p-4 text-center text-[#A3A7AE] text-sm">
+                                    No opportunities found matching your search.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Stats Grid */}
