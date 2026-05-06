@@ -12,6 +12,7 @@ const ResearchOpportunitiesAll = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const fetchOpportunities = async (page: number) => {
         setLoading(true);
@@ -40,6 +41,20 @@ const ResearchOpportunitiesAll = () => {
         }
     };
 
+    const filteredOpportunities = opportunities.filter((opp: any) => {
+        if (!searchQuery) return true;
+        const lowerQuery = searchQuery.toLowerCase();
+        
+        const matchTitle = opp.title?.toLowerCase().includes(lowerQuery);
+        const matchOverview = opp.overview?.toLowerCase().includes(lowerQuery);
+        const matchMentor = opp.mentor?.user?.name?.toLowerCase().includes(lowerQuery);
+        const matchInstitution = opp.university_hospitals?.some((inst: any) => 
+            inst.name?.toLowerCase().includes(lowerQuery)
+        );
+
+        return matchTitle || matchOverview || matchMentor || matchInstitution;
+    });
+
     return (
         <section className="min-h-screen bg-[#0A0C0F] text-white py-12 px-6 md:px-12 lg:px-20 font-inter">
             <div className="container mx-auto">
@@ -57,12 +72,14 @@ const ResearchOpportunitiesAll = () => {
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#64748B] w-4.5 h-4.5 transition-colors group-focus-within:text-[#00D1FF]" />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search opportunities, mentors, or institutions..."
                             className="w-full bg-[#111419] border border-white/5 rounded-[12px] py-3.5 pl-12 pr-5 text-sm md:text-base placeholder:text-[#64748B] focus:outline-none focus:border-[#00D1FF]/40 transition-all duration-300"
                         />
                     </div>
 
-                    <div className="flex items-center flex-wrap gap-3 w-full lg:w-auto">
+                    {/* <div className="flex items-center flex-wrap gap-3 w-full lg:w-auto">
                         <button className="flex items-center justify-between gap-2.5 bg-[#111419] border border-white/5 rounded-[10px] px-5 py-2.5 text-sm min-w-[170px] hover:bg-white/5 transition-all text-[#A3A7AE] group">
                             All Specialties <ChevronDown className="w-4 h-4 group-hover:text-white transition-colors" />
                         </button>
@@ -72,7 +89,7 @@ const ResearchOpportunitiesAll = () => {
                         <button className="flex items-center gap-2.5 bg-[#111419] border border-white/5 rounded-[10px] px-5 py-2.5 text-sm hover:bg-white/5 transition-all text-[#A3A7AE] group">
                             <Filter className="w-4 h-4 group-hover:text-white transition-colors" /> More Filters
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Grid */}
@@ -82,8 +99,8 @@ const ResearchOpportunitiesAll = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                        {opportunities.length > 0 ? (
-                            opportunities.map((opp, index) => (
+                        {filteredOpportunities.length > 0 ? (
+                            filteredOpportunities.map((opp, index) => (
                                 <motion.div
                                     key={opp.id}
                                     initial={{ opacity: 0, y: 20 }}
@@ -148,7 +165,7 @@ const ResearchOpportunitiesAll = () => {
                             ))
                         ) : (
                             <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20 bg-[#111419] rounded-[20px] border border-white/5">
-                                <p className="text-[#A3A7AE] text-lg">No research opportunities found.</p>
+                                <p className="text-[#A3A7AE] text-lg">No research opportunities found matching your search.</p>
                             </div>
                         )}
                     </div>

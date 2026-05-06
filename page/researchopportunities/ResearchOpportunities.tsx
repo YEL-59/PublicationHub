@@ -12,6 +12,7 @@ const ResearchOpportunities = () => {
     const [displayCount, setDisplayCount] = useState(6);
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const fetchOpportunities = async () => {
@@ -31,8 +32,22 @@ const ResearchOpportunities = () => {
         fetchOpportunities();
     }, []);
 
+    const filteredOpportunities = opportunities.filter((opp: any) => {
+        if (!searchQuery) return true;
+        const lowerQuery = searchQuery.toLowerCase();
+        
+        const matchTitle = opp.title?.toLowerCase().includes(lowerQuery);
+        const matchOverview = opp.overview?.toLowerCase().includes(lowerQuery);
+        const matchMentor = opp.mentor?.user?.name?.toLowerCase().includes(lowerQuery);
+        const matchInstitution = opp.university_hospitals?.some((inst: any) => 
+            inst.name?.toLowerCase().includes(lowerQuery)
+        );
+
+        return matchTitle || matchOverview || matchMentor || matchInstitution;
+    });
+
     const handleLoadMore = () => {
-        setDisplayCount(opportunities.length);
+        setDisplayCount(filteredOpportunities.length);
     };
 
     return (
@@ -52,6 +67,11 @@ const ResearchOpportunities = () => {
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#64748B] w-4.5 h-4.5 transition-colors group-focus-within:text-[#00D1FF]" />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setDisplayCount(6); // reset display count on new search
+                            }}
                             placeholder="Search opportunities, mentors, or institutions..."
                             className="w-full bg-[#111419] border border-white/5 rounded-[14px] py-4 pl-12 pr-5 text-sm md:text-base placeholder:text-[#64748B] focus:outline-none focus:border-[#00D1FF]/40 transition-all duration-300"
                         />
@@ -72,7 +92,7 @@ const ResearchOpportunities = () => {
 
                 <div className="mb-8">
                     <p className="text-[#64748B] text-sm font-medium">
-                        {loading ? "Loading..." : `${total} opportunities available`}
+                        {loading ? "Loading..." : `${searchQuery ? filteredOpportunities.length : total} opportunities available`}
                     </p>
                 </div>
 
@@ -82,8 +102,8 @@ const ResearchOpportunities = () => {
                         [...Array(6)].map((_, i) => (
                             <div key={i} className="bg-[#111419] border border-white/5 rounded-[24px] h-[500px] animate-pulse" />
                         ))
-                    ) : (
-                        opportunities.slice(0, displayCount).map((opp, index) => (
+                    ) : filteredOpportunities.length > 0 ? (
+                        filteredOpportunities.slice(0, displayCount).map((opp: any, index: number) => (
                             <motion.div
                                 key={opp.id}
                                 initial={{ opacity: 0, y: 30 }}
@@ -144,11 +164,15 @@ const ResearchOpportunities = () => {
                                 </div>
                             </motion.div>
                         ))
+                    ) : (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-20">
+                            <p className="text-[#A3A7AE] text-lg">No opportunities found matching your search.</p>
+                        </div>
                     )}
                 </div>
 
 
-                {!loading && displayCount < opportunities.length && (
+                {!loading && displayCount < filteredOpportunities.length && (
                     <div className="flex justify-center mt-12">
                         <button
                             onClick={handleLoadMore}
@@ -159,7 +183,7 @@ const ResearchOpportunities = () => {
                     </div>
                 )}
                 
-                {!loading && displayCount >= opportunities.length && total > opportunities.length && (
+                {!loading && displayCount >= filteredOpportunities.length && total > opportunities.length && !searchQuery && (
                      <div className="flex justify-center mt-12">
                         <Link
                             href="/researchopportunities/view-all"

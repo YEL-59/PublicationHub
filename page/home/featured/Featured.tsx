@@ -1,59 +1,32 @@
 "use client";
 
-import React from "react";
-import { Calendar, User, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 interface Opportunity {
     id: number;
-    category: string;
-    date: string;
     title: string;
-    description: string;
-    mentor: string;
-    categoryColor: string;
+    overview: string;
+    created_at: string;
+    categories: { id: number; name: string }[];
+    mentor: {
+        user: {
+            name: string;
+        };
+    };
 }
 
-const opportunities: Opportunity[] = [
-    {
-        id: 1,
-        category: "Cardiology",
-        date: "Mar 15, 2026",
-        title: "Clinical Research Fellowship",
-        description: "Join our cutting-edge cardiovascular research team investigating novel treatment approaches.",
-        mentor: "Dr. Sarah Chen",
-        categoryColor: "bg-[#3B384D]",
-    },
-    {
-        id: 2,
-        category: "Data Science",
-        date: "Apr 1, 2026",
-        title: "AI in Healthcare Research",
-        description: "Develop machine learning models for early disease detection and patient outcome prediction.",
-        mentor: "Prof. James Miller",
-        categoryColor: "bg-[#2D334D]",
-    },
-    {
-        id: 3,
-        category: "Neurology",
-        date: "Mar 30, 2026",
-        title: "Neuroscience Lab Position",
-        description: "Investigate neural mechanisms of memory formation using advanced imaging techniques.",
-        mentor: "Dr. Emily Watson",
-        categoryColor: "bg-[#3B384D]",
-    },
-    {
-        id: 4,
-        category: "Public Health",
-        date: "Apr 15, 2026",
-        title: "Global Health Initiative",
-        description: "Contribute to research on improving healthcare access in underserved communities.",
-        mentor: "Dr. Michael Okonkwo",
-        categoryColor: "bg-[#2D334D]",
-    },
-];
+const OpportunityCard = ({ item, index }: { item: Opportunity; index: number }) => {
+    const date = new Date(item.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
 
-const OpportunityCard = ({ item }: { item: Opportunity }) => {
+    const categoryName = item.categories?.[0]?.name || "Uncategorized";
+    const categoryColor = index % 2 === 0 ? "bg-[#3B384D]" : "bg-[#2D334D]";
+
     return (
         <div
             className="relative rounded-[16px] border border-white/10 p-8 flex flex-col gap-6 transition-all duration-300 hover:border-[#00D1FF]/30 group"
@@ -63,12 +36,12 @@ const OpportunityCard = ({ item }: { item: Opportunity }) => {
             }}
         >
             <div className="flex items-center justify-between">
-                <span className={`${item.categoryColor} text-[#9C8BE9] font-inter text-sm font-medium leading-5 px-4 py-1.5 rounded-full`}>
-                    {item.category}
+                <span className={`${categoryColor} text-[#9C8BE9] font-inter text-sm font-medium leading-5 px-4 py-1.5 rounded-full`}>
+                    {categoryName}
                 </span>
                 <div className="flex items-center gap-2 text-[#A3A7AE] text-xs font-medium">
                     <Calendar size={14} className="text-[#A3A7AE]" />
-                    <span>{item.date}</span>
+                    <span>{date}</span>
                 </div>
             </div>
 
@@ -80,27 +53,28 @@ const OpportunityCard = ({ item }: { item: Opportunity }) => {
                     {item.title}
                 </h3>
                 <p
-                    className="text-[#A3A7AE] font-inter text-sm font-normal leading-5 max-w-xl"
+                    className="text-[#A3A7AE] font-inter text-sm font-normal leading-5 max-w-xl line-clamp-2"
                     style={{ fontFamily: "'Inter', sans-serif", }}
                 >
-                    {item.description}
+                    {item.overview}
                 </p>
             </div>
 
             <div className="flex items-center gap-2 text-[#A3A7AE] text-sm font-medium">
                 <User size={16} />
-                <span>{item.mentor}</span>
+                <span>{item.mentor?.user?.name || "Unknown Mentor"}</span>
             </div>
 
             <div className="flex items-center gap-6 mt-4">
-                <button
-                    className="px-7 py-3 rounded-xl text-sm font-bold text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(42,157,144,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+                <Link
+                    href={`/researchopportunities/apply/${item.id}`}
+                    className="px-7 py-3 rounded-xl text-sm font-bold text-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(42,157,144,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group/btn"
                     style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                 >
-                    Apply Now
-                </button>
-                <Link href="#" className="text-sm font-semibold text-[#A3A7AE] hover:text-[#00D1FF] transition-colors">
-                    Learn More
+                    Apply Now <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
+                <Link href={`/researchopportunities/${item.id}`} className="text-sm font-semibold text-[#A3A7AE] hover:text-[#00D1FF] transition-colors">
+                    details 
                 </Link>
             </div>
         </div>
@@ -108,24 +82,34 @@ const OpportunityCard = ({ item }: { item: Opportunity }) => {
 };
 
 const Featured = () => {
+    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchOpportunities();
+    }, []);
+
+    const fetchOpportunities = async () => {
+        setIsLoading(true);
+        try {
+            const url = "https://ibraheemaltamim.thesyndicates.team/api/opportunities?per_page=4";
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.status) {
+                // Support both `data.data.data` (if deeply nested) or `data.data` as per your JSON snippet
+                setOpportunities(data.data?.data || data.data || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch opportunities:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section className="relative w-full bg-[#0A0C0F] py-20 px-4 md:px-8 lg:px-12 overflow-hidden">
-            {/* Background Decorative Elements */}
-            {/* <div className="absolute left-0 top-0 w-64 h-full opacity-20 pointer-events-none">
-                <svg width="256" height="100%" viewBox="0 0 256 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M-50 0C-50 0 100 200 50 400C0 600 150 800 150 800" stroke="#A3A7AE" strokeWidth="1" strokeDasharray="4 4" />
-                    <path d="M-20 0C-20 0 130 200 80 400C30 600 180 800 180 800" stroke="#A3A7AE" strokeWidth="1" strokeDasharray="4 4" />
-                    <path d="M10 0C10 0 160 200 110 400C60 600 210 800 210 800" stroke="#A3A7AE" strokeWidth="1" strokeDasharray="4 4" />
-                </svg>
-            </div>
-
-            <div className="absolute right-10 bottom-10 w-48 h-48 opacity-10 pointer-events-none">
-                <svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 170C50 140 100 160 130 110C160 60 120 20 170 20M170 20L150 25M170 20L165 40" stroke="#A3A7AE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="20" cy="170" r="4" fill="#A3A7AE" />
-                </svg>
-            </div> */}
-
             <div className="container mx-auto relative z-10">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
@@ -144,11 +128,22 @@ const Featured = () => {
                 </div>
 
                 {/* Grid Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {opportunities.map((item) => (
-                        <OpportunityCard key={item.id} item={item} />
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <Loader2 className="w-8 h-8 text-[#00D1FF] animate-spin" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {opportunities.map((item, index) => (
+                            <OpportunityCard key={item.id} item={item} index={index} />
+                        ))}
+                        {opportunities.length === 0 && (
+                            <div className="col-span-1 md:col-span-2 text-center text-[#A3A7AE] py-10">
+                                No opportunities found.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </section>
     );
