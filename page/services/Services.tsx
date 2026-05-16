@@ -116,9 +116,18 @@ const ServiceCard = ({
                         </ul>
 
                         <div className="pt-4 flex items-center justify-between border-t border-white/5">
+
                             <div>
-                                <p className="text-[11px] text-[#00D1FF] font-bold uppercase tracking-wider mb-1">Starting from</p>
-                                <p className="text-xl font-bold text-white">${service.starting_price}</p>
+                                {service.starting_price ? (
+                                    <>
+                                        <p className="text-[11px] text-[#00D1FF] font-bold uppercase tracking-wider mb-1">Starting from</p>
+                                        <p className="text-xl font-bold text-white">${service.starting_price}</p>
+                                    </>
+                                ) : (
+                                    <>
+                                       
+                                    </>
+                                )}
                             </div>
                             <a 
                                 href={`https://wa.me/${service.effective_whatsapp_number || service.whats_app_num}`}

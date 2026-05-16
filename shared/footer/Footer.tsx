@@ -76,9 +76,9 @@ const Footer = () => {
     const footerLinks = {
         platform: [
             { name: "Research Opportunities", href: "/research" },
-            { name: "Chat", href: "/chat" },
+            { name: "About", href: "/about" },
             { name: "Research Services", href: "/services" },
-            { name: "Settings", href: "/settings" },
+            
         ],
         resources: [
             { name: "FAQ", href: "/faq" },
@@ -107,9 +107,9 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-6 mb-20">
 
                     {/* Brand Section */}
-                    <div className="lg:col-span-3 flex flex-col gap-7">
+                    <div className="lg:col-span-3 flex flex-col gap-2">
                         <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
-                            <div className="relative w-48 h-12">
+                            <div className="relative w-15 h-12">
                                 <Image
                                     src={systemInfo?.logo || navLogo}
                                     alt={systemInfo?.system_name || "PublicationHub Logo"}
@@ -118,7 +118,9 @@ const Footer = () => {
                                     priority
                                     unoptimized={!!systemInfo?.logo}
                                 />
+                               
                             </div>
+                             <h2 className="text-transparent font-bold text-2xl bg-gradient-to-r from-[#00D1FF] to-[#3F5EFB] bg-clip-text ">{systemInfo?.system_name}</h2>
                         </Link>
                         <p className="text-[#A3A7AE]  text-sm font-normal leading-5 max-w-[280px]">
                             {systemInfo?.description || "The centralized platform for research opportunities, mentorship, and academic growth."}

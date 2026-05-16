@@ -129,7 +129,7 @@ const Banner = () => {
                         </div>
                         <button
                             onClick={() => router.push('/researchopportunities')}
-                            className="px-8 py-3 rounded-xl font-bold text-white transition-all duration-300 active:scale-95"
+                            className="px-8 py-3 cursor-pointer rounded-xl font-bold text-white transition-all duration-300 active:scale-95"
                             style={{ background: "linear-gradient(135deg, #2A9D90 0%, #6467F2 100%)" }}
                         >
                             Search

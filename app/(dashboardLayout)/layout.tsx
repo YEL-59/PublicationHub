@@ -94,12 +94,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             </Link>
 
             <div className="flex items-center gap-6">
-              <button className="text-gray-400 hover:text-white transition-colors relative">
+              {/* <button className="text-gray-400 hover:text-white transition-colors relative">
                 <Bell size={22} />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] flex items-center justify-center text-white border-2 border-[#0A0C0F]">
                   2
                 </span>
-              </button>
+              </button> */}
 
               <div className="relative" ref={dropdownRef}>
                 <button 

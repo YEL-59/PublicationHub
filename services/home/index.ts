@@ -177,11 +177,11 @@ export const getAllOpportunities = async (page: number = 1) => {
 export const getOpportunityById = async (id: number) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/opportunities/?opportunity_id=${id}`, {
-            method: "POST", // Changed to POST to allow passing a body. If it must be GET, body is not allowed. Let's send it POST.
+            method: "GET", // Changed to POST to allow passing a body. If it must be GET, body is not allowed. Let's send it POST.
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ opportunity_id: id })
+           // body: JSON.stringify({ opportunity_id: id })
         });
         const data = await response.json();
         return data;
@@ -306,6 +306,24 @@ export const getMetaAcademyCounter = async () => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/meta-academy-page/counter-section`, {
             method: "GET",
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get researcher applications
+export const getResearcherApplications = async (page: number = 1) => {
+    const token = (await cookies()).get("token")?.value;
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/researcher/opportunity-applications?page=${page}&per_page=5`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            }
         });
         const data = await response.json();
         return data;

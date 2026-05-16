@@ -92,7 +92,7 @@ const Featured = () => {
     const fetchOpportunities = async () => {
         setIsLoading(true);
         try {
-            const url = "https://ibraheemaltamim.thesyndicates.team/api/opportunities?per_page=4";
+            const url = "https://dashboard.publicationhub.co/api/opportunities?per_page=4";
             
             const response = await fetch(url);
             const data = await response.json();
@@ -107,6 +107,8 @@ const Featured = () => {
             setIsLoading(false);
         }
     };
+
+    console.log("opportunities", opportunities);
 
     return (
         <section className="relative w-full bg-[#0A0C0F] py-20 px-4 md:px-8 lg:px-12 overflow-hidden">

@@ -7,10 +7,12 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { User, MapPin, Briefcase, Calendar, BookOpen, FileText, Settings, LayoutGrid } from "lucide-react";
 import { getCurrentUser } from "@/services/auth";
+import { getResearcherApplications } from "@/services/home";
 import { ICurrentUser } from "@/types/auth/auth";
 
 const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<ICurrentUser | null>(null);
+    const [appCount, setAppCount] = useState<number>(0);
     const pathname = usePathname();
 
     useEffect(() => {
@@ -19,12 +21,23 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
             setUser(currentUser);
         };
         fetchUser();
+        
+        const fetchStats = async () => {
+            try {
+                const res = await getResearcherApplications(1);
+                if (res?.status) {
+                    setAppCount(res.pagination?.total || res.data?.length || 0);
+                }
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            }
+        };
+        fetchStats();
     }, []);
 
     const tabs = [
-        { name: "All", href: "/myprofile", icon: LayoutGrid },
-        { name: "My Courses", href: "/myprofile/courses", icon: BookOpen, count: 3 },
-        { name: "Research Applications", href: "/myprofile/applications", icon: FileText, count: 3 },
+        { name: "Research Applications", href: "/myprofile/applications", icon: FileText, count: appCount },
+        { name: "My Courses", href: "/myprofile/courses", icon: BookOpen, count: 0 },
         { name: "Settings", href: "/myprofile/settings", icon: Settings },
     ];
 
@@ -82,11 +95,11 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
                     {/* Quick Stats */}
                     <div className="flex items-center justify-center gap-8 md:gap-12 border-t md:border-t-0 md:border-l border-white/5 pt-6 md:pt-0 md:pl-12">
                         <div className="text-center">
-                            <p className="text-[#00D1FF] text-2xl md:text-3xl font-bold mb-1">3</p>
+                            <p className="text-[#00D1FF] text-2xl md:text-3xl font-bold mb-1">0</p>
                             <p className="text-[#64748B] text-[10px] font-bold uppercase tracking-wider">Enrolled Courses</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-[#00D1FF] text-2xl md:text-3xl font-bold mb-1">3</p>
+                            <p className="text-[#00D1FF] text-2xl md:text-3xl font-bold mb-1">{appCount}</p>
                             <p className="text-[#64748B] text-[10px] font-bold uppercase tracking-wider">Applications</p>
                         </div>
                     </div>

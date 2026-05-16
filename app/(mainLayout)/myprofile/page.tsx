@@ -1,5 +1,5 @@
-import ProfileDashboard from "@/page/myprofile/ProfileDashboard";
+import { redirect } from "next/navigation";
 
 export default function ProfileDashboardPage() {
-    return <ProfileDashboard />;
+    redirect("/myprofile/applications");
 }

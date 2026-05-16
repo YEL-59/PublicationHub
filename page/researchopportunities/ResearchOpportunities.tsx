@@ -19,6 +19,7 @@ const ResearchOpportunities = () => {
             setLoading(true);
             try {
                 const res = await getAllOpportunities(1);
+               // console.log("res", res);
                 if (res?.status) {
                     setOpportunities(res.data);
                     setTotal(res.pagination?.total || 0);

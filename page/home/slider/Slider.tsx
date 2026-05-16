@@ -36,12 +36,12 @@ const ResearcherCard = ({ data }: { data: SliderData }) => {
         >
             <div className="flex-1 min-w-0 flex flex-col items-start gap-6">
                 {/* Number Badge */}
-                <div
+                {/* <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shrink-0"
                     style={{ background: "linear-gradient(135deg, #00D1FF 0%, #6467F2 100%)" }}
                 >
                     {data.id}
-                </div>
+                </div> */}
 
                 {/* Content */}
                 <div className="space-y-4">
@@ -90,6 +90,7 @@ const Slider = () => {
         const fetchSlider = async () => {
             setIsLoading(true);
             const res = await getWhyChooseContent();
+            console.log("res.data ", res.data)
             if (res?.status) {
                 setContent(res.data.content);
                 setItems(res.data.items);
@@ -100,6 +101,7 @@ const Slider = () => {
     }, []);
 
     const displayItems = items;
+    console.log("items ", items)
 
     return (
         <section className="w-full bg-[#0A0C0F] pt-40 pb-20 px-4 md:px-8 overflow-hidden border border-t-[#2A9D90]/20">

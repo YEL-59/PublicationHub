@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "dashboard.hooray-entertainment.online",
       },
+      {
+        protocol: "https",
+        hostname: "dashboard.publicationhub.co",
+      },
     ],
   },
 };

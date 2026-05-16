@@ -105,6 +105,8 @@ const Navbar = () => {
                             priority
                         />
                     )}
+                                                 <h2 className="text-transparent font-bold text-md bg-gradient-to-r from-[#00D1FF] to-[#3F5EFB] bg-clip-text ">{systemInfo?.system_name}</h2>
+
                 </Link>
 
                 {/* Desktop Navigation Links */}
@@ -209,9 +211,11 @@ const Navbar = () => {
                         </Link>
                     )}
 
-                    <CTAButton>
-                        Join as a mentor
-                    </CTAButton>
+                    <Link href="/register" >
+                        <CTAButton>
+                            Join as a mentor
+                        </CTAButton>
+                    </Link>
                 </div>
 
                 {/* Tablet/Mobile Toggle */}
