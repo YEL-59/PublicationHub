@@ -331,3 +331,204 @@ export const getResearcherApplications = async (page: number = 1) => {
         throw error;
     }
 }
+
+// get my enrolled courses (mentor & researcher)
+export const getMyCourses = async () => {
+    const token = (await cookies()).get("token")?.value;
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/my-courses`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// buy a course
+export const buyCourse = async (courseId: string | number) => {
+    const token = (await cookies()).get("token")?.value;
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/courses/${courseId}/buy`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: featured research opportunities section
+export const getFeaturedOpportunitiesSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/home-page/featured-research-opportunities-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: home review section
+export const getHomeReviewSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/home-page/review-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: home faq section
+export const getHomeFaqSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/home-page/faq-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: faq page hero
+export const getFaqPageHero = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/faq-page/hero-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: faq page questions section
+export const getFaqPageQuestionsSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/faq-page/question-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: research page section
+export const getResearchPageSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/research-page/research-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// CMS: service page section
+export const getServicePageSection = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/cms/service-page/service-section`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get social links
+export const getSocialLinks = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/social-links`, { method: "GET" });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get opportunity filter lists
+export const getOpportunityFilterList = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/opportunities/fillter-list`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get mentor by id from opportunities
+export const getOpportunityMentorById = async (mentorId: string | number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/opportunities/mentors/${mentorId}`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get single service by id
+export const getServiceById = async (id: string | number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/services/${id}`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get calendly schedule link
+export const getCalendlyScheduleLink = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/calendly/schedule-link`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get all offers
+export const getAllOffers = async (page = 1, perPage = 10) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/offers?page=${page}&per_page=${perPage}`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}
+
+// get single offer
+export const getOfferById = async (id: string | number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/offers/${id}`, {
+            method: "GET",
+        });
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+}

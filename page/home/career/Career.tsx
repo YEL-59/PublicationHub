@@ -5,11 +5,20 @@ import { Sparkles, ArrowRight } from "lucide-react";
 import { getResearchJourneyContent } from "@/services/home";
 import Link from "next/link";
 
-const Career = () => {
-    const [content, setContent] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState(true);
+interface CareerProps {
+    initialContent?: any;
+}
+
+const Career = ({ initialContent }: CareerProps) => {
+    const [content, setContent] = useState<any>(initialContent || null);
+    const [isLoading, setIsLoading] = useState(!initialContent);
 
     useEffect(() => {
+        if (initialContent) {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchContent = async () => {
             setIsLoading(true);
             const res = await getResearchJourneyContent();
@@ -19,7 +28,7 @@ const Career = () => {
             setIsLoading(false);
         };
         fetchContent();
-    }, []);
+    }, [initialContent]);
 
     return (
         <section className="relative w-full bg-[#0A0C0F] py-32 px-4 overflow-hidden">

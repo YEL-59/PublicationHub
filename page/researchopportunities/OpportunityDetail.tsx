@@ -1,30 +1,79 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     ArrowLeft,
     Calendar,
     Clock,
     Building2,
     Bookmark,
-    Share2,
     MessageSquare,
-    ArrowRight
 } from "lucide-react";
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { addFavourite, getFavourites, removeFavourite } from "@/services/researcher";
+import { toast } from "sonner";
 
 interface OpportunityDetailProps {
-    opportunity: any; // In a real app, define a proper interface
+    opportunity: any;
 }
 
 const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
+    const [isSaved, setIsSaved] = useState(false);
+    const [favouriteId, setFavouriteId] = useState<number | null>(null);
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        const checkFavourite = async () => {
+            try {
+                const res = await getFavourites();
+                if (res?.status && Array.isArray(res.data)) {
+                    const fav = res.data.find((f: any) => f.opportunity_id === opportunity.id || f.opportunity?.id === opportunity.id);
+                    if (fav) {
+                        setIsSaved(true);
+                        setFavouriteId(fav.id);
+                    }
+                }
+            } catch {
+                // User may not be logged in
+            }
+        };
+        checkFavourite();
+    }, [opportunity.id]);
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            if (isSaved && favouriteId) {
+                const res = await removeFavourite(favouriteId);
+                if (res?.status) {
+                    setIsSaved(false);
+                    setFavouriteId(null);
+                    toast.success("Removed from favourites");
+                } else {
+                    toast.error(res?.message || "Failed to remove favourite");
+                }
+            } else {
+                const res = await addFavourite(opportunity.id);
+                if (res?.status) {
+                    setIsSaved(true);
+                    setFavouriteId(res.data?.id || null);
+                    toast.success("Saved to favourites");
+                } else {
+                    toast.error(res?.message || "Please sign in to save opportunities");
+                }
+            }
+        } catch {
+            toast.error("An error occurred");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (!opportunity) return null;
 
     return (
         <section className="min-h-screen bg-[#0A0C0F] text-white py-12 px-6 md:px-12 lg:px-20 font-inter">
             <div className="container mx-auto">
-                {/* Back Link */}
                 <Link
                     href="/researchopportunities"
                     className="flex items-center gap-2 text-[#A3A7AE] hover:text-white transition-colors mb-8 group"
@@ -34,9 +83,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Main Content */}
                     <div className="lg:col-span-8">
-                        {/* Tags */}
                         <div className="flex flex-wrap gap-2 mb-6">
                             {(opportunity.specialities || []).map((spec: any) => (
                                 <span
@@ -56,12 +103,10 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             ))}
                         </div>
 
-                        {/* Title */}
                         <h1 className="text-3xl md:text-4xl lg:text-4xl font-bold leading-tight mb-10 tracking-tight text-[#EBEEF1]">
                             {opportunity.title}
                         </h1>
 
-                        {/* Info Bar */}
                         <div className="bg-[#111419] border border-white/5 rounded-2xl p-6 mb-12 grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className="flex items-center gap-4">
                                 <div className="p-2.5 bg-[#00D1FF]/10 rounded-xl">
@@ -92,7 +137,6 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             </div>
                         </div>
 
-                        {/* Detailed Description */}
                         <div className="space-y-12">
                             <div>
                                 <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">About This Opportunity</h2>
@@ -104,7 +148,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             {opportunity.desciptions && opportunity.desciptions.map((desc: any, index: number) => (
                                 <div key={index}>
                                     <h2 className="text-xl font-bold mb-5 text-[#EBEEF1]">{desc.title}</h2>
-                                    <div 
+                                    <div
                                         className="text-[#A3A7AE] text-sm md:text-base leading-relaxed prose prose-invert max-w-none"
                                         dangerouslySetInnerHTML={{ __html: desc.description }}
                                     />
@@ -113,9 +157,7 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                         </div>
                     </div>
 
-                    {/* Sidebar */}
                     <div className="lg:col-span-4 space-y-6">
-                        {/* Action Card */}
                         <div className="bg-[#111419] border border-white/5 rounded-t-2xl p-6 space-y-4">
                             <Link
                                 href={`/researchopportunities/apply/${opportunity.id}`}
@@ -123,17 +165,18 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                             >
                                 Apply Now
                             </Link>
-                            {/* <div className="flex gap-3">
-                                <button className="flex-1 bg-[#111419] border border-white/5 hover:bg-white/5 text-white/90 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
-                                    <Bookmark className="w-4 h-4" /> Save
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className={`flex-1 bg-[#111419] border border-white/5 hover:bg-white/5 text-white/90 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all ${isSaved ? "text-[#00D1FF] border-[#00D1FF]/30" : ""}`}
+                                >
+                                    <Bookmark className={`w-4 h-4 ${isSaved ? "fill-current" : ""}`} />
+                                    {isSaved ? "Saved" : "Save"}
                                 </button>
-                                <button className="flex-1 bg-[#111419] border border-white/5 hover:bg-white/5 text-white/90 font-medium py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
-                                    <Share2 className="w-4 h-4" /> Share
-                                </button>
-                            </div> */}
+                            </div>
                         </div>
 
-                        {/* Mentor Card */}
                         {opportunity.mentor && (
                             <div className="bg-[#111419] border border-white/5 rounded-b-2xl p-8 space-y-8">
                                 <div>
@@ -151,9 +194,12 @@ const OpportunityDetail = ({ opportunity }: OpportunityDetailProps) => {
                                     </div>
                                 </div>
 
-                                {/* <button className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300">
+                                <Link
+                                    href="/myprofile/conversation"
+                                    className="w-full bg-[#111419] border border-white/5 hover:bg-white/5 text-white font-semibold py-3.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all duration-300"
+                                >
                                     <MessageSquare className="w-4 h-4" /> Contact Mentor
-                                </button> */}
+                                </Link>
                             </div>
                         )}
                     </div>

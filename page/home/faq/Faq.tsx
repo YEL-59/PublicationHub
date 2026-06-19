@@ -60,13 +60,18 @@ const FAQItem = ({ question, answer, isOpen, onClick }: FAQItemProps) => {
     );
 };
 
-const Faq = () => {
-    const [faqs, setFaqs] = useState<FAQData[]>([]);
+interface FaqProps {
+    initialFaqs?: FAQData[];
+    initialPagination?: any;
+}
+
+const Faq = ({ initialFaqs, initialPagination }: FaqProps) => {
+    const [faqs, setFaqs] = useState<FAQData[]>(initialFaqs || []);
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialFaqs);
     const [loadMoreLoading, setLoadMoreLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(initialPagination?.current_page || 1);
+    const [lastPage, setLastPage] = useState(initialPagination?.last_page || 1);
 
     const fetchFaqs = async (page: number, isInitial = false) => {
         if (isInitial) setLoading(true);
@@ -92,8 +97,12 @@ const Faq = () => {
     };
 
     useEffect(() => {
+        if (initialFaqs) {
+            setLoading(false);
+            return;
+        }
         fetchFaqs(1, true);
-    }, []);
+    }, [initialFaqs, initialPagination]);
 
     const handleLoadMore = () => {
         if (currentPage < lastPage) {

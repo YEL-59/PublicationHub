@@ -19,16 +19,27 @@ interface IStatItem {
     sub_title: string;
 }
 
-const Banner = () => {
-    const [banner, setBanner] = useState<IBannerContent | null>(null);
-    const [stats, setStats] = useState<IStatItem[]>([]);
-    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface BannerProps {
+    initialBanner?: IBannerContent | null;
+    initialStats?: IStatItem[];
+    initialOpportunities?: Opportunity[];
+}
+
+const Banner = ({ initialBanner, initialStats, initialOpportunities }: BannerProps) => {
+    const [banner, setBanner] = useState<IBannerContent | null>(initialBanner || null);
+    const [stats, setStats] = useState<IStatItem[]>(initialStats || []);
+    const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities || []);
+    const [isLoading, setIsLoading] = useState(!initialBanner);
     const [searchQuery, setSearchQuery] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
+        if (initialBanner && initialStats && initialOpportunities) {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             setIsLoading(true);
             const [bannerRes, statsRes, oppsRes] = await Promise.all([
@@ -43,7 +54,7 @@ const Banner = () => {
             setIsLoading(false);
         };
         fetchData();
-    }, []);
+    }, [initialBanner, initialStats, initialOpportunities]);
 
     const filteredOpportunities = opportunities.filter((opp: any) => {
         if (!searchQuery) return true;
@@ -164,9 +175,9 @@ const Banner = () => {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl translate-y-24 relative z-20">
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl translate-y-24 relative z-20">
                     {isLoading ? (
-                        [1, 2, 3, 4].map((idx) => (
+                        [1, 2, 3].map((idx) => (
                             <div
                                 key={idx}
                                 className="border border-white/10 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[160px] bg-white/5 animate-pulse backdrop-blur-md"
@@ -194,7 +205,7 @@ const Banner = () => {
                             </div>
                         ))
                     )}
-                </div>
+                </div> */}
             </div>
         </section>
     );

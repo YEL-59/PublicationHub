@@ -1,0 +1,3500 @@
+{
+  "info": {
+    "_postman_id": "1ef9bc7a-676c-44f9-891e-3446d0a8fd1e",
+    "name": "ibraheemaltamim",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "24176706",
+    "_collection_link": "https://go.postman.co/collection/24176706-1ef9bc7a-676c-44f9-891e-3446d0a8fd1e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Singin&Logout",
+              "item": [
+                {
+                  "name": "Login",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          ""
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "researcher@researcher.com",
+                          "type": "text",
+                          "uuid": "834b9e5f-480a-4a4d-8e0d-2ca20e7f62d4",
+                          "disabled": true
+                        },
+                        {
+                          "key": "password",
+                          "value": "12345678",
+                          "type": "text",
+                          "uuid": "f533a99a-c325-4112-9a04-62a4dc37cf3d"
+                        },
+                        {
+                          "key": "email",
+                          "value": "coordinator@coordinator.com",
+                          "type": "text",
+                          "uuid": "2740a8c8-e0b6-4e57-a336-2238098dc1bb"
+                        },
+                        {
+                          "key": "email",
+                          "value": "mentor@mentor.com",
+                          "type": "text",
+                          "uuid": "8cc2b927-c711-47ec-a518-0dcbd3d64ed1"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/login",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "login"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Logout",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/logout",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "logout"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Refresh Token",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/refresh-token",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "refresh-token"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Sign-up",
+              "item": [
+                {
+                  "name": "Registation",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "name",
+                          "value": "helal",
+                          "type": "text"
+                        },
+                        {
+                          "key": "email",
+                          "value": " ",
+                          "type": "text"
+                        },
+                        {
+                          "key": "password",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "password_confirmation",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "role",
+                          "value": "researcher",
+                          "description": "mentor | researcher",
+                          "type": "text",
+                          "uuid": "d1403b6a-c086-44a2-bdbe-a9321a8f624c"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/register",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "register"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Verify Email",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "var jsonData = pm.response.json();\r",
+                          "\r",
+                          "if (jsonData && jsonData.token) {\r",
+                          "    pm.globals.set('token', jsonData.token);\r",
+                          "    console.log('Token set globally: ' + jsonData.token);\r",
+                          "} else {\r",
+                          "    console.error('Token not found in the response');\r",
+                          "}"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    },
+                    {
+                      "listen": "prerequest",
+                      "script": {
+                        "exec": [
+                          ""
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "husoaib425@gmail.com",
+                          "type": "text"
+                        },
+                        {
+                          "key": "otp",
+                          "value": "1234",
+                          "type": "text",
+                          "description": "// 4 digit"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/verify-email",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "verify-email"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Resent OTP",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "husoaib422@gmail.com",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/resend-otp",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "resend-otp"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Forget Password",
+              "item": [
+                {
+                  "name": "Forget Password",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "user@user.com",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/forget-password",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "forget-password"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "PassWord Reset Verify OTP",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "husoaib422@gmail.com",
+                          "type": "text"
+                        },
+                        {
+                          "key": "otp",
+                          "value": "5265",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/verify-otp",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "verify-otp"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Reset Password",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "email",
+                          "value": "user@user.com",
+                          "type": "text"
+                        },
+                        {
+                          "key": "password",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "password_confirmation",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "token",
+                          "value": "fhfdhfd643",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/reset-password",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "reset-password"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Profile",
+              "item": [
+                {
+                  "name": "User info",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/me",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "me"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Update Profile",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "name",
+                          "value": " John Doe",
+                          "type": "text"
+                        },
+                        {
+                          "key": "avatar",
+                          "type": "file",
+                          "src": "/C:/Users/USER/Downloads/about-us.jpg"
+                        },
+                        {
+                          "key": "gender",
+                          "value": " male",
+                          "type": "text",
+                          "description": "//male,female,others"
+                        },
+                        {
+                          "key": "password",
+                          "value": "12345678",
+                          "type": "text",
+                          "disabled": true
+                        },
+                        {
+                          "key": "password_confirmation",
+                          "value": "12345678",
+                          "type": "text",
+                          "disabled": true
+                        },
+                        {
+                          "key": "phone",
+                          "value": "+8801712345678",
+                          "type": "text",
+                          "disabled": true
+                        },
+                        {
+                          "key": "birthdate",
+                          "value": "1998-05-21",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/update-profile",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "update-profile"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Password Change",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "current_password",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "new_password",
+                          "value": "12345678",
+                          "type": "text"
+                        },
+                        {
+                          "key": "new_password_confirmation",
+                          "value": "12345678",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/update-password",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "update-password"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Profile Delete",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/delete-profile",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "delete-profile"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Social Login",
+              "item": [
+                {
+                  "name": "Social-Login",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "token",
+                          "value": "dfhdfy45g325fgdsfvsd45t",
+                          "type": "text",
+                          "uuid": "fcc6447e-535d-427f-8498-6ff37c08bbe2"
+                        },
+                        {
+                          "key": "provider",
+                          "value": "google",
+                          "type": "text",
+                          "uuid": "233a5dca-627f-48e8-b373-0d68bfb472bd"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/social-login",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "social-login"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mentors",
+          "item": [
+            {
+              "name": "Research Idea",
+              "item": [
+                {
+                  "name": "Update research idea",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "urlencoded",
+                      "urlencoded": [
+                        {
+                          "key": "study_title",
+                          "value": "Title",
+                          "type": "text"
+                        },
+                        {
+                          "key": "study_descritions",
+                          "value": "Desc",
+                          "type": "text"
+                        },
+                        {
+                          "key": "research_objectives",
+                          "value": "Obj",
+                          "type": "text"
+                        },
+                        {
+                          "key": "perposed_methodology",
+                          "value": "Meth",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/research-ideas/{{research_idea_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "research-ideas",
+                        "{{research_idea_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Research idea show",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/research-ideas/{{research_idea_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "research-ideas",
+                        "{{research_idea_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Research ideas list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/research-ideas?per_page=15",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "research-ideas"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "15"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Create research idea",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "urlencoded",
+                      "urlencoded": [
+                        {
+                          "key": "study_title",
+                          "value": "Title",
+                          "type": "text",
+                          "description": "required"
+                        },
+                        {
+                          "key": "study_descritions",
+                          "value": "Long description",
+                          "type": "text",
+                          "description": "API field spelling"
+                        },
+                        {
+                          "key": "research_objectives",
+                          "value": "Objectives",
+                          "type": "text",
+                          "description": "required"
+                        },
+                        {
+                          "key": "perposed_methodology",
+                          "value": "Methodology",
+                          "type": "text",
+                          "description": "API spelling perposed"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/research-ideas",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "research-ideas"
+                      ]
+                    },
+                    "description": "Can use form-urlencoded or raw JSON with same keys."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Submit submission proof",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "proof_files[]",
+                          "type": "file",
+                          "description": "pdf,jpg,jpeg,png,webp; add multiple",
+                          "value": null
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/research-ideas/{{research_idea_id}}/submission-proof",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "research-ideas",
+                        "{{research_idea_id}}",
+                        "submission-proof"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Chating",
+              "item": [
+                {
+                  "name": "Chats list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/chats",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "chats"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Send chat message",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "message",
+                          "value": "Hello just message",
+                          "type": "text",
+                          "uuid": "3e3f7048-6b81-4cf8-882f-6b75de32a6f0",
+                          "disabled": true
+                        },
+                        {
+                          "key": "file",
+                          "type": "file",
+                          "uuid": "f0f4d9bc-fd7a-4750-a47b-6a6bed79b136",
+                          "value": null
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/chats/{{chat_id}}/messages",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "chats",
+                        "{{chat_id}}",
+                        "messages"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Chat show (+ messages)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/mentor/chats/{{chat_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "mentor",
+                        "chats",
+                        "{{chat_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Courses",
+              "item": [
+                {
+                  "name": "My courses",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/my-courses",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-courses"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Buy new courses",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/courses/{{courseId}}/buy",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "courses",
+                        "{{courseId}}",
+                        "buy"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Researcher",
+          "item": [
+            {
+              "name": "Opportunity",
+              "item": [
+                {
+                  "name": "Create opportunity application",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "opportunity_id",
+                          "value": "{{opportunity_id}}",
+                          "type": "text"
+                        },
+                        {
+                          "key": "first_name",
+                          "value": "Jane",
+                          "type": "text"
+                        },
+                        {
+                          "key": "last_name",
+                          "value": "Doe",
+                          "type": "text"
+                        },
+                        {
+                          "key": "email",
+                          "value": "jane@example.com",
+                          "type": "text"
+                        },
+                        {
+                          "key": "phone",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "highest_edu_level",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "institution",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "field_of_study",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "research_experience",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "current_position",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "linkedin_profile",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "personal_website",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "cover_letter",
+                          "value": "",
+                          "type": "text"
+                        },
+                        {
+                          "key": "accept_term",
+                          "value": "1",
+                          "type": "text",
+                          "description": "required boolean"
+                        },
+                        {
+                          "key": "documents[]",
+                          "type": "file",
+                          "description": "optional multiple",
+                          "value": null
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/opportunity-applications",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "opportunity-applications"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Update application",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "first_name",
+                          "value": "Jane",
+                          "type": "text"
+                        },
+                        {
+                          "key": "email",
+                          "value": "jane@example.com",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/opportunity-applications/{{application_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "opportunity-applications",
+                        "{{application_id}}"
+                      ]
+                    },
+                    "description": "Only while status is pending. Optional documents[]."
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Applications list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/opportunity-applications?per_page=15",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "opportunity-applications"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "15"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Application show",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/opportunity-applications/{{application_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "opportunity-applications",
+                        "{{application_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Application delete",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/opportunity-applications/{{application_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "opportunity-applications",
+                        "{{application_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Chats",
+              "item": [
+                {
+                  "name": "Send message",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "message",
+                          "value": "test",
+                          "description": "'required_without:file|string|max:10000',",
+                          "type": "text",
+                          "uuid": "6b4c72fc-d6df-49fc-a2a4-2a24f2bfa979"
+                        },
+                        {
+                          "key": "file",
+                          "description": "'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,gif|max:10240'",
+                          "type": "file",
+                          "uuid": "d0d9f5cc-6122-48b1-b8c9-35f59bb67125",
+                          "src": "/C:/Users/USER/Downloads/7DII0425.jpg",
+                          "disabled": true
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/chats/{{chat_id}}/messages",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "chats",
+                        "{{chat_id}}",
+                        "messages"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Chats list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/chats?per_page=10",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "chats"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "10"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Chat show",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/chats/{{chat_id}}?per_page=10",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "chats",
+                        "{{chat_id}}"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "10"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Notifications",
+              "item": [
+                {
+                  "name": "Get All My-notifications",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/my-notifications?per_page=25",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-notifications"
+                      ],
+                      "query": [
+                        {
+                          "key": "per_page",
+                          "value": "25"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "mark-as-read",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "notification_ids[]",
+                          "value": "",
+                          "type": "text",
+                          "uuid": "556d14eb-abe9-4078-b057-fde485d5495a"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/my-notifications/mark-as-read",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-notifications",
+                        "mark-as-read"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Single delete by id",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": []
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/my-notifications-delete/{{notification_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-notifications-delete",
+                        "{{notification_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "my-notifications-delete-all",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": []
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/my-notifications-delete-all",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-notifications-delete-all"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Favourites",
+              "item": [
+                {
+                  "name": "Favourite add",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "urlencoded",
+                      "urlencoded": [
+                        {
+                          "key": "opportunity_id",
+                          "value": "{{opportunity_id}}",
+                          "type": "text",
+                          "description": "required"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/favourites",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "favourites"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Favourite show",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/favourites/{{favourite_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "favourites",
+                        "{{favourite_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Favourite remove",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/favourites/{{favourite_id}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "favourites",
+                        "{{favourite_id}}"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Favourites list",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/researcher/favourites",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "researcher",
+                        "favourites"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Courses",
+              "item": [
+                {
+                  "name": "My courses",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/my-courses",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "my-courses"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Buy new courses",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/courses/{{courseId}}/buy",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "courses",
+                        "{{courseId}}",
+                        "buy"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Co-ordinator",
+          "item": []
+        }
+      ]
+    },
+    {
+      "name": "Public / Marketing",
+      "item": [
+        {
+          "name": "System",
+          "item": [
+            {
+              "name": "Get System info",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/system-info",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "system-info"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Dynamic Pages",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dynamic-pages",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dynamic-pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single Dynamic Page",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/dynamic-pages/single/privacy-policy",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "dynamic-pages",
+                    "single",
+                    "privacy-policy"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "CMS",
+          "item": [
+            {
+              "name": "Home page",
+              "item": [
+                {
+                  "name": "Hero section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/hero-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "hero-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Counter section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/counter-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "counter-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Why researchers choose",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/why-researchers-choose-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "why-researchers-choose-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Featured research opportunities",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/featured-research-opportunities-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "featured-research-opportunities-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Meta academy section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/meta-academy-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "meta-academy-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Review section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/review-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "review-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Research journey section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/research-journey-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "research-journey-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "FAQ section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/home-page/faq-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "home-page",
+                        "faq-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "FAQ page",
+              "item": [
+                {
+                  "name": "FAQ hero (GET)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/faq-page/hero-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "faq-page",
+                        "hero-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "FAQ questions section (GET)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/faq-page/question-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "faq-page",
+                        "question-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "About page",
+              "item": [
+                {
+                  "name": "About hero (GET)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/aboutus-page/hero-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "aboutus-page",
+                        "hero-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "About Our Mission section (GET)",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/aboutus-page/our-mission-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "aboutus-page",
+                        "our-mission-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Other pages",
+              "item": [
+                {
+                  "name": "Meta academy — hero",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/meta-academy-page/hero-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "meta-academy-page",
+                        "hero-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Meta academy — counter",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/meta-academy-page/counter-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "meta-academy-page",
+                        "counter-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Research page — section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/research-page/research-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "research-page",
+                        "research-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Service page — section",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/service-page/service-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "service-page",
+                        "service-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Partnership page",
+              "item": [
+                {
+                  "name": "Hero",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/hero-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "hero-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Our mission",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/our-mission-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "our-mission-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "About us",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/about-us-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "about-us-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Partnership value",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/partnership-value-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "partnership-value-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Core research",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/core-research-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "core-research-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Systematic review",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/systematic-review-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "systematic-review-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Manuscript",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/manuscript-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "manuscript-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Partnership model",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/partnership-model-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "partnership-model-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Reviewer comment",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/reviewer-comment-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "reviewer-comment-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Journal",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/journal-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "journal-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Research opportunities",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/research-opportunitie-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "research-opportunitie-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Why partner",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/why-partner-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "why-partner-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Partner model",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/cms/partnership-page/partner-model-section",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "cms",
+                        "partnership-page",
+                        "partner-model-section"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Newsletter",
+          "item": [
+            {
+              "name": "Newsletter Subscribe",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "email",
+                      "value": "helal1@helal.com",
+                      "type": "text",
+                      "uuid": "715d3815-7479-4b68-9e37-6e83e3eb37c7"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/newsletter/subscribe",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "newsletter",
+                    "subscribe"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Social Links",
+          "item": [
+            {
+              "name": "Get All Social Links",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/social-links",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "social-links"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "10",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "contact-support-message",
+          "item": [
+            {
+              "name": "contact-support-message sent",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "full_name",
+                      "value": "Helal Uddin",
+                      "type": "text"
+                    },
+                    {
+                      "key": "message",
+                      "value": "i need help",
+                      "type": "text"
+                    },
+                    {
+                      "key": "email",
+                      "value": "husoaib422@gmail.com",
+                      "description": "user",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/contact-support-message/sent",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "contact-support-message",
+                    "sent"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Opportunities",
+          "item": [
+            {
+              "name": "Opportunities list",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/opportunities?per_page=15",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "opportunities"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "15"
+                    },
+                    {
+                      "key": "only_active",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_ids[]",
+                      "value": "18",
+                      "disabled": true
+                    },
+                    {
+                      "key": "speciality_ids[]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "studydesign_type_ids[]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "contribution_type_ids[]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "university_hospital_ids[]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "place_ids[]",
+                      "value": "19",
+                      "disabled": true
+                    },
+                    {
+                      "key": "experience_level_ids[]",
+                      "value": "31",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Query: is_future=0|1, only_active (default true)."
+              },
+              "response": []
+            },
+            {
+              "name": "Opportunity detail",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/opportunities/{{opportunity_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "opportunities",
+                    "{{opportunity_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Filter List (speciality,student_design_type,contribution_type,university_hospital,place,experience_level)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "type",
+                      "value": "place",
+                      "description": "speciality,student_design_type,contribution_type,university_hospital,place,experience_level",
+                      "type": "text",
+                      "uuid": "01734680-fd38-40a5-8a14-0a86b53a9fe7"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/opportunities/fillter-list",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "opportunities",
+                    "fillter-list"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "20",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single Mentor By Id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/opportunities/mentors/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "opportunities",
+                    "mentors",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Faqs",
+          "item": [
+            {
+              "name": "Get All Category",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/faqs-categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "faqs-categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single Category ByCategoryID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/faqs-categories/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "faqs-categories",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All faqs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/faqs",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "faqs"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Courses/ Meta academy",
+          "item": [
+            {
+              "name": "Courses list",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/courses?per_page=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "courses"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "is_future",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Course detail",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/courses/{{course_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "courses",
+                    "{{course_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Publications",
+          "item": [
+            {
+              "name": "Publications list",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/publications",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "publications"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "10",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "category_id",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Publication detail",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/publications/{{publication_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "publications",
+                    "{{publication_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Services",
+          "item": [
+            {
+              "name": "Services list",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/services",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "10",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "featured",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Service detail",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/services/{{service_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "services",
+                    "{{service_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Partnership",
+          "item": [
+            {
+              "name": "Partnership request (form)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "full_name",
+                      "value": "Partner Name",
+                      "type": "text",
+                      "description": "required"
+                    },
+                    {
+                      "key": "organization",
+                      "value": "",
+                      "type": "text",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "email",
+                      "value": "partner@org.com",
+                      "type": "text",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "",
+                      "type": "text",
+                      "description": "optional"
+                    },
+                    {
+                      "key": "message",
+                      "value": "We would like to collaborate.",
+                      "type": "text",
+                      "description": "optional"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/partnership-requests",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "partnership-requests"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule Meeting /Calendly scheduling URL",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/calendly/schedule-link",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "calendly",
+                    "schedule-link"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Offers",
+          "item": [
+            {
+              "name": "Get All",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/offers?per_page=10",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "offers"
+                  ],
+                  "query": [
+                    {
+                      "key": "per_page",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "15% Off",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Single",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/offers/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "offers",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "local",
+      "value": "",
+      "disabled": true
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "base_url",
+      "value": "http://ibraheemaltamim.test",
+      "disabled": true
+    },
+    {
+      "key": "base_url",
+      "value": "https://ibraheemaltamim.thesyndicates.team",
+      "disabled": true
+    },
+    {
+      "key": "base_url",
+      "value": "https://dashboard.publicationhub.co"
+    },
+    {
+      "key": "course_id",
+      "value": "1"
+    },
+    {
+      "key": "opportunity_id",
+      "value": "1"
+    },
+    {
+      "key": "chat_id",
+      "value": "1"
+    },
+    {
+      "key": "research_idea_id",
+      "value": "1"
+    },
+    {
+      "key": "application_id",
+      "value": "1"
+    },
+    {
+      "key": "favourite_id",
+      "value": "1"
+    },
+    {
+      "key": "publication_id",
+      "value": "1"
+    },
+    {
+      "key": "service_id",
+      "value": "1"
+    },
+    {
+      "key": "notification_id",
+      "value": "gdsg34523",
+      "disabled": true
+    },
+    {
+      "key": "dynamic_page_slug",
+      "value": "about"
+    },
+    {
+      "key": "courseId",
+      "value": ""
+    }
+  ]
+}

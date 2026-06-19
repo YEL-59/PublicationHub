@@ -126,6 +126,9 @@ export const changePassword = async (data: FieldValues) => {
 // get user info
 export const getUserInfo = async () => {
     const token = (await cookies()).get("token")?.value;
+    if (!token) {
+        return { status: false, message: "No token found" };
+    }
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/me`, {
             method: "GET",
@@ -275,8 +278,45 @@ export const verifyOtpService = async (email: string, otp: string) => {
 }
 
 export const logoutService = async () => {
+    const token = (await cookies()).get("token")?.value;
+
+    if (token) {
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/logout`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            });
+        } catch (error) {
+            console.error("Logout API error:", error);
+        }
+    }
+
     (await cookies()).delete("token");
     (await cookies()).delete("user");
+}
+
+export const deleteProfile = async () => {
+    const token = (await cookies()).get("token")?.value;
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/delete-profile`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+        });
+        const data = await response.json();
+        if (data?.status) {
+            (await cookies()).delete("token");
+            (await cookies()).delete("user");
+        }
+        return data;
+    } catch (error) {
+        throw error;
+    }
 }
 
 export const getToken = async () => {

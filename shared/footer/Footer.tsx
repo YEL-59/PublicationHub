@@ -8,7 +8,7 @@ import navLogo from "@/assets/images/nav-logo.png";
 import { ArrowRight, Loader2, Send } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { subscribeNewsletter, getSystemInfo } from "@/services/home";
+import { subscribeNewsletter, getSystemInfo, getSocialLinks } from "@/services/home";
 import { getDynamicPages } from "@/services/dynamicPages";
 
 interface SystemInfo {
@@ -25,13 +25,15 @@ const Footer = () => {
     const [loading, setLoading] = useState(false);
     const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
     const [dynamicPages, setDynamicPages] = useState<any[]>([]);
+    const [apiSocialLinks, setApiSocialLinks] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [systemRes, pagesRes] = await Promise.all([
+                const [systemRes, pagesRes, socialRes] = await Promise.all([
                     getSystemInfo(),
-                    getDynamicPages()
+                    getDynamicPages(),
+                    getSocialLinks(),
                 ]);
                 
                 if (systemRes?.status) {
@@ -40,6 +42,10 @@ const Footer = () => {
                 
                 if (pagesRes?.status) {
                     setDynamicPages(pagesRes.data);
+                }
+
+                if (socialRes?.status && Array.isArray(socialRes.data)) {
+                    setApiSocialLinks(socialRes.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch footer data:", error);
@@ -93,12 +99,23 @@ const Footer = () => {
         ],
     };
 
-    const socialLinks = [
+    const defaultSocialLinks = [
         { icon: <TwitterIcon size={18} />, href: "#", label: "Twitter" },
         { icon: <LinkedInIcon size={18} />, href: "#", label: "LinkedIn" },
         { icon: <YoutubeIcon size={18} />, href: "#", label: "YouTube" },
         { icon: <MailIcon size={18} />, href: "#", label: "Email" },
     ];
+
+    const socialLinks = apiSocialLinks.length > 0
+        ? apiSocialLinks.map((link: any) => ({
+            icon: link.platform?.toLowerCase().includes("linkedin") ? <LinkedInIcon size={18} />
+                : link.platform?.toLowerCase().includes("youtube") ? <YoutubeIcon size={18} />
+                : link.platform?.toLowerCase().includes("twitter") || link.platform?.toLowerCase().includes("x") ? <TwitterIcon size={18} />
+                : <MailIcon size={18} />,
+            href: link.url || link.link || "#",
+            label: link.platform || link.name || "Social",
+        }))
+        : defaultSocialLinks;
 
     return (
         <footer className="w-full bg-[#171A21] border-t border-white/10 pt-20 pb-8 px-4 md:px-8 lg:px-12">

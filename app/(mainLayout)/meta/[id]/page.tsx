@@ -27,11 +27,12 @@ import metaBg from "@/assets/images/metabg.png";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getCourseDetails } from "@/services/home";
+import { getCourseDetails, buyCourse } from "@/services/home";
 import { Course } from "@/types/course";
 import { Loader2 } from "lucide-react";
 import VideoModal from "@/page/meta/VideoModal";
 import { AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 const CourseDetails = () => {
     const { id } = useParams();
@@ -41,6 +42,24 @@ const CourseDetails = () => {
     const [selectedVideo, setSelectedVideo] = useState<{ title: string; videoUrl?: string | null } | null>(null);
     const [selectedTextContent, setSelectedTextContent] = useState<{ title: string; content: string } | null>(null);
     const [expandedModules, setExpandedModules] = useState<number[]>([]);
+    const [enrolling, setEnrolling] = useState(false);
+
+    const handleEnroll = async () => {
+        if (!course) return;
+        setEnrolling(true);
+        try {
+            const res = await buyCourse(course.id);
+            if (res?.status) {
+                toast.success(res.message || "Enrolled successfully!");
+            } else {
+                toast.error(res?.message || "Please sign in to enroll");
+            }
+        } catch {
+            toast.error("Failed to enroll in course");
+        } finally {
+            setEnrolling(false);
+        }
+    };
 
     const toggleModule = (moduleId: number) => {
         setExpandedModules(prev => 
@@ -267,9 +286,13 @@ const CourseDetails = () => {
 
                                 {/* Enrollment CTA */}
                                 <div className="space-y-4 mb-10">
-                                    <button className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#00D4FF] to-[#8E90FF] text-white font-black text-lg transition-all active:scale-[0.98] shadow-[0_10px_25px_rgba(0,212,255,0.2)] flex items-center justify-center gap-2 group">
-                                        ENROLL NOW
-                                        <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
+                                    <button
+                                        onClick={handleEnroll}
+                                        disabled={enrolling}
+                                        className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#00D4FF] to-[#8E90FF] text-white font-black text-lg transition-all active:scale-[0.98] shadow-[0_10px_25px_rgba(0,212,255,0.2)] flex items-center justify-center gap-2 group disabled:opacity-50"
+                                    >
+                                        {enrolling ? <Loader2 className="w-5 h-5 animate-spin" /> : "ENROLL NOW"}
+                                        {!enrolling && <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />}
                                     </button>
 
                                     <button className="w-full py-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-bold text-sm transition-all border border-white/10">

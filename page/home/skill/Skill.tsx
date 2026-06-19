@@ -14,11 +14,20 @@ interface MetaAcademyContent {
     image: string;
 }
 
-const Skill = () => {
-    const [content, setContent] = useState<MetaAcademyContent | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+interface SkillProps {
+    initialContent?: MetaAcademyContent | null;
+}
+
+const Skill = ({ initialContent }: SkillProps) => {
+    const [content, setContent] = useState<MetaAcademyContent | null>(initialContent || null);
+    const [isLoading, setIsLoading] = useState(!initialContent);
 
     useEffect(() => {
+        if (initialContent) {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             setIsLoading(true);
             const res = await getMetaAcademyContent();
@@ -28,14 +37,14 @@ const Skill = () => {
             setIsLoading(false);
         };
         fetchData();
-    }, []);
+    }, [initialContent]);
 
-    // Simple helper to extract text from <p> tags if we want to keep the icon styling
+    // Server-safe regex helper to extract text from <p> tags
     const parseFeatures = (html: string) => {
         if (!html) return [];
-        const div = document.createElement("div");
-        div.innerHTML = html;
-        return Array.from(div.querySelectorAll("p")).map(p => p.textContent || "");
+        const matches = html.match(/<p>(.*?)<\/p>/g);
+        if (!matches) return [];
+        return matches.map(p => p.replace(/<\/?p>/g, "").trim());
     };
 
     const features = content?.description ? parseFeatures(content.description) : [];

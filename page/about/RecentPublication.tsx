@@ -184,13 +184,23 @@ const Pagination = ({
 };
 
 // ── Main Component ─────────────────────────────────────────────────────
-const RecentPublication = () => {
+interface RecentPublicationProps {
+    initialPublications?: ApiPublication[];
+    initialTotalPages?: number;
+}
+
+const RecentPublication = ({ initialPublications, initialTotalPages }: RecentPublicationProps) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [publications, setPublications] = useState<ApiPublication[]>([]);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(true);
+    const [publications, setPublications] = useState<ApiPublication[]>(initialPublications || []);
+    const [totalPages, setTotalPages] = useState(initialTotalPages || 1);
+    const [loading, setLoading] = useState(!initialPublications);
 
     useEffect(() => {
+        if (initialPublications && currentPage === 1) {
+            setLoading(false);
+            return;
+        }
+
         const fetchPublications = async () => {
             setLoading(true);
             try {
@@ -206,7 +216,7 @@ const RecentPublication = () => {
             }
         };
         fetchPublications();
-    }, [currentPage]);
+    }, [currentPage, initialPublications, initialTotalPages]);
 
     // Split into 2-column grid: last item full-width if odd count
     const isOdd = publications.length % 2 !== 0;

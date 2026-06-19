@@ -51,7 +51,13 @@ const DecorativeCurves = () => (
     </svg>
 );
 
-const FaqHero = () => {
+interface FaqHeroProps {
+    title?: string;
+    subtitle?: string;
+    badge?: string;
+}
+
+const FaqHero = ({ title, subtitle, badge }: FaqHeroProps) => {
     return (
         <section className="relative overflow-hidden bg-[#0A0C0F]">
             {/* Background image */}
@@ -80,7 +86,7 @@ const FaqHero = () => {
                     className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#0E1A1E] border border-[#00D1FF]/25 rounded-full text-[10px] font-bold text-[#00D1FF] uppercase tracking-[0.18em] mb-7"
                 >
                     <HelpCircle className="w-3 h-3" />
-                    Help Center
+                    {badge || "Help Center"}
                 </motion.div>
 
                 {/* Heading */}
@@ -90,7 +96,7 @@ const FaqHero = () => {
                     transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                     className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-5 max-w-2xl leading-tight"
                 >
-                    Frequently Asked Questions
+                    {title || "Frequently Asked Questions"}
                 </motion.h1>
 
                 {/* Subheading */}
@@ -100,7 +106,7 @@ const FaqHero = () => {
                     transition={{ duration: 0.7, delay: 0.22, ease: "easeOut" }}
                     className="text-[#6B7280] text-sm md:text-base max-w-md leading-relaxed"
                 >
-                    Find answers to common questions about Meta Scholars, research opportunities, and Meta Academy courses.
+                    {subtitle || "Find answers to common questions about Meta Scholars, research opportunities, and Meta Academy courses."}
                 </motion.p>
             </div>
         </section>

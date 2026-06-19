@@ -118,12 +118,21 @@ const CategoryBlock = ({
 );
 
 // ── Main Component ─────────────────────────────────────────────────────
-const FaqContent = () => {
-    const [categories, setCategories] = useState<FaqCategory[]>([]);
+interface FaqContentProps {
+    initialCategories?: FaqCategory[];
+}
+
+const FaqContent = ({ initialCategories }: FaqContentProps) => {
+    const [categories, setCategories] = useState<FaqCategory[]>(initialCategories || []);
     const [openId, setOpenId] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialCategories);
 
     useEffect(() => {
+        if (initialCategories) {
+            setLoading(false);
+            return;
+        }
+
         const fetchAllFaqs = async () => {
             setLoading(true);
             try {
@@ -149,7 +158,7 @@ const FaqContent = () => {
         };
 
         fetchAllFaqs();
-    }, []);
+    }, [initialCategories]);
 
     return (
         <section className="relative bg-[#0A0C0F] py-12 px-6 md:px-12 lg:px-20 min-h-[400px]">

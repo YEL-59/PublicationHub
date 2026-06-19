@@ -4,17 +4,33 @@ import React, { useState, useEffect } from "react";
 import { Search, ChevronDown, Filter, Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { getAllOpportunities } from "@/services/home";
+import { getAllOpportunities, getOpportunityFilterList } from "@/services/home";
 import { Opportunity } from "@/types/opportunity";
 
-const ResearchOpportunities = () => {
-    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+interface ResearchOpportunitiesProps {
+    initialOpportunities?: Opportunity[];
+    initialTotal?: number;
+}
+
+const ResearchOpportunities = ({ initialOpportunities, initialTotal }: ResearchOpportunitiesProps) => {
+    const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities || []);
     const [displayCount, setDisplayCount] = useState(6);
-    const [loading, setLoading] = useState(true);
-    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(!initialOpportunities);
+    const [total, setTotal] = useState(initialTotal || 0);
     const [searchQuery, setSearchQuery] = useState("");
+    const [filterOptions, setFilterOptions] = useState<any>(null);
 
     useEffect(() => {
+        getOpportunityFilterList()
+            .then((res) => { if (res?.status) setFilterOptions(res.data); })
+            .catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (initialOpportunities) {
+            setLoading(false);
+            return;
+        }
         const fetchOpportunities = async () => {
             setLoading(true);
             try {
@@ -31,7 +47,7 @@ const ResearchOpportunities = () => {
             }
         };
         fetchOpportunities();
-    }, []);
+    }, [initialOpportunities, initialTotal]);
 
     const filteredOpportunities = opportunities.filter((opp: any) => {
         if (!searchQuery) return true;

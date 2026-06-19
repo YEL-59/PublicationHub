@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, Menu, X, User, LogOut, ChevronDown, Settings, LayoutDashboard } from "lucide-react";
+import { Search, Menu, X, User, LogOut, ChevronDown, Settings, LayoutDashboard, MessageSquare } from "lucide-react";
 import navLogo from "@/assets/images/nav-logo.png";
 import CTAButton from "@/components/CTAButton";
 import { getCurrentUser, logoutService, getUserInfo } from "@/services/auth";
+import NotificationsDropdown from "@/components/notifications/NotificationsDropdown";
 import { ICurrentUser } from "@/types/auth/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -17,18 +18,28 @@ interface ISystemInfo {
     system_name: string;
 }
 
-const Navbar = () => {
+interface NavbarProps {
+    initialUser?: ICurrentUser | null;
+    initialSystemInfo?: ISystemInfo | null;
+}
+
+const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [user, setUser] = useState<ICurrentUser | null>(null);
+    const [user, setUser] = useState<ICurrentUser | null>(initialUser || null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
 
-    const [systemInfo, setSystemInfo] = useState<ISystemInfo | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [systemInfo, setSystemInfo] = useState<ISystemInfo | null>(initialSystemInfo || null);
+    const [isLoading, setIsLoading] = useState(!initialSystemInfo);
 
     useEffect(() => {
+        if (initialSystemInfo) {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             setIsLoading(true);
             const [userRes, systemRes] = await Promise.all([
@@ -49,7 +60,7 @@ const Navbar = () => {
             setIsLoading(false);
         };
         fetchData();
-    }, []);
+    }, [initialUser, initialSystemInfo]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -75,59 +86,63 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        { name: "Home", href: "/" },
-        { name: "Research Opportunities", href: "/researchopportunities" },
-        { name: "Services", href: "/service" },
-        { name: "Meta Academy", href: "/meta" },
-        { name: "Partnership", href: "/partnership" },
-        { name: "About", href: "/about" },
-        { name: "FAQ", href: "/faq" },
+        { name: "Home", shortName: "Home", href: "/" },
+        { name: "Services", shortName: "Services", href: "/service" },
+        { name: "Research Opportunities", shortName: "Research", href: "/researchopportunities" },
+        { name: "Meta Academy", shortName: "Meta", href: "/meta" },
+        { name: "Partnership", shortName: "Partnership", href: "/partnership" },
+        { name: "About", shortName: "About", href: "/about" },
+        { name: "FAQ", shortName: "FAQ", href: "/faq" },
     ];
 
     return (
-        <nav className="sticky top-0 z-50 w-full bg-[#171A21] border-b border-white/10 shadow-[0_10px_15px_-3px_rgba(0,230,255,0.05),0_4px_6px_-4px_rgba(0,230,255,0.05)] backdrop-blur-[12px] py-5 px-4 md:px-6 lg:px-12">
-            <div className="container mx-auto flex items-center justify-between">
+        <nav className="sticky top-0 z-50 w-full bg-[#171A21] border-b border-white/10 shadow-[0_10px_15px_-3px_rgba(0,230,255,0.05),0_4px_6px_-4px_rgba(0,230,255,0.05)] backdrop-blur-[12px] py-3 md:py-4 px-4 md:px-6 lg:px-8 2xl:px-12">
+            <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 xl:gap-4">
                 {/* Logo Section */}
-                <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
+                <Link href="/" className="flex items-center gap-2.5 shrink-0 min-w-0 transition-opacity hover:opacity-90">
                     {isLoading ? (
-                        <div className="h-10 md:h-12 w-40 bg-white/10 animate-pulse rounded"></div>
+                        <div className="h-9 md:h-10 w-32 md:w-36 bg-white/10 animate-pulse rounded shrink-0"></div>
                     ) : systemInfo?.logo ? (
                         <img
                             src={systemInfo.logo}
                             alt={systemInfo.system_name || "PublicationHub Logo"}
-                            className="h-10 md:h-12 w-auto object-contain"
+                            className="h-9 md:h-10 w-auto object-contain shrink-0"
                         />
                     ) : (
                         <Image
                             src={navLogo}
                             alt="PublicationHub Logo"
-                            className="h-10 md:h-12 w-auto object-contain"
+                            className="h-9 md:h-10 w-auto object-contain shrink-0"
                             priority
                         />
                     )}
-                                                 <h2 className="text-transparent font-bold text-md bg-gradient-to-r from-[#00D1FF] to-[#3F5EFB] bg-clip-text ">{systemInfo?.system_name}</h2>
-
+                    {systemInfo?.system_name && (
+                        <span className="hidden sm:block text-transparent font-bold text-sm md:text-base bg-gradient-to-r from-[#00D1FF] to-[#3F5EFB] bg-clip-text truncate max-w-[100px] md:max-w-[140px] xl:max-w-[160px] 2xl:max-w-none whitespace-nowrap">
+                            {systemInfo.system_name}
+                        </span>
+                    )}
                 </Link>
 
                 {/* Desktop Navigation Links */}
-                <div className="hidden lg:flex items-center gap-6 xl:gap-9">
+                <div className="hidden xl:flex flex-1 items-center justify-center gap-3 2xl:gap-6 min-w-0 px-1">
                     {navLinks.map((link) => {
                         const isActive = pathname === link.href;
                         return (
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                className={`text-[15px] font-medium transition-colors duration-200 hover:text-[#00D1FF] ${isActive ? "text-[#00D1FF]" : "text-[#94A3B8]"
+                                className={`whitespace-nowrap text-[13px] 2xl:text-[15px] font-medium transition-colors duration-200 hover:text-[#00D1FF] shrink-0 ${isActive ? "text-[#00D1FF]" : "text-[#94A3B8]"
                                     }`}
                             >
-                                {link.name}
+                                <span className="2xl:hidden">{link.shortName}</span>
+                                <span className="hidden 2xl:inline">{link.name}</span>
                             </Link>
                         );
                     })}
                 </div>
 
-                {/* Right Section: Search, User Profile or Sign In, CTA */}
-                <div className="hidden lg:flex items-center gap-7">
+                {/* Right Section: User Profile or Sign In, CTA */}
+                <div className="hidden xl:flex items-center gap-3 2xl:gap-5 shrink-0">
                     {/* <button className="text-white hover:text-[#00D1FF] transition-colors p-1.5 focus:outline-none">
                         <Search size={22} strokeWidth={2.5} />
                     </button> */}
@@ -141,6 +156,8 @@ const Navbar = () => {
                             </div>
                         </div>
                     ) : user ? (
+                        <>
+                            <NotificationsDropdown />
                         <div className="relative" ref={dropdownRef}>
                             <button 
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -190,6 +207,11 @@ const Navbar = () => {
                                         <span className="text-sm font-medium">Settings</span>
                                     </Link>
 
+                                    <Link href="/myprofile/conversation" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                                        <MessageSquare size={18} />
+                                        <span className="text-sm font-medium">Messages</span>
+                                    </Link>
+
                                     <div className="h-px bg-white/5 my-2" />
 
                                     <button 
@@ -202,24 +224,26 @@ const Navbar = () => {
                                 </div>
                             )}
                         </div>
+                        </>
                     ) : (
                         <Link
                             href="/login"
-                            className="text-white text-[15px] font-medium hover:text-[#00D1FF] transition-colors"
+                            className="whitespace-nowrap text-[13px] 2xl:text-[15px] font-medium text-white hover:text-[#00D1FF] transition-colors"
                         >
                             Sign In
                         </Link>
                     )}
 
-                    <Link href="/register" >
-                        <CTAButton>
-                            Join as a mentor
+                    <Link href="/register">
+                        <CTAButton className="whitespace-nowrap px-4 py-2.5 text-sm 2xl:px-7 2xl:py-3 2xl:text-base">
+                            <span className="2xl:hidden">Join mentor</span>
+                            <span className="hidden 2xl:inline">Join as a mentor</span>
                         </CTAButton>
                     </Link>
                 </div>
 
                 {/* Tablet/Mobile Toggle */}
-                <div className="flex lg:hidden items-center gap-3">
+                <div className="flex xl:hidden items-center gap-2 shrink-0">
                     <button className="text-white p-2">
                         <Search size={24} />
                     </button>
@@ -234,7 +258,7 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             <div
-                className={`lg:hidden absolute top-full left-0 w-full bg-[#171A21]/95 backdrop-blur-[12px] border-b border-white/10 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[600px] opacity-100 border-t border-white/5" : "max-h-0 opacity-0"
+                className={`xl:hidden absolute top-full left-0 w-full bg-[#171A21]/95 backdrop-blur-[12px] border-b border-white/10 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[600px] opacity-100 border-t border-white/5" : "max-h-0 opacity-0"
                     }`}
             >
                 <div className="flex flex-col gap-1 p-6">
@@ -316,9 +340,11 @@ const Navbar = () => {
                                 Sign In
                             </Link>
                         )}
-                        <CTAButton className="w-full py-4">
-                            Join as a mentor
-                        </CTAButton>
+                        <Link href="/register" onClick={() => setIsOpen(false)}>
+                            <CTAButton className="w-full py-4">
+                                Join as a mentor
+                            </CTAButton>
+                        </Link>
                     </div>
                 </div>
             </div>

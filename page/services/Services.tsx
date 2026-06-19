@@ -31,16 +31,20 @@ const ServiceCard = ({
     isOpen: boolean;
     onClick: () => void;
 }) => {
-    // Helper to parse HTML from API description
+    // Server-safe regex helper to parse HTML from API description
     const parseFeatures = (html: string) => {
-        if (typeof window === "undefined" || !html) return [];
-        const div = document.createElement("div");
-        div.innerHTML = html;
-        // Search for li tags
-        const listItems = Array.from(div.querySelectorAll("li")).map(li => li.textContent || "");
-        if (listItems.length > 0) return listItems;
-        // Fallback for simple p tags
-        return Array.from(div.querySelectorAll("p")).map(p => p.textContent || "");
+        if (!html) return [];
+        // Match li tags
+        const liMatches = html.match(/<li>(.*?)<\/li>/g);
+        if (liMatches && liMatches.length > 0) {
+            return liMatches.map(li => li.replace(/<\/?li>/g, "").trim());
+        }
+        // Fallback to p tags
+        const pMatches = html.match(/<p>(.*?)<\/p>/g);
+        if (pMatches && pMatches.length > 0) {
+            return pMatches.map(p => p.replace(/<\/?p>/g, "").trim());
+        }
+        return [];
     };
 
     const features = parseFeatures(service.description);
@@ -145,13 +149,19 @@ const ServiceCard = ({
     );
 };
 
-const Services = () => {
-    const [services, setServices] = useState<ServiceData[]>([]);
+interface ServicesProps {
+    initialServices?: ServiceData[];
+    initialPagination?: any;
+    sectionData?: any;
+}
+
+const Services = ({ initialServices, initialPagination, sectionData }: ServicesProps) => {
+    const [services, setServices] = useState<ServiceData[]>(initialServices || []);
     const [activeId, setActiveId] = useState<number | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialServices);
     const [loadMoreLoading, setLoadMoreLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(initialPagination?.current_page || 1);
+    const [lastPage, setLastPage] = useState(initialPagination?.last_page || 1);
 
     const fetchAllServices = async (page: number, isInitial = false) => {
         if (isInitial) setLoading(true);
@@ -177,8 +187,12 @@ const Services = () => {
     };
 
     useEffect(() => {
+        if (initialServices) {
+            setLoading(false);
+            return;
+        }
         fetchAllServices(1, true);
-    }, []);
+    }, [initialServices, initialPagination]);
 
     const handleLoadMore = () => {
         if (currentPage < lastPage) {
@@ -202,7 +216,7 @@ const Services = () => {
                         className="inline-flex items-center gap-2 px-4 py-2 bg-[#111419] border border-[#00D1FF]/20 rounded-full text-[11px] font-bold text-[#00D1FF] uppercase tracking-widest mb-6"
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-[#00D1FF] animate-pulse" />
-                        Research Services
+                        {sectionData?.badge || "Research Services"}
                     </motion.div>
 
                     <motion.h1
@@ -211,7 +225,11 @@ const Services = () => {
                         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                         className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tighter"
                     >
-                        Expert <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#8B8FF9]">Research</span> Support
+                        {sectionData?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: sectionData.title }} />
+                        ) : (
+                            <>Expert <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00D1FF] to-[#8B8FF9]">Research</span> Support</>
+                        )}
                     </motion.h1>
 
                     <motion.p
@@ -220,7 +238,7 @@ const Services = () => {
                         transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
                         className="text-[#A3A7AE] text-sm md:text-xl max-w-2xl mx-auto leading-relaxed font-medium"
                     >
-                        Advancing clinical excellence and evidence-based medicine across the Kingdom.
+                        {sectionData?.subtitle || sectionData?.description || "Advancing clinical excellence and evidence-based medicine across the Kingdom."}
                     </motion.p>
                 </div>
 

@@ -66,6 +66,29 @@ export const getResearchIdeaById = async (id: string | number) => {
 /**
  * Uploads submission proof files for a specific research idea
  */
+export const updateResearchIdea = async (id: string | number, data: Record<string, string>) => {
+    try {
+        const token = (await cookies()).get("token")?.value;
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) formData.append(key, value);
+        });
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/mentor/research-ideas/${id}`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            },
+            body: formData,
+        });
+
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const uploadSubmissionProof = async (id: string | number, files: File[]) => {
     try {
         const token = (await cookies()).get("token")?.value;

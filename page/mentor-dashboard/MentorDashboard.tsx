@@ -35,31 +35,40 @@ interface ISubmission {
   endDate?: string;
 }
 
-const MentorDashboard = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submissions, setSubmissions] = useState<ISubmission[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+interface MentorDashboardProps {
+  initialIdeas?: IResearchIdeaRaw[];
+  initialPagination?: any;
+}
 
-  const [totalSubmissions, setTotalSubmissions] = useState(0);
+const MentorDashboard = ({ initialIdeas, initialPagination }: MentorDashboardProps) => {
+  const formatSubmissions = (data: IResearchIdeaRaw[]) => {
+    return data.map((item: IResearchIdeaRaw) => ({
+      id: item.id,
+      title: item.study_title,
+      description: item.study_descritions,
+      submittedAt: new Date(item.created_at).toLocaleDateString(),
+      status: item.status === "pending" ? "Pending Review" : item.status === "accept" ? "Accepted" : item.status,
+      deadline: item.dead_line ? new Date(item.dead_line).toLocaleDateString() : undefined,
+      startDate: item.start_date ? new Date(item.start_date).toLocaleDateString() : undefined,
+      endDate: item.end_date ? new Date(item.end_date).toLocaleDateString() : undefined,
+    }));
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submissions, setSubmissions] = useState<ISubmission[]>(
+    initialIdeas ? formatSubmissions(initialIdeas) : []
+  );
+  const [currentPage, setCurrentPage] = useState(initialPagination?.current_page || 1);
+  const [totalPages, setTotalPages] = useState(initialPagination?.last_page || 1);
+  const [isLoading, setIsLoading] = useState(!initialIdeas);
+  const [totalSubmissions, setTotalSubmissions] = useState(initialPagination?.total || 0);
 
   const fetchIdeas = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
       const res = await getResearchIdeas(page, 5);
       if (res?.status) {
-        const formattedData = res.data.map((item: IResearchIdeaRaw) => ({
-          id: item.id,
-          title: item.study_title,
-          description: item.study_descritions,
-          submittedAt: new Date(item.created_at).toLocaleDateString(),
-          status: item.status === "pending" ? "Pending Review" : item.status === "accept" ? "Accepted" : item.status,
-          deadline: item.dead_line ? new Date(item.dead_line).toLocaleDateString() : undefined,
-          startDate: item.start_date ? new Date(item.start_date).toLocaleDateString() : undefined,
-          endDate: item.end_date ? new Date(item.end_date).toLocaleDateString() : undefined,
-        }));
-        setSubmissions(formattedData);
+        setSubmissions(formatSubmissions(res.data));
         setCurrentPage(res.pagination.current_page);
         setTotalPages(res.pagination.last_page);
         setTotalSubmissions(res.pagination.total);
@@ -72,8 +81,12 @@ const MentorDashboard = () => {
   }, []);
 
   useEffect(() => {
+    if (initialIdeas) {
+      setIsLoading(false);
+      return;
+    }
     fetchIdeas(1);
-  }, [fetchIdeas]);
+  }, [fetchIdeas, initialIdeas]);
 
 
   const stats = [
@@ -92,7 +105,7 @@ const MentorDashboard = () => {
       status: "Pending Review",
     };
     setSubmissions([newSubmission, ...submissions]);
-    setTotalSubmissions(prev => prev + 1);
+    setTotalSubmissions((prev: number) => prev + 1);
   };
 
   return (

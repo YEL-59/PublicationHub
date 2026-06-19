@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, School, Building2, Upload, Save, X, Edit3, Loader2, Lock } from "lucide-react";
 import { ICurrentUser } from "@/types/auth/auth";
-import { updateProfile } from "@/services/auth";
+import { updateProfile, deleteProfile } from "@/services/auth";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import PasswordChange from "./Passwordchange";
 
 interface ProfileSettingsProps {
@@ -13,8 +14,10 @@ interface ProfileSettingsProps {
 }
 
 const ProfileSettings = ({ user }: ProfileSettingsProps) => {
+    const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -72,6 +75,24 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
             toast.error("An error occurred while saving profile");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDeleteProfile = async () => {
+        if (!confirm("Are you sure you want to permanently delete your account? This cannot be undone.")) return;
+        setIsDeleting(true);
+        try {
+            const res = await deleteProfile();
+            if (res?.status) {
+                toast.success("Account deleted successfully");
+                router.push("/login");
+            } else {
+                toast.error(res?.message || "Failed to delete account");
+            }
+        } catch {
+            toast.error("An error occurred while deleting your account");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -262,6 +283,19 @@ const ProfileSettings = ({ user }: ProfileSettingsProps) => {
                 isOpen={isPasswordModalOpen} 
                 onClose={() => setIsPasswordModalOpen(false)} 
             />
+
+            <div className="bg-[#111419] border border-red-500/20 rounded-2xl p-6 md:p-8">
+                <h3 className="text-lg font-bold text-red-400 mb-2">Danger Zone</h3>
+                <p className="text-sm text-[#64748B] mb-4">Permanently delete your account and all associated data.</p>
+                <button
+                    onClick={handleDeleteProfile}
+                    disabled={isDeleting}
+                    className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 font-bold py-2.5 px-6 rounded-xl text-sm transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                    {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Delete Account
+                </button>
+            </div>
         </div>
     );
 };

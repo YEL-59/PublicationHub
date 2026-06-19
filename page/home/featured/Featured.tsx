@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-
+import { getAllOpportunities } from "@/services/home";
 interface Opportunity {
     id: number;
     title: string;
@@ -81,25 +81,29 @@ const OpportunityCard = ({ item, index }: { item: Opportunity; index: number }) 
     );
 };
 
-const Featured = () => {
-    const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+interface FeaturedProps {
+    initialOpportunities?: Opportunity[];
+}
+
+const Featured = ({ initialOpportunities }: FeaturedProps) => {
+    const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities || []);
+    const [isLoading, setIsLoading] = useState(!initialOpportunities);
 
     useEffect(() => {
+        if (initialOpportunities) {
+            setIsLoading(false);
+            return;
+        }
         fetchOpportunities();
-    }, []);
+    }, [initialOpportunities]);
 
     const fetchOpportunities = async () => {
         setIsLoading(true);
         try {
-            const url = "https://dashboard.publicationhub.co/api/opportunities?per_page=4";
-            
-            const response = await fetch(url);
-            const data = await response.json();
-            
+            const data = await getAllOpportunities(1);
             if (data.status) {
-                // Support both `data.data.data` (if deeply nested) or `data.data` as per your JSON snippet
-                setOpportunities(data.data?.data || data.data || []);
+                const items = Array.isArray(data.data) ? data.data : [];
+                setOpportunities(items.slice(0, 4));
             }
         } catch (error) {
             console.error("Failed to fetch opportunities:", error);
@@ -108,10 +112,7 @@ const Featured = () => {
         }
     };
 
-    console.log("opportunities", opportunities);
-
-    return (
-        <section className="relative w-full bg-[#0A0C0F] py-20 px-4 md:px-8 lg:px-12 overflow-hidden">
+    return (        <section className="relative w-full bg-[#0A0C0F] py-20 px-4 md:px-8 lg:px-12 overflow-hidden">
             <div className="container mx-auto relative z-10">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
