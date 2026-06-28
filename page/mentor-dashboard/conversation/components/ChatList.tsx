@@ -56,7 +56,9 @@ const ChatList = ({ conversations, activeConv, setActiveConv, searchQuery, setSe
                   <h3 className="text-sm font-bold text-white truncate">{conv.chatable?.title}</h3>
                 </div>
                 <p className="text-xs text-gray-400 truncate">
-                  {conv.type === "group" ? `${conv.users.length} members` : "Direct message"}
+                  {conv.type === "group" && (conv.users?.length ?? 0) > 0
+                    ? `${conv.users!.length} members`
+                    : "Opportunity chat"}
                 </p>
               </div>
             </motion.button>

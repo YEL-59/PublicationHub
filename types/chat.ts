@@ -26,7 +26,7 @@ export interface Chat {
     type: string;
     status: string;
     chatable: Opportunity;
-    users: ChatUser[];
+    users?: ChatUser[];
 }
 
 export interface Message {

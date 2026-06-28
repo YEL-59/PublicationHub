@@ -34,8 +34,8 @@ const ResearcherConversationPage = () => {
 
     return (
         <OpportunityChatPage
-            backHref="/myprofile"
-            backLabel="Back to Profile"
+            backHref="/researcher-dashboard"
+            backLabel="Back to Dashboard"
             services={services}
         />
     );

@@ -43,15 +43,16 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-10 md:px-6 lg:px-8">
-      <div className="flex flex-col gap-8">
+    <div className="max-w-[900px] mx-auto w-full">
+      <div className="flex flex-col gap-6 md:gap-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-extrabold text-white tracking-tight">Profile Settings</h1>
-            <p className="text-gray-400 font-medium">Manage your personal information and profile picture.</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[#64748B] text-xs font-bold uppercase tracking-widest">Account</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Profile Settings</h2>
+            <p className="text-gray-400 text-sm font-medium">Manage your personal information and profile picture.</p>
           </div>
-          
+
           <AnimatePresence mode="wait">
             {!isEditing ? (
               <motion.button
@@ -60,7 +61,7 @@ const ProfileSettings = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-cyan-400 text-black font-bold hover:bg-cyan-300 transition-all shadow-lg shadow-cyan-400/20"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-cyan-400 text-black font-bold hover:bg-cyan-300 transition-all shadow-lg shadow-cyan-400/20 shrink-0"
               >
                 <Edit3 size={18} />
                 Edit Profile
