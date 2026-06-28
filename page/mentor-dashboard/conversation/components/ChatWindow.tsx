@@ -91,7 +91,9 @@ const ChatWindow = ({
             <div className="flex items-center gap-2 mt-1.5">
               <span className="flex items-center gap-1.5 text-[10px] text-gray-400 font-bold uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                {activeConv.users.length} members
+                {(activeConv.users?.length ?? 0) > 0
+                  ? `${activeConv.users!.length} members`
+                  : "Opportunity chat"}
               </span>
             </div>
           </div>

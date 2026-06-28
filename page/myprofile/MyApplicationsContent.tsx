@@ -9,9 +9,14 @@ import Link from "next/link";
 interface MyApplicationsContentProps {
     initialApplications?: any[];
     initialPagination?: any;
+    applicationsBasePath?: string;
 }
 
-export default function MyApplicationsContent({ initialApplications, initialPagination }: MyApplicationsContentProps) {
+export default function MyApplicationsContent({
+    initialApplications,
+    initialPagination,
+    applicationsBasePath = "/myprofile/applications",
+}: MyApplicationsContentProps) {
     const [applications, setApplications] = useState<any[]>(initialApplications || []);
     const [loading, setLoading] = useState(!initialApplications);
     const [currentPage, setCurrentPage] = useState(initialPagination?.current_page || 1);
@@ -126,7 +131,7 @@ export default function MyApplicationsContent({ initialApplications, initialPagi
 
                             <div className="flex flex-col md:justify-center">
                                  <Link 
-                                    href={`/myprofile/applications/${app.id}`}
+                                    href={`${applicationsBasePath}/${app.id}`}
                                     className="bg-[#1F242D] hover:bg-white/5 text-center text-white border border-white/5 py-2.5 px-6 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
                                  >
                                      View Details

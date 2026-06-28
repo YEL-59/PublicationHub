@@ -109,12 +109,15 @@ const MentorDashboard = ({ initialIdeas, initialPagination }: MentorDashboardPro
   };
 
   return (
-    <div className="container mx-auto px-4 py-10 md:px-6 lg:px-8">
-      <div className="flex flex-col gap-8">
+    <div className="max-w-[1400px] mx-auto w-full">
+      <div className="flex flex-col gap-6 md:gap-8">
         {/* Header Section */}
-        <div className="flex flex-col gap-2">
-          <h1 className="text-4xl font-extrabold text-white tracking-tight">Dashboard</h1>
-          <p className="text-gray-400 font-medium">Welcome back! Here&apos;s an overview of your research opportunities.</p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[#64748B] text-xs font-bold uppercase tracking-widest">Overview</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Research Dashboard</h2>
+            <p className="text-gray-400 text-sm md:text-base font-medium">Welcome back! Here&apos;s an overview of your research opportunities.</p>
+          </div>
         </div>
 
         {/* Stats Grid */}

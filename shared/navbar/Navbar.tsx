@@ -23,6 +23,101 @@ interface NavbarProps {
     initialSystemInfo?: ISystemInfo | null;
 }
 
+const getUserPortalPaths = (role?: string) => {
+    switch (role) {
+        case "researcher":
+            return {
+                dashboard: "/researcher-dashboard",
+                profile: "/researcher-dashboard/profile",
+                settings: "/researcher-dashboard/profile",
+                messages: "/researcher-dashboard/conversation",
+                hasDashboard: true,
+            };
+        case "coordinator":
+            return {
+                dashboard: "/coordinator-dashboard",
+                profile: "/coordinator-dashboard/profile",
+                settings: "/coordinator-dashboard/profile",
+                messages: "/coordinator-dashboard/conversation",
+                hasDashboard: true,
+            };
+        case "mentor":
+            return {
+                dashboard: "/mentor-dashboard",
+                profile: "/mentor-dashboard/profile",
+                settings: "/mentor-dashboard/profile",
+                messages: "/mentor-dashboard/conversation",
+                hasDashboard: true,
+            };
+        default:
+            return {
+                dashboard: "/myprofile",
+                profile: "/myprofile",
+                settings: "/myprofile/settings",
+                messages: "/myprofile/conversation",
+                hasDashboard: false,
+            };
+    }
+};
+
+const ProfileDropdownLinks = ({
+    portalPaths,
+    onNavigate,
+    onLogout,
+    variant = "desktop",
+}: {
+    portalPaths: ReturnType<typeof getUserPortalPaths>;
+    onNavigate: () => void;
+    onLogout: () => void;
+    variant?: "desktop" | "mobile";
+}) => {
+    const linkClass =
+        variant === "desktop"
+            ? "flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+            : "text-gray-300 text-lg font-medium px-4 flex items-center gap-3 hover:text-white transition-colors";
+    const iconSize = variant === "desktop" ? 18 : 20;
+
+    return (
+        <>
+            {portalPaths.hasDashboard && (
+                <Link href={portalPaths.dashboard} onClick={onNavigate} className={linkClass}>
+                    <LayoutDashboard size={iconSize} />
+                    <span className={variant === "desktop" ? "text-sm font-medium" : ""}>Dashboard</span>
+                </Link>
+            )}
+
+            <Link href={portalPaths.profile} onClick={onNavigate} className={linkClass}>
+                <User size={iconSize} />
+                <span className={variant === "desktop" ? "text-sm font-medium" : ""}>My Profile</span>
+            </Link>
+
+            <Link href={portalPaths.settings} onClick={onNavigate} className={linkClass}>
+                <Settings size={iconSize} />
+                <span className={variant === "desktop" ? "text-sm font-medium" : ""}>Settings</span>
+            </Link>
+
+            <Link href={portalPaths.messages} onClick={onNavigate} className={linkClass}>
+                <MessageSquare size={iconSize} />
+                <span className={variant === "desktop" ? "text-sm font-medium" : ""}>Messages</span>
+            </Link>
+
+            <div className={variant === "desktop" ? "h-px bg-white/5 my-2" : "h-px bg-white/5 my-2 mx-4"} />
+
+            <button
+                onClick={onLogout}
+                className={
+                    variant === "desktop"
+                        ? "w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-colors"
+                        : "text-red-400 text-lg font-bold px-4 flex items-center gap-3 text-left hover:text-red-300 transition-colors"
+                }
+            >
+                <LogOut size={iconSize} />
+                <span className={variant === "desktop" ? "text-sm font-bold" : ""}>Sign Out</span>
+            </button>
+        </>
+    );
+};
+
 const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<ICurrentUser | null>(initialUser || null);
@@ -95,6 +190,16 @@ const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
         { name: "FAQ", shortName: "FAQ", href: "/faq" },
     ];
 
+    const portalPaths = user ? getUserPortalPaths(user.role) : null;
+
+    const closeProfileDropdown = () => setIsProfileOpen(false);
+    const closeMobileMenu = () => setIsOpen(false);
+    const handleProfileLogout = () => {
+        closeProfileDropdown();
+        closeMobileMenu();
+        handleLogout();
+    };
+
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#171A21] border-b border-white/10 shadow-[0_10px_15px_-3px_rgba(0,230,255,0.05),0_4px_6px_-4px_rgba(0,230,255,0.05)] backdrop-blur-[12px] py-3 md:py-4 px-4 md:px-6 lg:px-8 2xl:px-12">
             <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-3 xl:gap-4">
@@ -155,9 +260,9 @@ const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
                                 <div className="h-2 w-12 bg-white/10 animate-pulse rounded"></div>
                             </div>
                         </div>
-                    ) : user ? (
+                    ) : user && portalPaths ? (
                         <>
-                            <NotificationsDropdown />
+                            {/* <NotificationsDropdown /> */}
                         <div className="relative" ref={dropdownRef}>
                             <button 
                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -183,44 +288,19 @@ const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
                                 </div>
                             </button>
 
-                            {/* Profile Dropdown */}
                             {isProfileOpen && (
-                                <div className="absolute right-0 mt-3 w-56 bg-[#1F242D] border border-white/10 rounded-2xl shadow-2xl py-3 z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute right-0 mt-3 w-60 bg-[#1F242D] border border-white/10 rounded-2xl shadow-2xl py-3 z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
                                     <div className="px-4 py-3 border-b border-white/5 mb-2">
                                         <p className="text-xs text-gray-400 mb-0.5">Signed in as</p>
                                         <p className="text-sm font-bold text-white truncate">{user.email}</p>
                                     </div>
-                                    {user.role === "mentor" && (
-                                        <Link href="/mentor-dashboard" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                                            <LayoutDashboard size={18} />
-                                            <span className="text-sm font-medium">Dashboard</span>
-                                        </Link>
-                                    )}
-                                    
-                                    <Link href="/myprofile" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                                        <User size={18} />
-                                        <span className="text-sm font-medium">My Profile</span>
-                                    </Link>
-                                    
-                                    <Link href="/myprofile/settings" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                                        <Settings size={18} />
-                                        <span className="text-sm font-medium">Settings</span>
-                                    </Link>
 
-                                    <Link href="/myprofile/conversation" className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-                                        <MessageSquare size={18} />
-                                        <span className="text-sm font-medium">Messages</span>
-                                    </Link>
-
-                                    <div className="h-px bg-white/5 my-2" />
-
-                                    <button 
-                                        onClick={handleLogout}
-                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-colors"
-                                    >
-                                        <LogOut size={18} />
-                                        <span className="text-sm font-bold">Sign Out</span>
-                                    </button>
+                                    <ProfileDropdownLinks
+                                        portalPaths={portalPaths}
+                                        onNavigate={closeProfileDropdown}
+                                        onLogout={handleProfileLogout}
+                                        variant="desktop"
+                                    />
                                 </div>
                             )}
                         </div>
@@ -291,7 +371,7 @@ const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
                                     <div className="h-6 w-24 bg-white/10 animate-pulse rounded"></div>
                                 </div>
                             </div>
-                        ) : user ? (
+                        ) : user && portalPaths ? (
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-3 px-4">
                                      <div className="w-12 h-12 rounded-full border border-[#00D1FF]/30 overflow-hidden relative">
@@ -308,28 +388,13 @@ const Navbar = ({ initialUser, initialSystemInfo }: NavbarProps) => {
                                         <p className="text-xs text-gray-400">{user.email}</p>
                                      </div>
                                 </div>
-                                {user.role === "mentor" && (
-                                    <Link 
-                                        href="/mentor-dashboard" 
-                                        onClick={() => setIsOpen(false)}
-                                        className="text-gray-300 text-lg font-medium px-4 flex items-center gap-3"
-                                    >
-                                        <LayoutDashboard size={20} /> Dashboard
-                                    </Link>
-                                )}
-                                <Link 
-                                    href="/myprofile" 
-                                    onClick={() => setIsOpen(false)}
-                                    className="text-gray-300 text-lg font-medium px-4 flex items-center gap-3"
-                                >
-                                    <User size={20} /> My Profile
-                                </Link>
-                                <button 
-                                    onClick={handleLogout}
-                                    className="text-red-400 text-lg font-bold px-4 flex items-center gap-3 text-left"
-                                >
-                                    <LogOut size={20} /> Sign Out
-                                </button>
+
+                                <ProfileDropdownLinks
+                                    portalPaths={portalPaths}
+                                    onNavigate={closeMobileMenu}
+                                    onLogout={handleProfileLogout}
+                                    variant="mobile"
+                                />
                             </div>
                         ) : (
                             <Link

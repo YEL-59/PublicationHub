@@ -11,7 +11,6 @@ import {
     getBannerContent, 
     getCounterContent, 
     getAllOpportunities, 
-    getWhyChooseContent, 
     getMetaAcademyContent, 
     getResearchJourneyContent, 
     getAllFaq,
@@ -26,7 +25,6 @@ const Home = async () => {
         bannerRes,
         statsRes,
         oppsRes,
-        whyChooseRes,
         metaAcademyRes,
         researchJourneyRes,
         faqRes,
@@ -37,7 +35,6 @@ const Home = async () => {
         getBannerContent(),
         getCounterContent(),
         getAllOpportunities(1),
-        getWhyChooseContent(),
         getMetaAcademyContent(),
         getResearchJourneyContent(),
         getAllFaq(1),
@@ -49,10 +46,6 @@ const Home = async () => {
     const banner = bannerRes.status === "fulfilled" && bannerRes.value?.status ? bannerRes.value.data : null;
     const stats = statsRes.status === "fulfilled" && statsRes.value?.status ? statsRes.value.data.items : [];
     const opportunities = oppsRes.status === "fulfilled" && oppsRes.value?.status ? oppsRes.value.data : [];
-    
-    // Slider
-    const sliderContent = whyChooseRes.status === "fulfilled" && whyChooseRes.value?.status ? whyChooseRes.value.data.content : null;
-    const sliderItems = whyChooseRes.status === "fulfilled" && whyChooseRes.value?.status ? whyChooseRes.value.data.items : [];
     
     // Featured opportunities
     const featuredOpportunities = opportunities.slice(0, 4);
@@ -81,10 +74,7 @@ const Home = async () => {
                 initialStats={stats} 
                 initialOpportunities={opportunities} 
             />
-            <Slider 
-                initialContent={sliderContent} 
-                initialItems={sliderItems} 
-            />
+            <Slider />
             <PlatformStats />
             <Featured 
                 initialOpportunities={featuredOpportunities} 

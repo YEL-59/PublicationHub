@@ -7,6 +7,7 @@ import {
     getResearcherChatMessages,
     sendResearcherChatMessage,
 } from "@/services/researcher";
+import { Chat } from "@/types/chat";
 
 const ResearcherConversationPage = () => {
     const services = useMemo(
@@ -14,7 +15,12 @@ const ResearcherConversationPage = () => {
             getChats: async () => {
                 const res = await getResearcherChats();
                 if (res?.status) {
-                    const chats = Array.isArray(res.data) ? res.data : res.data?.data || [];
+                    const raw = Array.isArray(res.data) ? res.data : res.data?.data || [];
+                    const chats = raw.map((chat: Chat) => ({
+                        ...chat,
+                        users: chat.users ?? [],
+                        chatable: chat.chatable ?? { id: 0, title: "Conversation", thumbnail: null },
+                    }));
                     return { status: true, data: chats };
                 }
                 return { status: false, data: [], message: res?.message };

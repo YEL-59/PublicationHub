@@ -30,6 +30,10 @@ const LoginForm = () => {
         toast.success(res.message || "Logged in successfully!");
         if (res.data?.role === "mentor") {
           router.push("/mentor-dashboard");
+        } else if (res.data?.role === "researcher") {
+          router.push("/researcher-dashboard");
+        } else if (res.data?.role === "coordinator") {
+          router.push("/coordinator-dashboard");
         } else {
           router.push("/");
         }

@@ -10,9 +10,13 @@ import { toast } from "sonner";
 
 interface ApplicationDetailsContentProps {
     application: any;
+    applicationsPath?: string;
 }
 
-export default function ApplicationDetailsContent({ application }: ApplicationDetailsContentProps) {
+export default function ApplicationDetailsContent({
+    application,
+    applicationsPath = "/myprofile/applications",
+}: ApplicationDetailsContentProps) {
     const router = useRouter();
     const [deleting, setDeleting] = useState(false);
 
@@ -23,7 +27,7 @@ export default function ApplicationDetailsContent({ application }: ApplicationDe
             const res = await deleteResearcherApplication(application.id);
             if (res?.status) {
                 toast.success("Application deleted successfully");
-                router.push("/myprofile/applications");
+                router.push(applicationsPath);
             } else {
                 toast.error(res?.message || "Failed to delete application");
             }
@@ -54,7 +58,7 @@ export default function ApplicationDetailsContent({ application }: ApplicationDe
     return (
         <div className="space-y-8">
             <div className="flex items-center gap-4">
-                <Link href="/myprofile/applications" className="p-2 bg-[#111419] border border-white/5 rounded-xl text-white hover:border-[#00D1FF]/30 transition-colors">
+                <Link href={applicationsPath} className="p-2 bg-[#111419] border border-white/5 rounded-xl text-white hover:border-[#00D1FF]/30 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
                 </Link>
                 <div>
